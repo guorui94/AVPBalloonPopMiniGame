@@ -25,22 +25,31 @@ struct ImmersiveView: View {
                 
                 for _ in 1...30 {
                     let bubbleClone = bubble.clone(recursive: true)
+                    
+                    let linearX = Float.random(in: -0.05...0.05)
+                    let linearY = Float.random(in: -0.05...0.05)
+                    let linearZ = Float.random(in: -0.05...0.05)
+                    var pm = PhysicsMotionComponent(linearVelocity: [linearX, linearY, linearZ])
+                    
+                    bubbleClone.components[PhysicsMotionComponent.self] = pm
+
                     // randomly assign positions
                     let x = Float.random(in: -1.5...1.5)
-                    let y = Float.random(in: 1...1.5)
-                    let z = Float.random(in: -1.5...1.5)
+                    let y = Float.random(in: 0...1.5)
+                    let z = Float.random(in: -1.5...0)
                     
                     bubbleClone.position = [x, y, z]
-                    content.add(bubbleClone)
+                    immersiveContentEntity.addChild(bubbleClone)
                 }
                         
+                // use a world anchor
+                let worldAnchor = AnchorEntity(world: .zero)
 
-                // Attach to camera so it appears in front of user
-                let headAnchor = AnchorEntity(.head)
-                immersiveContentEntity.position = [0, -0.5, -1]
-                headAnchor.addChild(immersiveContentEntity)
-                
-                content.add(headAnchor)
+                // position the bubble group one meter in front of the user
+                immersiveContentEntity.position = [0, 1, -1]
+
+                worldAnchor.addChild(immersiveContentEntity)
+                content.add(worldAnchor)
             }
         }
         .gesture(SpatialTapGesture().targetedToEntity(where: predicate).onEnded({ value in
@@ -76,6 +85,7 @@ struct ImmersiveView: View {
             })
             
         }))
+
     }
 }
 
