@@ -18,6 +18,7 @@ struct ImmersiveView: View {
     @State private var timer: Timer?
     @State var bubble = Entity()
     @State private var bubbleClones: [Entity] = []
+    @Environment(AppModel.self) var appModel
     
     var body: some View {
         RealityView { content in
@@ -27,6 +28,7 @@ struct ImmersiveView: View {
                 guard let bubble = immersiveContentEntity.findEntity(named: "Bubble") else {
                     fatalError()
                 }
+                bubble.removeFromParent()
                 
                 for _ in 1...15 {
                     let bubbleClone = bubble.clone(recursive: true)
@@ -63,6 +65,9 @@ struct ImmersiveView: View {
             
             // if not popped, set it to popped
             entity.components.set(PoppedComponent())
+            let updateScore = appModel.score
+            updateScore.score += 1
+
             
             // makes sure that material is accessed before proceeding.
             guard let modelComponent = entity.components[ModelComponent.self],
@@ -76,6 +81,7 @@ struct ImmersiveView: View {
             let totalFrames = Int(duration / frameRate)
             var currentFrame = 0
             var popValue: Float = 0
+
             
             timer?.invalidate()
             timer = Timer.scheduledTimer(withTimeInterval: frameRate, repeats: true, block: { timer in
@@ -87,7 +93,7 @@ struct ImmersiveView: View {
                 do {
                     try mat.setParameter(name: "Pop", value: .float(popValue))
                     entity.components[ModelComponent.self]?.materials = [mat]
-
+                    
                 }
                 catch {
                     print(error.localizedDescription)

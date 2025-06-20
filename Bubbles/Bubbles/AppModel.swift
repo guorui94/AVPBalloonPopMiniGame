@@ -11,6 +11,8 @@ import SwiftUI
 @MainActor
 @Observable
 class AppModel {
+    var score = ScoreModel()
+    
     let immersiveSpaceID = "ImmersiveSpace"
     enum ImmersiveSpaceState {
         case closed

@@ -13,7 +13,7 @@ struct ToggleImmersiveSpaceButton: View {
 
     @Environment(\.dismissImmersiveSpace) private var dismissImmersiveSpace
     @Environment(\.openImmersiveSpace) private var openImmersiveSpace
-
+    
     var body: some View {
         Button {
             Task { @MainActor in
