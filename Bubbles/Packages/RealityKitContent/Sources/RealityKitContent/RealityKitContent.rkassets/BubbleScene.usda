@@ -40,8 +40,8 @@ def Xform "Root"
         token outputs:mtlx:surface.connect = </Root/BubbleMaterial/PreviewSurface.outputs:out>
         token outputs:realitykit:vertex
         string[] ui:nodegraph:realitykit:node:attributesShowingChildren = ["outputs:realitykit:vertex", "outputs:mtlx:surface", "outputs:mtlx:surface"]
-        float2 ui:nodegraph:realitykit:subgraphOutputs:pos = (68.70532, 14.261361)
-        int ui:nodegraph:realitykit:subgraphOutputs:stackingOrder = 4361
+        float2 ui:nodegraph:realitykit:subgraphOutputs:pos = (126.23398, 45.58365)
+        int ui:nodegraph:realitykit:subgraphOutputs:stackingOrder = 5235
 
         def Shader "PreviewSurface"
         {
@@ -62,7 +62,7 @@ def Xform "Root"
             float inputs:roughness = 0.5
             token outputs:out
             float2 ui:nodegraph:node:pos = (-151.39653, 16.346899)
-            int ui:nodegraph:node:stackingOrder = 4759
+            int ui:nodegraph:node:stackingOrder = 5233
             string[] ui:nodegraph:realitykit:node:attributesShowingChildren = ["Advanced", "inputs:occlusion"]
         }
 
@@ -682,7 +682,7 @@ def Xform "Root"
         {
             uniform token axis = "Y"
             double height = 0.2
-            rel material:binding = </Root/BubbleMaterial> (
+            rel material:binding = None (
                 bindMaterialAs = "weakerThanDescendants"
             )
             double radius = 0.1
@@ -690,21 +690,6 @@ def Xform "Root"
             float3 xformOp:scale = (0.124999985, 0.102040805, 0.124999985)
             float3 xformOp:translate = (0, -0.10204083, 0)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
-
-            def Material "DefaultMaterial"
-            {
-                token outputs:mtlx:surface
-                token outputs:realitykit:vertex
-                token outputs:surface.connect = </Root/Bubble/Bow/DefaultMaterial/DefaultSurfaceShader.outputs:surface>
-
-                def Shader "DefaultSurfaceShader"
-                {
-                    uniform token info:id = "UsdPreviewSurface"
-                    color3f inputs:diffuseColor = (1, 1, 1)
-                    float inputs:roughness = 0.75
-                    token outputs:surface
-                }
-            }
         }
 
         def RealityKitComponent "HierarchicalFade"

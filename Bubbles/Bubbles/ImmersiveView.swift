@@ -20,6 +20,7 @@ struct ImmersiveView: View {
     @State private var bubbleClones: [Entity] = []
     @Environment(AppModel.self) var appModel
     
+    
     var body: some View {
         RealityView { content in
             // Add the initial RealityKit content
@@ -30,6 +31,8 @@ struct ImmersiveView: View {
                 }
                 bubble.removeFromParent()
                 
+
+                
                 for _ in 1...15 {
                     let bubbleClone = bubble.clone(recursive: true)
                     
@@ -38,6 +41,15 @@ struct ImmersiveView: View {
                     let pm = PhysicsMotionComponent(linearVelocity: [0, linearY , 0])
                     
                     bubbleClone.components[PhysicsMotionComponent.self] = pm
+                    
+//                    let randomColor = BalloonColor.allCases.randomElement()!
+//                    var material = SimpleMaterial(color: UIColor(randomColor.color), isMetallic: false)
+//                    bubbleClone.components[ModelComponent.self]?.materials = [material]
+//                    
+//                    guard let bow = bubbleClone.findEntity(named: "Bow") else {
+//                        fatalError()
+//                    }
+//                    bow.components[ModelComponent.self]?.materials = [material]
 
                     // randomly assign positions
                     let x = Float.random(in: -0.7...0.7)
