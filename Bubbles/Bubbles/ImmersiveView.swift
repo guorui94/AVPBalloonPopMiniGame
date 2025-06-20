@@ -13,6 +13,7 @@ struct ImmersiveView: View {
     @State var predicate = QueryPredicate<Entity>.has(ModelComponent.self)
     @State private var timer: Timer?
     @State var bubble = Entity()
+    @State private var bubbleClones: [Entity] = []
     
     var body: some View {
         RealityView { content in
@@ -26,27 +27,23 @@ struct ImmersiveView: View {
                 for _ in 1...30 {
                     let bubbleClone = bubble.clone(recursive: true)
                     
-                    let linearX = Float.random(in: -0.05...0.05)
-                    let linearY = Float.random(in: -0.05...0.05)
-                    let linearZ = Float.random(in: -0.05...0.05)
-                    var pm = PhysicsMotionComponent(linearVelocity: [linearX, linearY, linearZ])
+                    let linearY = Float.random(in: 0.02...0.1)
+
+                    let pm = PhysicsMotionComponent(linearVelocity: [0, linearY , 0])
                     
                     bubbleClone.components[PhysicsMotionComponent.self] = pm
 
                     // randomly assign positions
-                    let x = Float.random(in: -1.5...1.5)
-                    let y = Float.random(in: 0...1.5)
-                    let z = Float.random(in: -1.5...0)
+                    let x = Float.random(in: -0.7...0.7)
+                    let z = Float.random(in: -0.8...0.05)
                     
-                    bubbleClone.position = [x, y, z]
+                    bubbleClone.position = [x, 0, z] // in meters
                     immersiveContentEntity.addChild(bubbleClone)
+                    bubbleClones.append(bubbleClone)
                 }
                         
                 // use a world anchor
-                let worldAnchor = AnchorEntity(world: .zero)
-
-                // position the bubble group one meter in front of the user
-                immersiveContentEntity.position = [0, 1, -1]
+                let worldAnchor = AnchorEntity(world: [0, 1, -1])
 
                 worldAnchor.addChild(immersiveContentEntity)
                 content.add(worldAnchor)
@@ -54,7 +51,9 @@ struct ImmersiveView: View {
         }
         .gesture(SpatialTapGesture().targetedToEntity(where: predicate).onEnded({ value in
             let entity = value.entity
+            
             var mat = entity.components[ModelComponent.self]?.materials.first as! ShaderGraphMaterial // not the correct way to do it
+
             
             let frameRate: TimeInterval = 1.0/60.0 // 60 fps
             let duration: TimeInterval = 0.25
@@ -73,10 +72,12 @@ struct ImmersiveView: View {
                 do {
                     try mat.setParameter(name: "Pop", value: .float(popValue))
                     entity.components[ModelComponent.self]?.materials = [mat]
+
                 }
                 catch {
                     print(error.localizedDescription)
                 }
+                
                 
                 if currentFrame >= totalFrames {
                     timer.invalidate()
@@ -85,6 +86,20 @@ struct ImmersiveView: View {
             })
             
         }))
+        .task {
+            Timer.scheduledTimer(withTimeInterval: 0.25 / 30.0, repeats: true) { _ in
+                DispatchQueue.main.async {
+                    for i in (0..<bubbleClones.count).reversed() {
+                        let bubble = bubbleClones[i]
+                        if bubble.position.y > 1.1 {
+                            bubble.removeFromParent()
+                            bubbleClones.remove(at: i)
+                        }
+                    }
+                }
+            }
+        }
+
 
     }
 }

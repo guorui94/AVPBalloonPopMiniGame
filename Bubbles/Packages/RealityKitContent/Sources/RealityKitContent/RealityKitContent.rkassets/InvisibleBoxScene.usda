@@ -1,0 +1,58 @@
+#usda 1.0
+(
+    customLayerData = {
+        string creator = "Reality Composer Pro Version 2.0 (448.0.16.0.3)"
+    }
+    defaultPrim = "Root"
+    metersPerUnit = 1
+    upAxis = "Y"
+)
+
+def Xform "Root"
+{
+    reorder nameChildren = ["InvisibleBox", "BoxMaterial"]
+    def Cube "InvisibleBox" (
+        active = true
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        rel material:binding = </Root/BoxMaterial> (
+            bindMaterialAs = "weakerThanDescendants"
+        )
+        double size = 0.2
+        quatf xformOp:orient = (1, 0, 0, 0)
+        float3 xformOp:scale = (1.6, 2.8, 1.6)
+        float3 xformOp:translate = (0, 0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+    }
+
+    def Material "BoxMaterial"
+    {
+        token cullMode = "unspecified" (
+            allowedTokens = ["unspecified", "none", "front", "back"]
+        )
+        token outputs:mtlx:surface.connect = </Root/BoxMaterial/PreviewSurface.outputs:out>
+        token outputs:realitykit:vertex
+        string[] ui:nodegraph:realitykit:node:attributesShowingChildren = ["outputs:mtlx:surface"]
+        float2 ui:nodegraph:realitykit:subgraphOutputs:pos = (335.5, 100.5)
+        int ui:nodegraph:realitykit:subgraphOutputs:stackingOrder = 20
+
+        def Shader "PreviewSurface"
+        {
+            uniform token info:id = "ND_UsdPreviewSurface_surfaceshader"
+            float inputs:clearcoatRoughness = 0
+            color3f inputs:diffuseColor = (1, 1, 1) (
+                colorSpace = "srgb_texture"
+            )
+            float inputs:ior = 0.72
+            float inputs:opacity = 0
+            float inputs:opacityThreshold
+            float inputs:roughness = 0.75
+            token outputs:out
+            float2 ui:nodegraph:node:pos = (93.5, 100.5)
+            int ui:nodegraph:node:stackingOrder = 27
+            string[] ui:nodegraph:realitykit:node:attributesShowingChildren = ["Advanced"]
+        }
+    }
+}
+
