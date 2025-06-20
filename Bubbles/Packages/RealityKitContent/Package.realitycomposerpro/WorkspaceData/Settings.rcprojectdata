@@ -7,7 +7,7 @@
   },
   "unitDefaults" : {
     "°" : "°",
-    "kg" : "g",
+    "kg" : "kg",
     "kg⋅m²" : "kg⋅m²",
     "m" : "m",
     "m\/s" : "m\/s",

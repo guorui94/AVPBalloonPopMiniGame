@@ -9,6 +9,9 @@ import SwiftUI
 import RealityKit
 import RealityKitContent
 
+// track if the ballon has been popped, to avoid re-triggering the shader graph animation
+struct PoppedComponent: Component {}
+
 struct ImmersiveView: View {
     @State var predicate = QueryPredicate<Entity>.has(ModelComponent.self)
     @State private var timer: Timer?
@@ -24,10 +27,10 @@ struct ImmersiveView: View {
                     fatalError()
                 }
                 
-                for _ in 1...30 {
+                for _ in 1...15 {
                     let bubbleClone = bubble.clone(recursive: true)
                     
-                    let linearY = Float.random(in: 0.02...0.1)
+                    let linearY = Float.random(in: 0.05...0.13)
 
                     let pm = PhysicsMotionComponent(linearVelocity: [0, linearY , 0])
                     
@@ -51,6 +54,14 @@ struct ImmersiveView: View {
         }
         .gesture(SpatialTapGesture().targetedToEntity(where: predicate).onEnded({ value in
             let entity = value.entity
+        
+            // check if the bubble has been "popped"
+            if entity.components.has(PoppedComponent.self) {
+                return
+            }
+            
+            // if not popped, set it to popped
+            entity.components.set(PoppedComponent())
             
             var mat = entity.components[ModelComponent.self]?.materials.first as! ShaderGraphMaterial // not the correct way to do it
 

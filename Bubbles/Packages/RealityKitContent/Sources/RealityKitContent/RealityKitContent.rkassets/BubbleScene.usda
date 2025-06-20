@@ -552,7 +552,7 @@ def Xform "Root"
         prepend apiSchemas = ["MaterialBindingAPI"]
     )
     {
-        reorder nameChildren = ["Cone", "Collider", "InputTarget", "RealityKitContent_BubbleComponent", "RigidBody", "MotionState", "Cube"]
+        reorder nameChildren = ["Bow", "Collider", "InputTarget", "RealityKitContent_BubbleComponent", "RigidBody", "MotionState", "Cube"]
         rel material:binding = </Root/BubbleMaterial> (
             bindMaterialAs = "weakerThanDescendants"
         )
@@ -594,14 +594,22 @@ def Xform "Root"
 
         def RealityKitComponent "RigidBody"
         {
-            float angularDamping = -1
+            float angularDamping = 0
             bool gravityEnabled = 0
             uniform token info:id = "RealityKit.RigidBody"
             float linearDamping = 0
+            bool lockRotationX = 1
+            bool lockRotationY = 1
+            bool lockRotationZ = 1
             bool lockTranslationX = 0
+            bool lockTranslationY = 0
+            bool lockTranslationZ = 0
+            token motionType = "Dynamic"
 
             def RealityKitStruct "massFrame"
             {
+                float m_mass = 2
+
                 def RealityKitStruct "m_pose"
                 {
                 }
@@ -615,7 +623,7 @@ def Xform "Root"
         def RealityKitComponent "MotionState"
         {
             uniform token info:id = "RealityKit.MotionState"
-            float3 m_userSetLinearVelocity = (0.04, 0.04, 0)
+            float3 m_userSetLinearVelocity = (0, 0.08, 0)
             uint m_userSetLinearVelocityVersion = 1
         }
 
@@ -667,7 +675,7 @@ def Xform "Root"
             }
         }
 
-        def Cone "Cone" (
+        def Cone "Bow" (
             active = true
             prepend apiSchemas = ["MaterialBindingAPI"]
         )
@@ -685,7 +693,9 @@ def Xform "Root"
 
             def Material "DefaultMaterial"
             {
-                token outputs:surface.connect = </Root/Bubble/Cone/DefaultMaterial/DefaultSurfaceShader.outputs:surface>
+                token outputs:mtlx:surface
+                token outputs:realitykit:vertex
+                token outputs:surface.connect = </Root/Bubble/Bow/DefaultMaterial/DefaultSurfaceShader.outputs:surface>
 
                 def Shader "DefaultSurfaceShader"
                 {
