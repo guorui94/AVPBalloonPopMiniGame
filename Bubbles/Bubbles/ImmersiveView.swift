@@ -13,6 +13,7 @@ import RealityKitContent
 struct PoppedComponent: Component {}
 
 struct ImmersiveView: View {
+    // match any entity with a visible model component aka a 3d model
     @State var predicate = QueryPredicate<Entity>.has(ModelComponent.self)
     @State private var timer: Timer?
     @State var bubble = Entity()
@@ -45,7 +46,7 @@ struct ImmersiveView: View {
                     bubbleClones.append(bubbleClone)
                 }
                         
-                // use a world anchor
+                // use a world anchor to make sure the ballons spawn in front of the user
                 let worldAnchor = AnchorEntity(world: [0, 1, -1])
 
                 worldAnchor.addChild(immersiveContentEntity)
@@ -63,8 +64,11 @@ struct ImmersiveView: View {
             // if not popped, set it to popped
             entity.components.set(PoppedComponent())
             
-            var mat = entity.components[ModelComponent.self]?.materials.first as! ShaderGraphMaterial // not the correct way to do it
-
+            // makes sure that material is accessed before proceeding.
+            guard let modelComponent = entity.components[ModelComponent.self],
+                  var mat = modelComponent.materials.first as? ShaderGraphMaterial else {
+                fatalError()
+            }
             
             let frameRate: TimeInterval = 1.0/60.0 // 60 fps
             let duration: TimeInterval = 0.25
@@ -97,6 +101,7 @@ struct ImmersiveView: View {
             })
             
         }))
+        // sets the invisible boundary for ballons to disappear 
         .task {
             Timer.scheduledTimer(withTimeInterval: 0.25 / 30.0, repeats: true) { _ in
                 DispatchQueue.main.async {
@@ -110,8 +115,7 @@ struct ImmersiveView: View {
                 }
             }
         }
-
-
+        
     }
 }
 
