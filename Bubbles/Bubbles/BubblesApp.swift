@@ -16,6 +16,14 @@ struct BubblesApp: App {
         WindowGroup {
             ContentView()
                 .environment(appModel)
+                .onAppear {
+                    guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene else {
+                        return
+                    }
+                        
+                    windowScene.requestGeometryUpdate(.Vision(resizingRestrictions: UIWindowScene.ResizingRestrictions.none))
+                }
+            // need to redo again later, too buggy, stashed away
         }
 
         ImmersiveSpace(id: appModel.immersiveSpaceID) {

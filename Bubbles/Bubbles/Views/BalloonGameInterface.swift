@@ -11,13 +11,20 @@ struct BalloonGameInterface: View {
     @Environment(AppModel.self) var appModel
     var body: some View {
         let displayScore = appModel.score
-        Text("🎮 Score: \(displayScore.score)")
-            .font(.title)
-            .foregroundStyle(.secondary)
+        VStack {
+            Text("Score")
+                .font(.system(size: 100))
+                .foregroundStyle(.white)
+            
+            Text("\(displayScore.score)")
+                .font(.system(size: 100))
+                .foregroundStyle(.white)
+        }
+
     }
 }
 
-#Preview {
+#Preview(windowStyle: .automatic) {
     BalloonGameInterface()
         .environment(AppModel())
 }

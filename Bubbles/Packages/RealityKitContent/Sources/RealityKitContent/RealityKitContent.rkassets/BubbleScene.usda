@@ -21,6 +21,15 @@ def Xform "Root"
                 }
             }
         )
+        color3f inputs:BalloonColor = (0.6044158, 0.6242923, 0.8780094) (
+            colorSpace = "srgb_texture"
+            customData = {
+                dictionary realitykit = {
+                    float2 positionInSubgraph = (-481.6062, -262.4819)
+                    int stackingOrderInSubgraph = 5234
+                }
+            }
+        )
         float inputs:NoiseScale = 30 (
             customData = {
                 dictionary realitykit = {
@@ -51,6 +60,7 @@ def Xform "Root"
             color3f inputs:diffuseColor = (0.6899187, 0.6973368, 1) (
                 colorSpace = "srgb_texture"
             )
+            color3f inputs:diffuseColor.connect = </Root/BubbleMaterial.inputs:BalloonColor>
             color3f inputs:emissiveColor.connect = None
             float inputs:ior
             float inputs:metallic
