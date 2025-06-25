@@ -38,7 +38,7 @@ struct ImmersiveView: View {
                     
                     
                     let bubbleClone = bubble.clone(recursive: true)
-                    applyBalloonColor(to: bubbleClone, using: randomColor)
+                    applyBalloonColor(to: bubble, using: randomColor)
                     
                     let linearY = Float.random(in: 0.05...0.13)
 
@@ -48,7 +48,7 @@ struct ImmersiveView: View {
 
                     // randomly assign positions
                     let x = Float.random(in: -0.7...0.7)
-                    let z = Float.random(in: -0.8...0.05)
+                    let z = Float.random(in: -1...0)
                     
                     bubbleClone.position = [x, 0, z] // in meters
                     immersiveContentEntity.addChild(bubbleClone)
@@ -56,7 +56,7 @@ struct ImmersiveView: View {
                 }
                 print(totalScore)
                 // use a world anchor to make sure the ballons spawn in front of the user
-                let worldAnchor = AnchorEntity(world: [0, 1, -1])
+                let worldAnchor = AnchorEntity(world: [0, 1, -0.6])
 
                 worldAnchor.addChild(immersiveContentEntity)
                 content.add(worldAnchor)
