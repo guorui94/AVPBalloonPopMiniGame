@@ -19,6 +19,7 @@ struct ImmersiveView: View {
     @State var bubble = Entity()
     @State private var bubbleClones: [Entity] = []
     @Environment(AppModel.self) var appModel
+    @State private var totalScore = 0
     
     
     var body: some View {
@@ -30,31 +31,20 @@ struct ImmersiveView: View {
                     fatalError()
                 }
                 bubble.removeFromParent()
-                
+
                 for _ in 1...15 {
-                    guard var modelComponent = bubble.components[ModelComponent.self],
-                          var mat = modelComponent.materials.first as? ShaderGraphMaterial else {
-                        fatalError("Missing model or shader material")
-                    }
-        
-                    do {
-                        let color = try mat.getParameter(name: "BalloonColor")
-                        print(color)
-                    } catch {
-                        print("Shader error: \(error.localizedDescription)")
-                    }
+                    let randomColor = BalloonColor.allCases.randomElement()!
+                    totalScore += randomColor.poppingScore
+                    
                     
                     let bubbleClone = bubble.clone(recursive: true)
+                    applyBalloonColor(to: bubbleClone, using: randomColor)
                     
                     let linearY = Float.random(in: 0.05...0.13)
 
                     let pm = PhysicsMotionComponent(linearVelocity: [0, linearY , 0])
                     
                     bubbleClone.components[PhysicsMotionComponent.self] = pm
-                    
-                    let randomColor = BalloonColor.allCases.randomElement()!
-                    
-
 
                     // randomly assign positions
                     let x = Float.random(in: -0.7...0.7)
@@ -64,7 +54,7 @@ struct ImmersiveView: View {
                     immersiveContentEntity.addChild(bubbleClone)
                     bubbleClones.append(bubbleClone)
                 }
-                        
+                print(totalScore)
                 // use a world anchor to make sure the ballons spawn in front of the user
                 let worldAnchor = AnchorEntity(world: [0, 1, -1])
 
@@ -83,17 +73,17 @@ struct ImmersiveView: View {
             // if not popped, set it to popped
             entity.components.set(PoppedComponent())
             
-            
-            let updateScore = appModel.score
-            updateScore.score += 1
-
-            
             // makes sure that material is accessed before proceeding.
             guard let modelComponent = entity.components[ModelComponent.self],
                   var mat = modelComponent.materials.first as? ShaderGraphMaterial
             else {
                 fatalError()
             }
+            
+            print(mat.getParameter(name: "BalloonColor") ?? "red")
+            
+            let updateScore = appModel.score
+            updateScore.score += 1
             
             let frameRate: TimeInterval = 1.0/60.0 // 60 fps
             let duration: TimeInterval = 0.25
@@ -143,6 +133,26 @@ struct ImmersiveView: View {
         }
         
     }
+    func applyBalloonColor(to entity: Entity, using balloonColor: BalloonColor) {
+        if let modelEntity = entity as? ModelEntity,
+           var modelComponent = modelEntity.components[ModelComponent.self],
+           var mat = modelComponent.materials.first as? ShaderGraphMaterial {
+            do {
+                try mat.setParameter(name: "BalloonColor", value: .color(balloonColor.color))
+                modelComponent.materials[0] = mat
+                modelEntity.components[ModelComponent.self] = modelComponent
+            } catch {
+                print("Shader error: \(error.localizedDescription)")
+            }
+        }
+        
+        // Recursively apply to all children
+        for child in entity.children {
+            applyBalloonColor(to: child, using: balloonColor)
+        }
+    }
+
+
 }
 
 #Preview(immersionStyle: .mixed) {

@@ -11,8 +11,6 @@ class BubbleSystem: System {
     
     private let bubbleComponentQuery = EntityQuery(where: .has(BubbleComponent.self))
     private let speed: Float = 0.001
-    
-    private let colorComponentQuery = EntityQuery(where: .has(ColorComponent.self))
 
     required init(scene: Scene) {
     

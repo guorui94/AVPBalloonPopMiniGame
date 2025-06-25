@@ -10,7 +10,7 @@
 
 def Xform "Root"
 {
-    reorder nameChildren = ["Bubble", "Cube", "BubbleMaterial", "PopBubbleAudio"]
+    reorder nameChildren = ["Bubble", "BubbleMaterial", "PopBubbleAudio", "balloonpop_83760_mp3"]
     def Material "BubbleMaterial"
     {
         float inputs:AnimationSpeed = 0.01 (
@@ -26,7 +26,7 @@ def Xform "Root"
             customData = {
                 dictionary realitykit = {
                     float2 positionInSubgraph = (-365.442, -293.36362)
-                    int stackingOrderInSubgraph = 5237
+                    int stackingOrderInSubgraph = 5238
                 }
             }
         )
@@ -562,7 +562,7 @@ def Xform "Root"
         prepend apiSchemas = ["MaterialBindingAPI"]
     )
     {
-        reorder nameChildren = ["Bow", "Collider", "InputTarget", "RealityKitContent_BubbleComponent", "RigidBody", "MotionState", "Cube"]
+        reorder nameChildren = ["Bow", "Material", "RealityKitContent_ColorComponent", "OnNotification", "Collider", "InputTarget", "RealityKitContent_BubbleComponent", "RigidBody", "MotionState", "Cube", "HierarchicalFade", "RCP_BehaviorsContainer", "AudioLibrary"]
         rel material:binding = </Root/BubbleMaterial> (
             bindMaterialAs = "weakerThanDescendants"
         )
@@ -637,6 +637,76 @@ def Xform "Root"
             uint m_userSetLinearVelocityVersion = 1
         }
 
+        def RealityKitComponent "HierarchicalFade"
+        {
+            uniform token info:id = "RealityKit.HierarchicalFade"
+        }
+
+        def RealityKitComponent "RCP_BehaviorsContainer"
+        {
+            rel behaviors = </Root/Bubble/OnNotification>
+            uniform token info:id = "RCP.BehaviorsContainer"
+        }
+
+        def RealityKitComponent "AudioLibrary"
+        {
+            uniform token info:id = "RealityKit.AudioLibrary"
+
+            def RealityKitDict "resources"
+            {
+                string[] keys = ["balloonpop_83760_mp3"]
+                rel values = </Root/balloonpop_83760_mp3>
+            }
+        }
+
+        def Cone "Bow" (
+            active = true
+            prepend apiSchemas = ["MaterialBindingAPI"]
+            references = None
+        )
+        {
+            uniform token axis = "Y"
+            double height = 0.2
+            rel material:binding = </Root/BubbleMaterial> (
+                bindMaterialAs = "weakerThanDescendants"
+            )
+            double radius = 0.1
+            quatf xformOp:orient = (1, 0, 0, 0)
+            float3 xformOp:scale = (0.124999985, 0.102040805, 0.124999985)
+            float3 xformOp:translate = (0, -0.10204083, 0)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+        }
+
+        def RealityKitCustomComponent "RealityKitContent_ColorComponent"
+        {
+            uniform token info:id = "RealityKitContent.ColorComponent"
+        }
+
+        def Preliminary_Behavior "OnNotification"
+        {
+            rel actions = </Root/Bubble/OnNotification/Action>
+            uniform bool exclusive
+            rel triggers = </Root/Bubble/OnNotification/Trigger>
+
+            def Preliminary_Trigger "Trigger"
+            {
+                rel affectedObjects = </Root/Bubble>
+                string identifier = "PopBubbleAudio"
+                token info:id = "Notification"
+            }
+
+            def Preliminary_Action "Action"
+            {
+                rel affectedObjects = </Root>
+                rel animationLibraryKey = </Root/PopBubbleAudio>
+                rel animationLibraryKeyOverrideKey = </Root/Bubble/OnNotification/Trigger>
+                token info:id = "PlayTimeline"
+                int loops = 0
+                int performCount = 1
+                token type = "serial"
+            }
+        }
+
         def Cube "Cube" (
             prepend apiSchemas = ["MaterialBindingAPI"]
         )
@@ -685,72 +755,9 @@ def Xform "Root"
             }
         }
 
-        def Cone "Bow" (
-            active = true
-            prepend apiSchemas = ["MaterialBindingAPI"]
-        )
+        def RealityKitCustomComponent "RealityKitContent_ScoreComponent"
         {
-            uniform token axis = "Y"
-            double height = 0.2
-            rel material:binding = </Root/BubbleMaterial> (
-                bindMaterialAs = "weakerThanDescendants"
-            )
-            double radius = 0.1
-            quatf xformOp:orient = (1, 0, 0, 0)
-            float3 xformOp:scale = (0.124999985, 0.102040805, 0.124999985)
-            float3 xformOp:translate = (0, -0.10204083, 0)
-            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
-        }
-
-        def RealityKitComponent "HierarchicalFade"
-        {
-            uniform token info:id = "RealityKit.HierarchicalFade"
-        }
-
-        def RealityKitComponent "RCP_BehaviorsContainer"
-        {
-            rel behaviors = </Root/Bubble/OnTap>
-            uniform token info:id = "RCP.BehaviorsContainer"
-        }
-
-        def RealityKitComponent "AudioLibrary"
-        {
-            uniform token info:id = "RealityKit.AudioLibrary"
-
-            def RealityKitDict "resources"
-            {
-                string[] keys = ["balloonpop_83760_mp3"]
-                rel values = </Root/balloonpop_83760_mp3>
-            }
-        }
-
-        def RealityKitCustomComponent "RealityKitContent_ColorComponent"
-        {
-            uniform token info:id = "RealityKitContent.ColorComponent"
-        }
-
-        def Preliminary_Behavior "OnTap"
-        {
-            rel actions = </Root/Bubble/OnTap/Action>
-            uniform bool exclusive
-            rel triggers = </Root/Bubble/OnTap/Trigger>
-
-            def Preliminary_Trigger "Trigger"
-            {
-                rel affectedObjects = </Root/Bubble>
-                token info:id = "TapGesture"
-            }
-
-            def Preliminary_Action "Action"
-            {
-                rel affectedObjects = </Root>
-                rel animationLibraryKey = </Root/PopBubbleAudio>
-                rel animationLibraryKeyOverrideKey = </Root/Bubble/OnTap/Trigger>
-                token info:id = "PlayTimeline"
-                int loops = 0
-                int performCount = 1
-                token type = "serial"
-            }
+            uniform token info:id = "RealityKitContent.ScoreComponent"
         }
     }
 

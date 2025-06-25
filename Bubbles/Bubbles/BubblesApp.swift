@@ -23,7 +23,6 @@ struct BubblesApp: App {
                         
                     windowScene.requestGeometryUpdate(.Vision(resizingRestrictions: UIWindowScene.ResizingRestrictions.none))
                 }
-            // need to redo again later, too buggy, stashed away
         }
 
         ImmersiveSpace(id: appModel.immersiveSpaceID) {
