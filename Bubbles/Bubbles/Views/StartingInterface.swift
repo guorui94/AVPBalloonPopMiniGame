@@ -13,6 +13,7 @@ struct StartingInterface: View {
     @State private var isStarting = false
     @State private var isHovering = false
     @State private var changeInterface = false
+    @Environment(\.openWindow) private var openScoreWindow
     private var scoreInterface = BalloonGameInterface()
     var body: some View {
         if changeInterface {

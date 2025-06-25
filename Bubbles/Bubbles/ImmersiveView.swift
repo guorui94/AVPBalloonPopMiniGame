@@ -31,9 +31,19 @@ struct ImmersiveView: View {
                 }
                 bubble.removeFromParent()
                 
-
-                
                 for _ in 1...15 {
+                    guard var modelComponent = bubble.components[ModelComponent.self],
+                          var mat = modelComponent.materials.first as? ShaderGraphMaterial else {
+                        fatalError("Missing model or shader material")
+                    }
+        
+                    do {
+                        let color = try mat.getParameter(name: "BalloonColor")
+                        print(color)
+                    } catch {
+                        print("Shader error: \(error.localizedDescription)")
+                    }
+                    
                     let bubbleClone = bubble.clone(recursive: true)
                     
                     let linearY = Float.random(in: 0.05...0.13)
@@ -42,14 +52,9 @@ struct ImmersiveView: View {
                     
                     bubbleClone.components[PhysicsMotionComponent.self] = pm
                     
-//                    let randomColor = BalloonColor.allCases.randomElement()!
-//                    var material = SimpleMaterial(color: UIColor(randomColor.color), isMetallic: false)
-//                    bubbleClone.components[ModelComponent.self]?.materials = [material]
-//                    
-//                    guard let bow = bubbleClone.findEntity(named: "Bow") else {
-//                        fatalError()
-//                    }
-//                    bow.components[ModelComponent.self]?.materials = [material]
+                    let randomColor = BalloonColor.allCases.randomElement()!
+                    
+
 
                     // randomly assign positions
                     let x = Float.random(in: -0.7...0.7)
@@ -77,13 +82,16 @@ struct ImmersiveView: View {
             
             // if not popped, set it to popped
             entity.components.set(PoppedComponent())
+            
+            
             let updateScore = appModel.score
             updateScore.score += 1
 
             
             // makes sure that material is accessed before proceeding.
             guard let modelComponent = entity.components[ModelComponent.self],
-                  var mat = modelComponent.materials.first as? ShaderGraphMaterial else {
+                  var mat = modelComponent.materials.first as? ShaderGraphMaterial
+            else {
                 fatalError()
             }
             

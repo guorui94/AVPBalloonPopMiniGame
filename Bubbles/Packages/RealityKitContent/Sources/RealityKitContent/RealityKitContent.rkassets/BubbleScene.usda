@@ -10,7 +10,7 @@
 
 def Xform "Root"
 {
-    reorder nameChildren = ["Bubble", "Cube", "BubbleMaterial", "PopBubble"]
+    reorder nameChildren = ["Bubble", "Cube", "BubbleMaterial", "PopBubbleAudio"]
     def Material "BubbleMaterial"
     {
         float inputs:AnimationSpeed = 0.01 (
@@ -21,12 +21,12 @@ def Xform "Root"
                 }
             }
         )
-        color3f inputs:BalloonColor = (0.6044158, 0.6242923, 0.8780094) (
-            colorSpace = "srgb_texture"
+        color3f inputs:BalloonColor = (0.77510774, 0.39552802, 0.9332166) (
+            colorSpace = "lin_srgb"
             customData = {
                 dictionary realitykit = {
-                    float2 positionInSubgraph = (-481.6062, -262.4819)
-                    int stackingOrderInSubgraph = 5234
+                    float2 positionInSubgraph = (-365.442, -293.36362)
+                    int stackingOrderInSubgraph = 5237
                 }
             }
         )
@@ -72,7 +72,7 @@ def Xform "Root"
             float inputs:roughness = 0.5
             token outputs:out
             float2 ui:nodegraph:node:pos = (-151.39653, 16.346899)
-            int ui:nodegraph:node:stackingOrder = 5233
+            int ui:nodegraph:node:stackingOrder = 5234
             string[] ui:nodegraph:realitykit:node:attributesShowingChildren = ["Advanced", "inputs:occlusion"]
         }
 
@@ -692,7 +692,7 @@ def Xform "Root"
         {
             uniform token axis = "Y"
             double height = 0.2
-            rel material:binding = None (
+            rel material:binding = </Root/BubbleMaterial> (
                 bindMaterialAs = "weakerThanDescendants"
             )
             double radius = 0.1
@@ -713,6 +713,22 @@ def Xform "Root"
             uniform token info:id = "RCP.BehaviorsContainer"
         }
 
+        def RealityKitComponent "AudioLibrary"
+        {
+            uniform token info:id = "RealityKit.AudioLibrary"
+
+            def RealityKitDict "resources"
+            {
+                string[] keys = ["balloonpop_83760_mp3"]
+                rel values = </Root/balloonpop_83760_mp3>
+            }
+        }
+
+        def RealityKitCustomComponent "RealityKitContent_ColorComponent"
+        {
+            uniform token info:id = "RealityKitContent.ColorComponent"
+        }
+
         def Preliminary_Behavior "OnTap"
         {
             rel actions = </Root/Bubble/OnTap/Action>
@@ -728,7 +744,7 @@ def Xform "Root"
             def Preliminary_Action "Action"
             {
                 rel affectedObjects = </Root>
-                rel animationLibraryKey = </Root/PopBubble>
+                rel animationLibraryKey = </Root/PopBubbleAudio>
                 rel animationLibraryKeyOverrideKey = </Root/Bubble/OnTap/Trigger>
                 token info:id = "PlayTimeline"
                 int loops = 0
@@ -738,61 +754,42 @@ def Xform "Root"
         }
     }
 
-    def RealityKitTimeline "PopBubble"
+    def RealityKitTimeline "PopBubbleAudio"
     {
+        reorder nameChildren = ["Track", "Track2"]
         def RealityKitTrack "Track"
         {
-            def RealityKitAction "Hide"
+            def RealityKitAction "Play_Audio"
             {
-                string actionKind = "hide"
-                int blendLayer = 300
-                double duration = 0.2
-                uniform token info:id = "F0BAC074-7F22-4A4A-98B9-646ACBCF820A"
+                string actionKind = "audio"
+                string audioResourceName = "balloonpop_83760_mp3"
+                bool controlPlayback = 1
+                double duration = 0.5485625
+                uniform token info:id = "2338D5A5-D9F8-4B66-AFCF-E07C7F0D6C60"
                 double startTime = 0
                 rel target = </Root/Bubble>
 
-                def RealityKitStruct "timingFunction"
+                def RealityKitStruct "handoffType"
                 {
+                    token type = "stop"
                 }
             }
         }
+
+        def RealityKitTrack "Track2"
+        {
+        }
     }
-}
 
-def Material "BoxMaterial"
-{
-    reorder nameChildren = ["PreviewSurface", "InvisibleBox"]
-    token cullMode = "unspecified" (
-        allowedTokens = ["unspecified", "none", "front", "back"]
-    )
-    token outputs:mtlx:surface.connect = </BoxMaterial/PreviewSurface.outputs:out>
-    token outputs:realitykit:vertex
-    float2 ui:nodegraph:node:pos = (-305.15057, 59.66869)
-    int ui:nodegraph:node:stackingOrder = 1
-    string[] ui:nodegraph:realitykit:node:attributesShowingChildren = ["outputs:mtlx:surface"]
-    float2 ui:nodegraph:realitykit:subgraphOutputs:pos = (335.5, 100.5)
-    int ui:nodegraph:realitykit:subgraphOutputs:stackingOrder = 20
-
-    def Shader "PreviewSurface"
+    def RealityKitAudioFile "balloonpop_83760_mp3"
     {
-        uniform token info:id = "ND_UsdPreviewSurface_surfaceshader"
-        float inputs:clearcoatRoughness = 0
-        color3f inputs:diffuseColor = (0.77068573, 0.94329774, 1) (
-            colorSpace = "srgb_texture"
-        )
-        float inputs:ior = 0.72
-        float inputs:opacity = 0
-        float inputs:opacityThreshold
-        float inputs:roughness = 0.75
-        token outputs:out
-        float2 ui:nodegraph:node:pos = (93.5, 100.5)
-        int ui:nodegraph:node:stackingOrder = 39
-        string[] ui:nodegraph:realitykit:node:attributesShowingChildren = ["Advanced"]
+        uniform asset file = @balloonpop-83760.mp3@
+        uniform bool shouldLoop = 0
     }
 }
 
 def Cube "InvisibleBox" (
-    active = true
+    active = false
     prepend apiSchemas = ["MaterialBindingAPI"]
 )
 {

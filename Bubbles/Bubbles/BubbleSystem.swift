@@ -9,15 +9,17 @@ import RealityKitContent
 
 class BubbleSystem: System {
     
-    private let query = EntityQuery(where: .has(BubbleComponent.self))
+    private let bubbleComponentQuery = EntityQuery(where: .has(BubbleComponent.self))
     private let speed: Float = 0.001
     
+    private let colorComponentQuery = EntityQuery(where: .has(ColorComponent.self))
+
     required init(scene: Scene) {
     
     }
     
     func update(context: SceneUpdateContext) {
-        context.scene.performQuery(query).forEach { bubble in
+        context.scene.performQuery(bubbleComponentQuery).forEach { bubble in
             guard let bubbleComponent = bubble.components[BubbleComponent.self] else { return }
             bubble.position += bubbleComponent.direction * speed
         }

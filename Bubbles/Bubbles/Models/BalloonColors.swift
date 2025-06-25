@@ -18,17 +18,17 @@ enum BalloonColor: CaseIterable {
     var color: Color {
         switch self {
         case .red:
-            return .red
+            return .red //SIMD3<Float>(168, 50, 54) / 255.0
         case .blue:
-            return .blue
+            return .blue //SIMD3<Float>(50, 101, 168) / 255.0
         case .green:
-            return .green
+            return .green //SIMD3<Float>(78, 168, 50) / 255.0
         case .yellow:
-            return .yellow
+            return .yellow //SIMD3<Float>(224, 218, 40) / 255.0
         case .purple:
-            return .purple
+            return .purple //SIMD3<Float>(157, 93, 252) / 255.0
         case .orange:
-            return .orange
+            return .orange //SIMD3<Float>(217, 141, 35) / 255.0
         }
     }
 
