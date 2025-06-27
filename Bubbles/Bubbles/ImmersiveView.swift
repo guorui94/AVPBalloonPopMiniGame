@@ -23,6 +23,7 @@ struct ImmersiveView: View {
     
     
     var body: some View {
+        
         RealityView { content in
             // Add the initial RealityKit content
             if let immersiveContentEntity = try? await Entity(named: "BubbleScene", in: realityKitContentBundle) {
@@ -38,7 +39,7 @@ struct ImmersiveView: View {
                     
                     
                     let bubbleClone = bubble.clone(recursive: true)
-                    applyBalloonColor(to: bubbleClone, using: randomColor)
+                    applyBalloonColor(to: bubble, using: randomColor)
                     
                     let linearY = Float.random(in: 0.05...0.13)
 
@@ -48,7 +49,7 @@ struct ImmersiveView: View {
 
                     // randomly assign positions
                     let x = Float.random(in: -0.7...0.7)
-                    let z = Float.random(in: -0.8...0.05)
+                    let z = Float.random(in: -1...0)
                     
                     bubbleClone.position = [x, 0, z] // in meters
                     immersiveContentEntity.addChild(bubbleClone)
@@ -56,12 +57,12 @@ struct ImmersiveView: View {
                 }
                 print(totalScore)
                 // use a world anchor to make sure the ballons spawn in front of the user
-                let worldAnchor = AnchorEntity(world: [0, 1, -1])
+                let worldAnchor = AnchorEntity(world: [0, 1, -0.6])
 
                 worldAnchor.addChild(immersiveContentEntity)
                 content.add(worldAnchor)
             }
-        }
+        } 
         .gesture(SpatialTapGesture().targetedToEntity(where: predicate).onEnded({ value in
             let entity = value.entity
         
@@ -133,6 +134,8 @@ struct ImmersiveView: View {
         }
         
     }
+    
+    
     func applyBalloonColor(to entity: Entity, using balloonColor: BalloonColor) {
         if let modelEntity = entity as? ModelEntity,
            var modelComponent = modelEntity.components[ModelComponent.self],
@@ -142,7 +145,7 @@ struct ImmersiveView: View {
                 modelComponent.materials[0] = mat
                 modelEntity.components[ModelComponent.self] = modelComponent
             } catch {
-                print("Shader error: \(error.localizedDescription)")
+                // ignore the shader error
             }
         }
         

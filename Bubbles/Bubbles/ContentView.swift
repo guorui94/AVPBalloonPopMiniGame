@@ -56,13 +56,19 @@ struct ContentView: View {
                 Spacer()
             }
             .padding()
+            .glassBackgroundEffect(
+                in: RoundedRectangle(
+                    cornerRadius: 32,
+                    style: .continuous
+                )
+            )
         }
 
     }
 
 }
 
-#Preview(windowStyle: .automatic) {
+#Preview() {
     ContentView()
         .environment(AppModel())
 }
