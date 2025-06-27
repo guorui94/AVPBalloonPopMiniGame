@@ -20,7 +20,7 @@ struct ImmersiveView: View {
     @State private var bubbleClones: [Entity] = []
     @Environment(AppModel.self) var appModel
     @State private var totalScore = 0
-    
+    @State private var popAudio: AudioFileResource?
     
     var body: some View {
         
@@ -62,7 +62,16 @@ struct ImmersiveView: View {
                 worldAnchor.addChild(immersiveContentEntity)
                 content.add(worldAnchor)
             }
-        } 
+        }
+        .onAppear {
+            Task {
+                do {
+                    popAudio = try await AudioFileResource(named: "balloonpop-83760.mp3")
+                } catch {
+                    print("❌ Failed to load audio: \(error)")
+                }
+            }
+        }
         .gesture(SpatialTapGesture().targetedToEntity(where: predicate).onEnded({ value in
             let entity = value.entity
         
@@ -73,6 +82,9 @@ struct ImmersiveView: View {
             
             // if not popped, set it to popped
             entity.components.set(PoppedComponent())
+            if let audio = popAudio {
+                    entity.playAudio(audio)
+                }
             
             // makes sure that material is accessed before proceeding.
             guard let modelComponent = entity.components[ModelComponent.self],
@@ -80,8 +92,6 @@ struct ImmersiveView: View {
             else {
                 fatalError()
             }
-            
-            print(mat.getParameter(name: "BalloonColor") ?? "red")
             
             let updateScore = appModel.score
             updateScore.score += 1

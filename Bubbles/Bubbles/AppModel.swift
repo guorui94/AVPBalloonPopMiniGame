@@ -21,6 +21,4 @@ class AppModel {
     }
     var immersiveSpaceState = ImmersiveSpaceState.closed
     
-    var isScoreWindowActive: Bool = false
-
 }

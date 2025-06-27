@@ -22,7 +22,7 @@ struct StartingInterface: View {
                     VStack(spacing: 40) {
                         Spacer()
                         Text("🎈 Pop Balloons 🎈")
-                            .font(.extraLargeTitle)
+                            .font(.largeTitle)
                             .fontWeight(.semibold)
 
                         Text("Get ready to pop as many balloons as you can before the balloon disappears!")
@@ -56,13 +56,13 @@ struct StartingInterface: View {
                 .glassBackgroundEffect(in: RoundedRectangle(cornerRadius: 32, style: .continuous))
             }
         }
-        .overlay(alignment:.bottomLeading) {
+        .overlay(alignment:.bottomTrailing) {
             if changeInterface {
                 BalloonGameInterface()
                     .frame(width: 300)
                     .padding()
                     .glassBackgroundEffect(in: RoundedRectangle(cornerRadius: 32, style: .continuous))
-                    .offset(x: -300, y: -50)
+                    .offset(x: -250, y: -50)
             }
         }
         
