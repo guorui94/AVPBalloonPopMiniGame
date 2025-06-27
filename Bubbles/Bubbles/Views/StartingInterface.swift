@@ -53,18 +53,19 @@ struct StartingInterface: View {
                     Spacer()
                 }
                 .padding(40)
-                .glassBackgroundEffect(in: RoundedRectangle(cornerRadius: 28, style: .continuous))
+                .glassBackgroundEffect(in: RoundedRectangle(cornerRadius: 32, style: .continuous))
             }
         }
-        .overlay(alignment: .topLeading) {
+        .overlay(alignment:.bottomLeading) {
             if changeInterface {
                 BalloonGameInterface()
-                    .frame(width: 240)
+                    .frame(width: 300)
                     .padding()
-                    .glassBackgroundEffect(in: RoundedRectangle(cornerRadius: 28, style: .continuous))
-                    .offset(x: -520, y: -250) 
+                    .glassBackgroundEffect(in: RoundedRectangle(cornerRadius: 32, style: .continuous))
+                    .offset(x: -300, y: -50)
             }
         }
+        
     }
 }
 

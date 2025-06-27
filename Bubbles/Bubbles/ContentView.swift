@@ -53,7 +53,9 @@ struct ContentView: View {
 
                     Spacer()
                 }
+                
                 Spacer()
+                
             }
             .padding()
             .glassBackgroundEffect(
@@ -63,7 +65,6 @@ struct ContentView: View {
                 )
             )
         }
-
     }
 
 }

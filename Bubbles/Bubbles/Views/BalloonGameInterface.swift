@@ -24,7 +24,6 @@ struct BalloonGameInterface: View {
         }
         .padding(.vertical, 16)
         .padding(.horizontal, 20)
-        .frame(width: 240)
     }
 }
 

@@ -16,7 +16,6 @@ struct BubblesApp: App {
             ContentView()
                 .environment(appModel)
         }
-        .windowResizability(.contentSize)
         .windowStyle(.plain)
         // with the windowStyle being .plain, for each view, set the glass background effect as
         //.glassBackgroundEffect(in: RoundedRectangle(
