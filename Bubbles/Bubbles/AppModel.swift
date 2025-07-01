@@ -11,8 +11,6 @@ import SwiftUI
 @MainActor
 @Observable
 class AppModel {
-    var score = ScoreModel()
-    
     let immersiveSpaceID = "ImmersiveSpace"
     enum ImmersiveSpaceState {
         case closed
@@ -20,5 +18,10 @@ class AppModel {
         case open
     }
     var immersiveSpaceState = ImmersiveSpaceState.closed
+    
+    // begin game logic here
+    var score = ScoreModel()
+    
+    static let gameTimer = 20
     
 }

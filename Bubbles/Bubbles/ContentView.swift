@@ -34,7 +34,9 @@ struct ContentView: View {
                         title: "Balloon Popping",
                         subtitle: "Pop the balloons as fast as you can",
                         action: {
-                            selectedInterface = AnyView(StartingInterface())
+                            selectedInterface = AnyView(StartingInterface(onBack: {
+                                        selectedInterface = nil
+                                    }))
                         })
 
                     // fillers

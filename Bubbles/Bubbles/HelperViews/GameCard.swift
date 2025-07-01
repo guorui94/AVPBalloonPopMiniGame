@@ -31,7 +31,7 @@ struct GameCard: View {
             RoundedRectangle(cornerRadius: 20)
                 .stroke(Color.cyan.opacity(0.6), lineWidth: 6)
         )
-        .overlay( // create a "glowing" effect
+        .overlay(  // create a "glowing" effect
             RoundedRectangle(cornerRadius: 20)
                 .stroke(Color.white.opacity(0.3), lineWidth: 3)
         )
@@ -41,9 +41,8 @@ struct GameCard: View {
             action()
         }
         .hoverEffect { effect, isActive, proxy in
-                effect.scaleEffect(!isActive ? 1.0 : 1.2)
-            
-            }
+            effect.scaleEffect(!isActive ? 1.0 : 1.1)
+        }
     }
 }
 

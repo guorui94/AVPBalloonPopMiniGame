@@ -11,24 +11,24 @@ enum BalloonColor: CaseIterable {
     case red
     case blue
     case green
-    case yellow
+    case darkBrown
     case purple
-    case orange
+    case deepgrey
 
     var color: CGColor {
         switch self {
         case .red:
             return CGColor(red: 168.0 / 255.0, green: 50.0 / 255.0, blue: 54.0 / 255.0, alpha: 1.0)
         case .blue:
-            return CGColor(red: 50.0 / 255.0, green: 101.0 / 255.0, blue: 168.0 / 255.0, alpha: 1.0)
+            return CGColor(red: 0, green: 0, blue: 0.4, alpha: 1)
         case .green:
-            return CGColor(red: 78.0 / 255.0, green: 168.0 / 255.0, blue: 50.0 / 255.0, alpha: 1.0)
-        case .yellow:
-            return CGColor(red: 224.0 / 255.0, green: 218.0 / 255.0, blue: 40.0 / 255.0, alpha: 1.0)
+            return CGColor(red: 0, green: 0.39, blue: 0, alpha: 1)
+        case .darkBrown:
+            return CGColor(red: 0.3, green: 0.263, blue: 0.129, alpha: 1)
         case .purple:
-            return CGColor(red: 157.0 / 255.0, green: 93.0 / 255.0, blue: 252.0 / 255.0, alpha: 1.0)
-        case .orange:
-            return CGColor(red: 217.0 / 255.0, green: 141.0 / 255.0, blue: 35.0 / 255.0, alpha: 1.0)
+            return CGColor(red: 0.545, green: 0, blue: 0.545, alpha: 1)
+        case .deepgrey:
+            return CGColor(red: 0.2, green: 0.2, blue: 0.2, alpha: 1)
         }
     }
     
@@ -40,11 +40,11 @@ enum BalloonColor: CaseIterable {
             return 2
         case .green:
             return 3
-        case .yellow:
+        case .darkBrown:
             return 4
         case .purple:
             return 5
-        case .orange:
+        case .deepgrey:
             return 6
         }
     }

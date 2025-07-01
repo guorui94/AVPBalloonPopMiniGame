@@ -14,27 +14,28 @@ struct BalloonGameInterface: View {
         let displayScore = appModel.score
 
         VStack(spacing: 8) {
+            Text("\(displayScore.score)")
+                .font(.system(size: 60, weight: .bold))
+                .foregroundStyle(.primary)
+            
             Text("Score")
                 .font(.system(size: 24, weight: .medium))
                 .foregroundStyle(.secondary)
 
-            Text("\(displayScore.score)")
-                .font(.system(size: 60, weight: .bold))
-                .foregroundStyle(.primary)
+ 
         }
         .padding(.vertical, 16)
         .padding(.horizontal, 20)
+        .frame(width: 300)
+        .padding()
+        .glassBackgroundEffect(
+            in: RoundedRectangle(
+                cornerRadius: 32, style: .continuous)
+        )
     }
 }
 
 #Preview() {
-    VStack {
-        Spacer()
-        BalloonGameInterface()
-            .environment(AppModel())
-            .glassBackgroundEffect( in: RoundedRectangle(
-                cornerRadius: 32,
-                style: .continuous
-            ))
-    }
+    BalloonGameInterface()
+        .environment(AppModel())
 }
