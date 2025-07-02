@@ -12,6 +12,8 @@ import SwiftUI
 struct ContentView: View {
     @Environment(AppModel.self) private var appModel
     @State private var selectedInterface: AnyView?
+    @State var changeInterface = false
+    @State var isStarting = false
     var body: some View {
         if let interface = selectedInterface {
             interface
@@ -34,9 +36,21 @@ struct ContentView: View {
                         title: "Balloon Popping",
                         subtitle: "Pop the balloons as fast as you can",
                         action: {
-                            selectedInterface = AnyView(StartingInterface(onBack: {
+                            selectedInterface = AnyView(
+                                StartingInterface( changeInterface: $changeInterface, isStarting: $isStarting,
+                                    onBack: {
                                         selectedInterface = nil
-                                    }))
+                                    },
+                                    onShowEndGame: { playAgain, backToMenu in
+                                        selectedInterface = AnyView(
+                                            BalloonEndGame(
+                                                onPlayAgain: playAgain,
+                                                onBackToMenu: backToMenu
+                                            )
+                                        )
+                                    }
+                                )
+                            )
                         })
 
                     // fillers
@@ -55,9 +69,9 @@ struct ContentView: View {
 
                     Spacer()
                 }
-                
+
                 Spacer()
-                
+
             }
             .padding()
             .glassBackgroundEffect(

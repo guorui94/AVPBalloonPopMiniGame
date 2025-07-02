@@ -11,10 +11,14 @@ struct StartingInterface: View {
     @Environment(\.openImmersiveSpace) private var openImmersiveSpace
     @Environment(\.dismissImmersiveSpace) private var dismissImmersiveSpace
     @Environment(AppModel.self) private var appModel
-    @State private var changeInterface = false
-    @State private var isStarting = false
-    @State var countdown: Int? = nil
+    @Binding var changeInterface: Bool
+    @Binding var isStarting: Bool
+    @State private var countdown: Int? = nil
+    @State var gameEnds = false
     var onBack: () -> Void  // this sets the selected interface as nil (aka go back to ContentView)
+    var onShowEndGame:
+        (_ playAgain: @escaping () -> Void, _ backToMenu: @escaping () -> Void)
+            -> Void
 
     var body: some View {
         ZStack {
@@ -87,13 +91,14 @@ struct StartingInterface: View {
         .overlay(alignment: .bottomTrailing) {
             if changeInterface {
                 ZStack(alignment: .topLeading) {
-                    BalloonGameInterface()
+                    BalloonGameInterface(gameEnds: $gameEnds)
                     Button(action: {
                         Task {
                             await dismissImmersiveSpace()
                         }
                         changeInterface = false
                         isStarting = false
+                        appModel.score.resetScore()
                     }) {
                         Image(systemName: "chevron.left")
                             .font(.system(size: 24, weight: .medium))
@@ -111,6 +116,15 @@ struct StartingInterface: View {
                 .offset(x: -250, y: -50)
             }
         }
+        .onChange(of: gameEnds) { oldValue, newValue in
+            onShowEndGame(
+                {
+                    // play again logic
+                },
+                {
+                    // back to menu logic
+                })
+        }
 
     }
     private func startCountdown() {
@@ -126,11 +140,16 @@ struct StartingInterface: View {
             await openImmersiveSpace(id: appModel.immersiveSpaceID)
             changeInterface = true
         }
-
     }
 }
 
 #Preview {
-    StartingInterface(onBack: {})
-        .environment(AppModel())
+    StartingInterface(
+        changeInterface: .constant(false),
+        isStarting: .constant(false),
+        onBack: {},
+        onShowEndGame: { playAgain, backToMenu in
+        }
+    )
+    .environment(AppModel())
 }

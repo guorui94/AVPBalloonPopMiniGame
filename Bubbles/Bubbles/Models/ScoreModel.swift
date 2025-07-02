@@ -9,9 +9,9 @@ import Foundation
 
 @Observable
 class ScoreModel {
-    var score: Int = 0
+    var poppingScore: Int = 0
     
     func resetScore() {
-        score = 0
+        poppingScore = 0
     }
 }

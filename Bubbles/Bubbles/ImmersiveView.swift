@@ -23,7 +23,6 @@ struct ImmersiveView: View {
     @State private var totalScore = 0
     @State private var popAudio: AudioFileResource?
     
-
     var body: some View {
         RealityView { content in
             // Add the initial RealityKit content
@@ -38,12 +37,11 @@ struct ImmersiveView: View {
                 }
                 bubble.removeFromParent()
 
-                for _ in 1...15 {
+                for _ in 1...20 {
                     let randomColor = BalloonColor.allCases.randomElement()!
                     totalScore += randomColor.poppingScore
                     applyBalloonColor(to: bubble, using: randomColor)
                     let bubbleClone = bubble.clone(recursive: true)
-    
 
                     let linearY = Float.random(in: 0.05...0.17)
 
@@ -73,7 +71,7 @@ struct ImmersiveView: View {
             Task {
                 do {
                     popAudio = try await AudioFileResource(
-                        named: "balloonpop-83760.mp3")
+                        named: "balloonpopping.mp3")
                 } catch {
                     print("❌ Failed to load audio: \(error)")
                 }
@@ -105,7 +103,7 @@ struct ImmersiveView: View {
                 }
 
                 let updateScore = appModel.score
-                updateScore.score += 1
+                updateScore.poppingScore += 1
 
                 let frameRate: TimeInterval = 1.0 / 60.0  // 60 fps
                 let duration: TimeInterval = 0.25
@@ -185,8 +183,6 @@ struct ImmersiveView: View {
                 // ignore the shader error
             }
         }
-
-        // Recursively apply to all children
         for child in entity.children {
             applyBalloonColor(to: child, using: balloonColor)
         }
@@ -194,10 +190,9 @@ struct ImmersiveView: View {
     
     private func startBlinking(entity: Entity,
                        colorName: String = "DisappearingColor",
-                               blinkColor: CGColor = CGColor(red: 0.39, green: 0.39, blue: 0.39, alpha: 0.8),
+                               blinkColor: CGColor = CGColor(red: 0.7, green: 0.7, blue: 0.7, alpha: 1),
                        times: Int = 3,
                        fade: Bool = true) {
-        let maxBrightness: CGFloat = 0.9
         guard var modelComponent = entity.components[ModelComponent.self],
               var mat = modelComponent.materials.first as? ShaderGraphMaterial else {
             return
@@ -209,9 +204,9 @@ struct ImmersiveView: View {
                     for step in 0...10 {
                         let t = Float(step) / 10
                         let blendedCG = CGColor(
-                            red: CGFloat(t) * maxBrightness,
-                               green: CGFloat(t) * maxBrightness,
-                               blue: CGFloat(t) * maxBrightness,
+                            red: CGFloat(t) ,
+                               green: CGFloat(t) ,
+                               blue: CGFloat(t) ,
                                alpha: 1.0
                            )
                         try? mat.setParameter(name: colorName, value: .color(blendedCG))
@@ -222,9 +217,9 @@ struct ImmersiveView: View {
                     for step in (0...10).reversed() {
                         let t = Float(step) / 10
                         let blendedCG = CGColor(
-                               red: CGFloat(t) * maxBrightness,
-                               green: CGFloat(t) * maxBrightness,
-                               blue: CGFloat(t) * maxBrightness,
+                               red: CGFloat(t) ,
+                               green: CGFloat(t) ,
+                               blue: CGFloat(t) ,
                                alpha: 1.0
                            )
                         try? mat.setParameter(name: colorName, value: .color(blendedCG))

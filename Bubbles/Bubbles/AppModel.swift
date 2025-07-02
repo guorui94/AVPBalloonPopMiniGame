@@ -22,6 +22,7 @@ class AppModel {
     // begin game logic here
     var score = ScoreModel()
     
-    static let gameTimer = 20
-    
+    func resetGame() {
+        score.resetScore()
+    }
 }
