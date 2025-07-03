@@ -38,8 +38,16 @@ struct ImmersiveView: View {
 
                 for _ in 1...20 {
                     let randomColor = BalloonColor.allCases.randomElement()!
+                    
                     totalScore += randomColor.poppingScore
                     applyBalloonColor(to: bubble, using: randomColor)
+                    
+                    guard var bubbleComponent = bubble.components[ScoreComponent.self] else {
+                        fatalError()
+                    }
+                    bubbleComponent.score = randomColor.poppingScore
+                    bubble.components.set(bubbleComponent)
+
                     let bubbleClone = bubble.clone(recursive: true)
 
                     let linearY = Float.random(in: 0.05...0.17)
@@ -52,10 +60,9 @@ struct ImmersiveView: View {
 
                     // randomly assign positions
                     let x = Float.random(in: -0.7...0.7)
-                    let y = Float.random(in: -0.02...0)
                     let z = Float.random(in: -1...0)
 
-                    bubbleClone.position = [x, y, z]  // in meters
+                    bubbleClone.position = [x, 0, z]  // in meters
                     immersiveContentEntity.addChild(bubbleClone)
                     bubbleClones.append(bubbleClone)
                 }
@@ -93,12 +100,14 @@ struct ImmersiveView: View {
                 else {
                     fatalError()
                 }
-
-                let updateScore = appModel.score
-                updateScore.poppingScore += 1
+                
+                guard let bubbleComponent = entity.components[ScoreComponent.self] else {
+                    fatalError()
+                }
+                appModel.score.poppingScore += bubbleComponent.score
 
                 let frameRate: TimeInterval = 1.0 / 60.0  // 60 fps
-                let duration: TimeInterval = 0.25
+                let duration: TimeInterval = 0.20
                 let targetValue: Float = 1
                 let totalFrames = Int(duration / frameRate)
                 var currentFrame = 0
@@ -167,7 +176,7 @@ struct ImmersiveView: View {
                 try mat.setParameter(
                     name: "BalloonColor", value: .color(balloonColor.color))
                 try mat.setParameter(
-                    name: "DisappearingColor", value: .color(CGColor(red: 0, green: 0, blue: 0, alpha: 1)))
+                    name: "DisappearingColor", value: .color(CGColor(red: 0, green: 0, blue: 0, alpha: 0)))
                 modelComponent.materials[0] = mat
                 modelEntity.components[ModelComponent.self] = modelComponent
                 
@@ -234,6 +243,7 @@ struct ImmersiveView: View {
         }
     }
 
+    
 
 
 }

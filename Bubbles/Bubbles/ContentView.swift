@@ -11,6 +11,7 @@ import SwiftUI
 
 struct ContentView: View {
     @Environment(AppModel.self) private var appModel
+    @Environment(\.dismissImmersiveSpace) private var dismissImmersiveSpace
     @State private var selectedInterface: AnyView?
     @State var changeInterface = false
     @State var isStarting = false
@@ -80,13 +81,18 @@ struct ContentView: View {
                     selectedInterface = AnyView(
                         BalloonEndGame(
                             onPlayAgain: {
+                                Task {
+                                    await dismissImmersiveSpace()
+                                }
                                 appModel.resetGame()
                                 changeInterface = false
                                 isStarting = false
-                                
                                 showStartingInterface()
                             },
                             onBackToMenu: {
+                                Task {
+                                    await dismissImmersiveSpace()
+                                }
                                 selectedInterface = nil
                             }
                         )

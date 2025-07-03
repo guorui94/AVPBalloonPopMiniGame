@@ -4,7 +4,7 @@ import RealityKit
 // ScoreComponent.registerComponent()
 public struct ScoreComponent: Component, Codable {
     // This is an example of adding a variable to the component.
-    var score: Int = 0
+    public var score: Int = 0
     
     public init() {
     }

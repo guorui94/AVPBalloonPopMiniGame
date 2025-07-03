@@ -6,12 +6,16 @@
 //
 
 import SwiftUI
+import RealityKitContent
 
 @main
 struct BubblesApp: App {
     @State private var appModel = AppModel()
-    
+    init () {
+        ScoreComponent.registerComponent()
+    }
     var body: some Scene {
+        
         WindowGroup {
             ContentView()
                 .environment(appModel)

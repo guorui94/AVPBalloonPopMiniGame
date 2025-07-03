@@ -808,12 +808,6 @@ def Xform "Root"
         {
         }
     }
-
-    def RealityKitAudioFile "balloonpop_83760_mp3"
-    {
-        uniform asset file = @balloonpop-83760.mp3@
-        uniform bool shouldLoop = 0
-    }
 }
 
 def Cube "InvisibleBox" (

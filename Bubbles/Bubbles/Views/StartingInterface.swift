@@ -25,18 +25,41 @@ struct StartingInterface: View {
             if !changeInterface {
                 HStack {
                     Spacer()
-                    VStack(spacing: 40) {
+                    VStack(spacing: 30) {
                         Spacer()
                         Text("🎈 Pop Balloons 🎈")
                             .font(.extraLargeTitle)
                             .fontWeight(.bold)
 
                         Text(
-                            "Get ready to pop as many balloons as you can before the balloon disappears!"
+                            "You have 20 seconds to pop as many balloons as you can before they disappear at the top!"
                         )
                         .font(.title2)
                         .multilineTextAlignment(.center)
-                        .frame(width: 400)
+                        .frame(maxWidth: 600)
+                        
+                        HStack(spacing: 20) {
+                            VStack (alignment: .leading) {
+                                DisplayBalloonColors(color:BalloonColor.red.swiftColor, points: 5)
+
+                                DisplayBalloonColors(color:BalloonColor.blue.swiftColor, points: 10)
+                                
+                                DisplayBalloonColors(color:BalloonColor.green.swiftColor, points: 15)
+                            }
+
+                            VStack {
+                                DisplayBalloonColors(color:BalloonColor.darkBrown.swiftColor, points: 20)
+                                
+                                DisplayBalloonColors(color:BalloonColor.purple.swiftColor, points: 30)
+                                
+                                DisplayBalloonColors(color:BalloonColor.teal.swiftColor, points: 50)
+                            }
+                        }
+                        
+                        Text("Balloons with higher score will move much faster!")
+                            .font(.title2)
+                            .multilineTextAlignment(.center)
+                            .frame(maxWidth: 700)
 
                         Button(action: {
                             startCountdown()
@@ -123,7 +146,7 @@ struct StartingInterface: View {
                     changeInterface = false
                     isStarting = false
                     gameEnds = false
-                    
+
                 },
                 {
                     onBack()
@@ -145,6 +168,7 @@ struct StartingInterface: View {
             changeInterface = true
         }
     }
+    
 }
 
 #Preview {
