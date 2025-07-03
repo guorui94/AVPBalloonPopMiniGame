@@ -21,7 +21,6 @@ struct ImmersiveView: View {
     @State private var bubbleClones: [Entity] = []
     @Environment(AppModel.self) var appModel
     @State private var totalScore = 0
-    @State private var popAudio: AudioFileResource?
     
     var body: some View {
         RealityView { content in
@@ -67,16 +66,6 @@ struct ImmersiveView: View {
                 content.add(worldAnchor)
             }
         }
-        .onAppear {
-            Task {
-                do {
-                    popAudio = try await AudioFileResource(
-                        named: "balloonpopping.mp3")
-                } catch {
-                    print("❌ Failed to load audio: \(error)")
-                }
-            }
-        }
         .gesture(
             SpatialTapGesture().targetedToEntity(where: predicate).onEnded({
                 value in
@@ -86,6 +75,8 @@ struct ImmersiveView: View {
                 if entity.components.has(PoppedComponent.self) {
                     return
                 }
+                
+                let popAudio = appModel.balloonPoppingsounds.randomElement()
 
                 // if not popped, set it to popped
                 entity.components.set(PoppedComponent())
