@@ -52,9 +52,10 @@ struct ImmersiveView: View {
 
                     // randomly assign positions
                     let x = Float.random(in: -0.7...0.7)
+                    let y = Float.random(in: -0.02...0)
                     let z = Float.random(in: -1...0)
 
-                    bubbleClone.position = [x, 0, z]  // in meters
+                    bubbleClone.position = [x, y, z]  // in meters
                     immersiveContentEntity.addChild(bubbleClone)
                     bubbleClones.append(bubbleClone)
                 }

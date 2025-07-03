@@ -119,10 +119,14 @@ struct StartingInterface: View {
         .onChange(of: gameEnds) { oldValue, newValue in
             onShowEndGame(
                 {
-                    // play again logic
+                    appModel.resetGame()
+                    changeInterface = false
+                    isStarting = false
+                    gameEnds = false
+                    
                 },
                 {
-                    // back to menu logic
+                    onBack()
                 })
         }
 

@@ -35,22 +35,7 @@ struct ContentView: View {
                     GameCard(
                         title: "Balloon Popping",
                         subtitle: "Pop the balloons as fast as you can",
-                        action: {
-                            selectedInterface = AnyView(
-                                StartingInterface( changeInterface: $changeInterface, isStarting: $isStarting,
-                                    onBack: {
-                                        selectedInterface = nil
-                                    },
-                                    onShowEndGame: { playAgain, backToMenu in
-                                        selectedInterface = AnyView(
-                                            BalloonEndGame(
-                                                onPlayAgain: playAgain,
-                                                onBackToMenu: backToMenu
-                                            )
-                                        )
-                                    }
-                                )
-                            )
+                        action: { showStartingInterface()
                         })
 
                     // fillers
@@ -81,8 +66,36 @@ struct ContentView: View {
                 )
             )
         }
+        
     }
-
+    private func showStartingInterface() {
+        selectedInterface = AnyView(
+            StartingInterface(
+                changeInterface: $changeInterface,
+                isStarting: $isStarting,
+                onBack: {
+                    selectedInterface = nil
+                },
+                onShowEndGame: { playAgain, backToMenu in
+                    selectedInterface = AnyView(
+                        BalloonEndGame(
+                            onPlayAgain: {
+                                appModel.resetGame()
+                                changeInterface = false
+                                isStarting = false
+                                
+                                showStartingInterface()
+                            },
+                            onBackToMenu: {
+                                selectedInterface = nil
+                            }
+                        )
+                    )
+                }
+            )
+        )
+    }
+    
 }
 
 #Preview() {

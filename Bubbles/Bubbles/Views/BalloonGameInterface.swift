@@ -16,6 +16,7 @@ struct BalloonGameInterface: View {
     @State private var triggerColorChange = false
     @State private var isPulsing = false
     @State private var secondsRemaining = 20
+    
     @Binding var gameEnds: Bool
 
     var body: some View {
