@@ -9,18 +9,17 @@ import RealityKit
 import RealityKitContent
 import SwiftUI
 
-// track if the ballon has been popped, to avoid re-triggering the shader graph animation
+// track if the balloon has been popped, to avoid re-triggering the shader graph animation
 struct PoppedComponent: Component {}
 struct AboutToDisappearComponent: Component {}
 
-struct ImmersiveView: View {
+struct BalloonGameImmersiveView: View {
     // match any entity with a visible model component aka a 3d model
     @State var predicate = QueryPredicate<Entity>.has(ModelComponent.self)
-    @State private var timer: Timer?
     @State var bubble = Entity()
     @State private var bubbleClones: [Entity] = []
     @Environment(AppModel.self) var appModel
-    @State private var totalScore = 0
+
     
     var body: some View {
         RealityView { content in
@@ -35,23 +34,43 @@ struct ImmersiveView: View {
                     fatalError()
                 }
                 bubble.removeFromParent()
+                
+                let redCount = 6
+                let blueCount = 6
+                let greenCount = 5
+                let darkBrownCount = 6
+                let purpleCount = 3
+                let tealCount = 4
 
-                for _ in 1...20 {
-                    let randomColor = BalloonColor.allCases.randomElement()!
+                // set a fixed number ot balloons to appear in the immersive space
+                var colorList: [BalloonColor] = []
+                colorList += Array(repeating: .red, count: redCount)
+                colorList += Array(repeating: .blue, count: blueCount)
+                colorList += Array(repeating: .green, count: greenCount)
+                colorList += Array(repeating: .darkBrown, count: darkBrownCount)
+                colorList += Array(repeating: .purple, count: purpleCount)
+                colorList += Array(repeating: .teal, count: tealCount)
+                
+                colorList.shuffle()
+                
+                for balloonColor in colorList {
                     
-                    totalScore += randomColor.poppingScore
-                    applyBalloonColor(to: bubble, using: randomColor)
+                    applyBalloonColor(to: bubble, using: balloonColor.color)
                     
-                    guard var bubbleComponent = bubble.components[ScoreComponent.self] else {
+                    guard var scoreComponent = bubble.components[ScoreComponent.self] else {
                         fatalError()
                     }
-                    bubbleComponent.score = randomColor.poppingScore
-                    bubble.components.set(bubbleComponent)
+                    scoreComponent.score = balloonColor.poppingScore
+                    bubble.components.set(scoreComponent)
 
                     let bubbleClone = bubble.clone(recursive: true)
-
-                    let linearY = Float.random(in: 0.05...0.17)
-
+                    
+                    var linearY = Float.random(in: 0.05...0.17)
+                    
+                    if balloonColor.findColor == "purple" || balloonColor.findColor == "teal" {
+                        linearY = Float.random(in: 0.25...0.35)
+                    }
+                    
                     let pm = PhysicsMotionComponent(linearVelocity: [
                         0, linearY, 0,
                     ])
@@ -61,13 +80,22 @@ struct ImmersiveView: View {
                     // randomly assign positions
                     let x = Float.random(in: -0.7...0.7)
                     let z = Float.random(in: -1...0)
-
+                    
                     bubbleClone.position = [x, 0, z]  // in meters
-                    immersiveContentEntity.addChild(bubbleClone)
-                    bubbleClones.append(bubbleClone)
+                    if balloonColor.findColor == "purple" || balloonColor.findColor == "teal" {
+                        // Delayed adding to scene
+                        Task {
+                            try? await Task.sleep(nanoseconds: 3_000_000_000)
+                            immersiveContentEntity.addChild(bubbleClone)
+                            bubbleClones.append(bubbleClone)
+                        }
+                    } else {
+                        immersiveContentEntity.addChild(bubbleClone)
+                        bubbleClones.append(bubbleClone)
+                    }
                 }
-                print(totalScore)
-                // use a world anchor to make sure the ballons spawn in front of the user
+
+                // use a world anchor to make sure the balloons spawn in front of the user
                 let worldAnchor = AnchorEntity(world: [0, 1, -0.8])
 
                 worldAnchor.addChild(immersiveContentEntity)
@@ -101,46 +129,44 @@ struct ImmersiveView: View {
                     fatalError()
                 }
                 
-                guard let bubbleComponent = entity.components[ScoreComponent.self] else {
+                guard let scoreComponent = entity.components[ScoreComponent.self] else {
                     fatalError()
                 }
-                appModel.score.poppingScore += bubbleComponent.score
+                appModel.score.poppingScore += scoreComponent.score
 
                 let frameRate: TimeInterval = 1.0 / 60.0  // 60 fps
-                let duration: TimeInterval = 0.20
+                let duration: TimeInterval = 0.25
                 let targetValue: Float = 1
                 let totalFrames = Int(duration / frameRate)
                 var currentFrame = 0
                 var popValue: Float = 0
 
-                timer?.invalidate()
-                timer = Timer.scheduledTimer(
-                    withTimeInterval: frameRate, repeats: true,
-                    block: { timer in
-                        currentFrame += 1
-                        let progress = Float(currentFrame) / Float(totalFrames)
+                Timer.scheduledTimer(withTimeInterval: frameRate, repeats: true) { timer in
+                    currentFrame += 1
+                    let progress = Float(currentFrame) / Float(totalFrames)
+                    popValue = progress * targetValue
 
-                        popValue = progress * targetValue
+                    do {
+                        try mat.setParameter(name: "Pop", value: .float(popValue))
+                        entity.components[ModelComponent.self]?.materials = [mat]
+                    } catch {
+                        print(error.localizedDescription)
+                    }
 
-                        do {
-                            try mat.setParameter(
-                                name: "Pop", value: .float(popValue))
-                            entity.components[ModelComponent.self]?.materials =
-                                [mat]
-
-                        } catch {
-                            print(error.localizedDescription)
+                    if currentFrame >= totalFrames {
+                        timer.invalidate()
+                        entity.removeFromParent()
+                        Task { @MainActor in
+                            appModel.trackBalloonsRemoved()
+                            print(appModel.score.balloonsRemoved)
                         }
+                    }
+                }
 
-                        if currentFrame >= totalFrames {
-                            timer.invalidate()
-                            entity.removeFromParent()
-                        }
-                    })
 
             })
         )
-        // sets the invisible boundary for ballons to disappear
+        // sets the invisible boundary for balloons to disappear
         .task {
             Timer.scheduledTimer(withTimeInterval: 0.25 / 30.0, repeats: true) {
                 _ in
@@ -158,6 +184,10 @@ struct ImmersiveView: View {
                         if bubble.position.y >= 1.1 {
                             bubble.removeFromParent()
                             bubbleClones.remove(at: i)
+                            Task { @MainActor in
+                                appModel.trackBalloonsRemoved()
+                                print(appModel.score.balloonsRemoved)
+                            }
                         }
                     }
                 }
@@ -166,7 +196,7 @@ struct ImmersiveView: View {
 
     }
 
-    private func applyBalloonColor(to entity: Entity, using balloonColor: BalloonColor)
+    private func applyBalloonColor(to entity: Entity, using balloonColor: CGColor)
     {
         if let modelEntity = entity as? ModelEntity,
             var modelComponent = modelEntity.components[ModelComponent.self],
@@ -174,7 +204,7 @@ struct ImmersiveView: View {
         {
             do {
                 try mat.setParameter(
-                    name: "BalloonColor", value: .color(balloonColor.color))
+                    name: "BalloonColor", value: .color(balloonColor))
                 try mat.setParameter(
                     name: "DisappearingColor", value: .color(CGColor(red: 0, green: 0, blue: 0, alpha: 0)))
                 modelComponent.materials[0] = mat
@@ -249,6 +279,6 @@ struct ImmersiveView: View {
 }
 
 #Preview(immersionStyle: .mixed) {
-    ImmersiveView()
+    BalloonGameImmersiveView()
         .environment(AppModel())
 }

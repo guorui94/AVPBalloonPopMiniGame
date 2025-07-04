@@ -9,6 +9,7 @@ import SwiftUI
 
 struct BalloonEndGame: View {
     @Environment(AppModel.self) private var appModel
+    @State private var pulse = false
     var onPlayAgain: () -> Void
     var onBackToMenu: () -> Void
     var body: some View {
@@ -27,13 +28,25 @@ struct BalloonEndGame: View {
                     .padding(.top, 50)
 
                 Text("Your results are in...")
-                    .font(.title3)
+                    .font(.title)
                     .foregroundStyle(Color(white: 0.9))
 
                 Text(verbatim: "\(String(format: "%02d", displayScore.poppingScore))")
                     .font(.system(size: 50, weight: .semibold, design: .monospaced))
                     .foregroundStyle(.cyan)
-
+                
+                if appModel.score.isHighScore {
+                    Text("New high score!!")
+                        .font(.system(size: 30, weight: .semibold, design: .monospaced))
+                        .foregroundStyle(.cyan)
+                        .shadow(color: .cyan.opacity(0.7), radius: 10)
+                        .scaleEffect(pulse ? 1.1 : 1.0)
+                        .animation(.easeInOut(duration: 1).repeatForever(autoreverses: true), value: pulse)
+                        .onAppear {
+                            pulse = true
+                        }
+                }
+                
                 HStack(spacing: 20) {
                     Button(action: {
                         onPlayAgain()
@@ -60,7 +73,7 @@ struct BalloonEndGame: View {
                 }
                 .padding(.bottom, 30)
             }
-            .padding(.horizontal,50)
+            .padding(.horizontal, 50)
             .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 32, style: .continuous))
             .shadow(color: .cyan.opacity(0.3), radius: 20, x: 0, y: 10)
 
@@ -69,6 +82,11 @@ struct BalloonEndGame: View {
             in: RoundedRectangle(
                 cornerRadius: 32, style: .continuous)
         )
+        .onAppear {
+            if appModel.score.isHighScore {
+                appModel.highScoreApplause()
+            }
+        }
     }
 }
 

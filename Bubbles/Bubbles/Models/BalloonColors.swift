@@ -67,5 +67,22 @@ enum BalloonColor: CaseIterable {
             return 50
         }
     }
+    
+    var findColor: String {
+        switch self {
+        case .red:
+            return "red"
+        case .blue:
+            return "blue"
+        case .green:
+            return "green"
+        case .darkBrown:
+            return "darkBrown"
+        case .purple:
+            return "purple"
+        case .teal:
+            return "teal"
+        }
+    }
 
 }

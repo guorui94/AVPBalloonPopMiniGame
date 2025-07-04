@@ -698,11 +698,6 @@ def Xform "Root"
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
         }
 
-        def RealityKitCustomComponent "RealityKitContent_ColorComponent"
-        {
-            uniform token info:id = "RealityKitContent.ColorComponent"
-        }
-
         def Preliminary_Behavior "OnNotification"
         {
             rel actions = </Root/Bubble/OnNotification/Action>

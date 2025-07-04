@@ -36,7 +36,7 @@ struct StartingInterface: View {
                         )
                         .font(.title2)
                         .multilineTextAlignment(.center)
-                        .frame(maxWidth: 600)
+                        .frame(maxWidth: 800)
                         
                         HStack(spacing: 20) {
                             VStack (alignment: .leading) {
@@ -51,15 +51,32 @@ struct StartingInterface: View {
                                 DisplayBalloonColors(color:BalloonColor.darkBrown.swiftColor, points: 20)
                                 
                                 DisplayBalloonColors(color:BalloonColor.purple.swiftColor, points: 30)
+                                    .font(.title)
+                                    .fontWeight(.heavy)
+                                    .foregroundColor(.cyan)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 6)
+                                            .fill(Color.white.opacity(0.15))
+                                            .padding(-4) // Makes background snug
+                                    )
+
                                 
                                 DisplayBalloonColors(color:BalloonColor.teal.swiftColor, points: 50)
+                                    .font(.title)
+                                    .fontWeight(.heavy)
+                                    .foregroundColor(.cyan)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 6)
+                                            .fill(Color.white.opacity(0.15))
+                                            .padding(-4) // Makes background snug
+                                    )
                             }
                         }
                         
-                        Text("Balloons with higher score will move much faster!")
+                        Text("Balloons with higher points will move much faster and push other balloons!")
                             .font(.title2)
                             .multilineTextAlignment(.center)
-                            .frame(maxWidth: 700)
+                            .frame(maxWidth: 800)
 
                         Button(action: {
                             startCountdown()
@@ -121,7 +138,8 @@ struct StartingInterface: View {
                         }
                         changeInterface = false
                         isStarting = false
-                        appModel.score.resetScore()
+                        appModel.resetGame()
+                        appModel.resetBalloonsRemoved()
                     }) {
                         Image(systemName: "chevron.left")
                             .font(.system(size: 24, weight: .medium))
@@ -136,7 +154,7 @@ struct StartingInterface: View {
                         effect.scaleEffect(!isActive ? 1.0 : 1.2)
                     }
                 }
-                .offset(x: -250, y: -50)
+                .offset(x: -250, y: -70)
             }
         }
         .onChange(of: gameEnds) { oldValue, newValue in
@@ -146,13 +164,12 @@ struct StartingInterface: View {
                     changeInterface = false
                     isStarting = false
                     gameEnds = false
-
+                    
                 },
                 {
                     onBack()
                 })
         }
-
     }
     private func startCountdown() {
         countdown = 3
@@ -164,7 +181,7 @@ struct StartingInterface: View {
             }
             countdown = nil
 
-            await openImmersiveSpace(id: appModel.immersiveSpaceID)
+            await openImmersiveSpace(id: appModel.immersiveSpaceId)
             changeInterface = true
         }
     }

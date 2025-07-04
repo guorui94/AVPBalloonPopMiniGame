@@ -10,7 +10,7 @@ import RealityKitContent
 class BubbleSystem: System {
     
     private let bubbleComponentQuery = EntityQuery(where: .has(BubbleComponent.self))
-    public var speed: Float = 0.001
+    private let speed: Float = 0.001
 
     required init(scene: Scene) {
     

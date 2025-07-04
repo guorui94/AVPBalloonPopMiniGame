@@ -10,6 +10,7 @@ import SwiftUI
 
 struct BalloonGameInterface: View {
     @Environment(AppModel.self) var appModel
+    @Environment(\.dismissImmersiveSpace) private var dismissImmersiveSpace
     @State private var timer = Timer.publish(every: 1, on: .main, in: .common)
         .autoconnect()
     @State private var progress = 1.0
@@ -94,6 +95,11 @@ struct BalloonGameInterface: View {
                 if progress <= 0.0 {
                     progress = 0.0
                 }
+                
+                if appModel.score.balloonsRemoved >= 30 {
+                    prepareForEndGame()
+                }
+                
                 secondsRemaining -= 1
                 if secondsRemaining <= 5 {
                     withAnimation(.easeInOut(duration: 1.0)) {
@@ -101,14 +107,20 @@ struct BalloonGameInterface: View {
                         isPulsing = true
                     }
                 }
-            } else {
-                appModel.signalEndGame()
-                timer.upstream.connect().cancel()
-                gameEnds = true
+            }
+            else {
+                prepareForEndGame()
             }
         }
     }
-
+    func prepareForEndGame () {
+        Task {
+            await dismissImmersiveSpace()
+        }
+        appModel.signalEndGame()
+        timer.upstream.connect().cancel()
+        gameEnds = true
+    }
 }
 
 #Preview() {

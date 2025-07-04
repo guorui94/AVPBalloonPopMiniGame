@@ -85,12 +85,14 @@ struct ContentView: View {
                                     await dismissImmersiveSpace()
                                 }
                                 appModel.resetGame()
+                                appModel.resetBalloonsRemoved()
                                 changeInterface = false
                                 isStarting = false
                                 showStartingInterface()
                             },
                             onBackToMenu: {
                                 Task {
+                                    appModel.resetBalloonsRemoved()
                                     await dismissImmersiveSpace()
                                 }
                                 selectedInterface = nil
