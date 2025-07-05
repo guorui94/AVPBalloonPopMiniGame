@@ -81,9 +81,6 @@ struct ContentView: View {
                     selectedInterface = AnyView(
                         BalloonEndGame(
                             onPlayAgain: {
-                                Task {
-                                    await dismissImmersiveSpace()
-                                }
                                 appModel.resetGame()
                                 appModel.resetBalloonsRemoved()
                                 changeInterface = false
@@ -92,9 +89,12 @@ struct ContentView: View {
                             },
                             onBackToMenu: {
                                 Task {
-                                    appModel.resetBalloonsRemoved()
                                     await dismissImmersiveSpace()
                                 }
+                                appModel.resetGame()
+                                appModel.resetBalloonsRemoved()
+                                changeInterface = false
+                                isStarting = false
                                 selectedInterface = nil
                             }
                         )

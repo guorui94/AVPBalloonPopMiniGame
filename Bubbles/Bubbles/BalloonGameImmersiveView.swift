@@ -65,7 +65,7 @@ struct BalloonGameImmersiveView: View {
 
                     let bubbleClone = bubble.clone(recursive: true)
                     
-                    var linearY = Float.random(in: 0.05...0.17)
+                    var linearY = Float.random(in: 0.05...0.13)
                     
                     if balloonColor.findColor == "purple" || balloonColor.findColor == "teal" {
                         linearY = Float.random(in: 0.25...0.35)

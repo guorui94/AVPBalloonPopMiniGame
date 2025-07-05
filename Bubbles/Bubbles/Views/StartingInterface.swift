@@ -133,9 +133,6 @@ struct StartingInterface: View {
                 ZStack(alignment: .topLeading) {
                     BalloonGameInterface(gameEnds: $gameEnds)
                     Button(action: {
-                        Task {
-                            await dismissImmersiveSpace()
-                        }
                         changeInterface = false
                         isStarting = false
                         appModel.resetGame()
@@ -160,14 +157,11 @@ struct StartingInterface: View {
         .onChange(of: gameEnds) { oldValue, newValue in
             onShowEndGame(
                 {
-                    appModel.resetGame()
-                    changeInterface = false
-                    isStarting = false
-                    gameEnds = false
-                    
+                    resetGameState ()
                 },
                 {
                     onBack()
+                    resetGameState ()
                 })
         }
     }
@@ -184,6 +178,12 @@ struct StartingInterface: View {
             await openImmersiveSpace(id: appModel.immersiveSpaceId)
             changeInterface = true
         }
+    }
+    private func resetGameState () {
+        appModel.resetGame()
+        changeInterface = false
+        isStarting = false
+        gameEnds = false
     }
     
 }

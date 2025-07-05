@@ -17,7 +17,7 @@ struct BalloonGameInterface: View {
     @State private var triggerColorChange = false
     @State private var isPulsing = false
     @State private var secondsRemaining = 20
-    
+
     @Binding var gameEnds: Bool
 
     var body: some View {
@@ -48,7 +48,7 @@ struct BalloonGameInterface: View {
 
                     ProgressView(value: progress)
                         .progressViewStyle(LinearProgressViewStyle())
-                        .frame(width: 300, height: 12)
+                        .frame(width: 280, height: 12)
                         .padding(.horizontal, 30)
                         .tint(
                             triggerColorChange
@@ -95,11 +95,11 @@ struct BalloonGameInterface: View {
                 if progress <= 0.0 {
                     progress = 0.0
                 }
-                
+
                 if appModel.score.balloonsRemoved >= 30 {
                     prepareForEndGame()
                 }
-                
+
                 secondsRemaining -= 1
                 if secondsRemaining <= 5 {
                     withAnimation(.easeInOut(duration: 1.0)) {
@@ -107,13 +107,12 @@ struct BalloonGameInterface: View {
                         isPulsing = true
                     }
                 }
-            }
-            else {
+            } else {
                 prepareForEndGame()
             }
         }
     }
-    func prepareForEndGame () {
+    func prepareForEndGame() {
         Task {
             await dismissImmersiveSpace()
         }
