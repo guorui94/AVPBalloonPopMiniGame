@@ -44,7 +44,7 @@ struct BalloonGameInterface: View {
                                 ? Color.red : Color.white.opacity(0.7),
                             lineWidth: 2
                         )
-                        .frame(width: 305, height: 9)
+                        .frame(width: 285, height: 9)
 
                     ProgressView(value: progress)
                         .progressViewStyle(LinearProgressViewStyle())

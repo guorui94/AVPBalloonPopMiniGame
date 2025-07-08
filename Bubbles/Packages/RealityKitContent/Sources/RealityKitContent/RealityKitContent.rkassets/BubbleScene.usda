@@ -10,7 +10,7 @@
 
 def Xform "Root"
 {
-    reorder nameChildren = ["Bubble", "BubbleMaterial", "PopBubbleAudio", "balloonpop_83760_mp3"]
+    reorder nameChildren = ["Bubble", "BubbleMaterial", "balloonpop_83760_mp3"]
     def Material "BubbleMaterial"
     {
         float inputs:AnimationSpeed = 0.01 (
@@ -35,6 +35,7 @@ def Xform "Root"
             customData = {
                 dictionary realitykit = {
                     float2 positionInSubgraph = (-231.30582, -383.0035)
+                    int stackingOrderInSubgraph = 5524
                 }
             }
         )
@@ -774,33 +775,6 @@ def Xform "Root"
         def RealityKitCustomComponent "RealityKitContent_ScoreComponent"
         {
             uniform token info:id = "RealityKitContent.ScoreComponent"
-        }
-    }
-
-    def RealityKitTimeline "PopBubbleAudio"
-    {
-        reorder nameChildren = ["Track", "Track2"]
-        def RealityKitTrack "Track"
-        {
-            def RealityKitAction "Play_Audio"
-            {
-                string actionKind = "audio"
-                string audioResourceName = "balloonpop_83760_mp3"
-                bool controlPlayback = 1
-                double duration = 0.5485625
-                uniform token info:id = "2338D5A5-D9F8-4B66-AFCF-E07C7F0D6C60"
-                double startTime = 0
-                rel target = </Root/Bubble>
-
-                def RealityKitStruct "handoffType"
-                {
-                    token type = "stop"
-                }
-            }
-        }
-
-        def RealityKitTrack "Track2"
-        {
         }
     }
 }

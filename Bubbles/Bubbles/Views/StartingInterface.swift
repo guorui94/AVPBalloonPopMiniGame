@@ -116,7 +116,7 @@ struct StartingInterface: View {
                 onBack()
             }) {
                 Image(systemName: "chevron.left")
-                    .font(.system(size: 24, weight: .medium))
+                    .font(.system(size: 28, weight: .medium))
                     .padding(14)
                     .background(.ultraThinMaterial)
                     .clipShape(Circle())

@@ -56,8 +56,8 @@ struct BalloonEndGame: View {
                             .frame(width: 140)
                             .background(Color.cyan.opacity(0.2))
                             .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.cyan, lineWidth: 2))
-                            .cornerRadius(12)
                     }
+                    .cornerRadius(12)
                     .buttonStyle(.plain)
 
                     Button(action: {
@@ -66,9 +66,9 @@ struct BalloonEndGame: View {
                         Text("Back to Menu")
                             .padding()
                             .frame(width: 140)
-                            .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.white.opacity(0.5), lineWidth: 2))
-                            .cornerRadius(12)
+                            .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.white.opacity(0.7), lineWidth: 2))
                     }
+                    .cornerRadius(12)
                     .buttonStyle(.plain)
                 }
                 .padding(.bottom, 30)
