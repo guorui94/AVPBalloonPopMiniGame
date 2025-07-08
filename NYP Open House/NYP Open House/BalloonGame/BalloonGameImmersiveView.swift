@@ -36,20 +36,16 @@ struct BalloonGameImmersiveView: View {
                 bubble.removeFromParent()
                 
                 let redCount = 6
-                let blueCount = 6
-                let greenCount = 5
-                let darkBrownCount = 6
-                let purpleCount = 3
-                let tealCount = 4
+                let greenCount = 7
+                let purpleCount = 6
+                let goldCount = 4
 
                 // set a fixed number ot balloons to appear in the immersive space
                 var colorList: [BalloonColor] = []
                 colorList += Array(repeating: .red, count: redCount)
-                colorList += Array(repeating: .blue, count: blueCount)
                 colorList += Array(repeating: .green, count: greenCount)
-                colorList += Array(repeating: .darkBrown, count: darkBrownCount)
                 colorList += Array(repeating: .purple, count: purpleCount)
-                colorList += Array(repeating: .teal, count: tealCount)
+                colorList += Array(repeating: .gold, count: goldCount)
                 
                 colorList.shuffle()
                 
@@ -63,11 +59,36 @@ struct BalloonGameImmersiveView: View {
                     scoreComponent.score = balloonColor.poppingScore
                     bubble.components.set(scoreComponent)
 
+                    guard
+                        let modelComponent = bubble.components[ModelComponent.self],
+                        var mat = modelComponent.materials.first
+                            as? ShaderGraphMaterial
+                    else {
+                        fatalError()
+                    }
+                    
+                    do {
+                        if balloonColor.findColor == "gold" {
+                            try mat.setParameter(name: "Shiny", value: .float(1.0))
+                            try mat.setParameter(name: "Metallic", value: .float(0.8))
+                        }
+                        else {
+                            try mat.setParameter(name: "Shiny", value: .float(0.0))
+                            try mat.setParameter(name: "Metallic", value: .float(0.0))
+                        }
+                            
+                        bubble.components[ModelComponent.self]?.materials = [mat]
+                    } catch {
+                        print(error.localizedDescription)
+                    }
+                    
+                    
+                    
                     let bubbleClone = bubble.clone(recursive: true)
                     
                     var linearY = Float.random(in: 0.05...0.13)
                     
-                    if balloonColor.findColor == "purple" || balloonColor.findColor == "teal" {
+                    if balloonColor.findColor == "gold" {
                         linearY = Float.random(in: 0.25...0.35)
                     }
                     
@@ -79,10 +100,15 @@ struct BalloonGameImmersiveView: View {
 
                     // randomly assign positions
                     let x = Float.random(in: -0.7...0.7)
+                    var y = Float.random(in: -0.2...0)
                     let z = Float.random(in: -1...0)
                     
-                    bubbleClone.position = [x, 0, z]  // in meters
-                    if balloonColor.findColor == "purple" || balloonColor.findColor == "teal" {
+                    if balloonColor.findColor == "gold" {
+                        y = 0
+                    }
+                    
+                    bubbleClone.position = [x, y, z]  // in meters
+                    if  balloonColor.findColor == "gold" {
                         // Delayed adding to scene
                         Task {
                             try? await Task.sleep(nanoseconds: 3_000_000_000)

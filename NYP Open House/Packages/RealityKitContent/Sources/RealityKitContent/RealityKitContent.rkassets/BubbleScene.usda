@@ -21,12 +21,12 @@ def Xform "Root"
                 }
             }
         )
-        color3f inputs:BalloonColor = (0.9700503, 0.13657543, 0) (
+        color3f inputs:BalloonColor = (0.9085884, 0.7315051, 0.21568628) (
             colorSpace = "srgb_texture"
             customData = {
                 dictionary realitykit = {
-                    float2 positionInSubgraph = (-487.30756, -325.2636)
-                    int stackingOrderInSubgraph = 5520
+                    float2 positionInSubgraph = (-491.96896, -354.52432)
+                    int stackingOrderInSubgraph = 6103
                 }
             }
         )
@@ -34,8 +34,15 @@ def Xform "Root"
             colorSpace = "srgb_texture"
             customData = {
                 dictionary realitykit = {
-                    float2 positionInSubgraph = (-231.30582, -383.0035)
-                    int stackingOrderInSubgraph = 5524
+                    float2 positionInSubgraph = (-397.68903, -395.08484)
+                    int stackingOrderInSubgraph = 5547
+                }
+            }
+        )
+        float inputs:Metallic = 0 (
+            customData = {
+                dictionary realitykit = {
+                    float2 positionInSubgraph = (-426.36575, -196.86313)
                 }
             }
         )
@@ -50,8 +57,16 @@ def Xform "Root"
         float inputs:Pop = 0 (
             customData = {
                 dictionary realitykit = {
-                    float2 positionInSubgraph = (-1245.2898, 143.06856)
-                    int stackingOrderInSubgraph = 5227
+                    float2 positionInSubgraph = (-1354.5272, 20.99164)
+                    int stackingOrderInSubgraph = 6086
+                }
+            }
+        )
+        float inputs:Shiny = 0 (
+            customData = {
+                dictionary realitykit = {
+                    float2 positionInSubgraph = (-417.28436, -63.53229)
+                    int stackingOrderInSubgraph = 6102
                 }
             }
         )
@@ -64,8 +79,9 @@ def Xform "Root"
         def Shader "PreviewSurface"
         {
             uniform token info:id = "ND_UsdPreviewSurface_surfaceshader"
-            float inputs:clearcoat
-            float inputs:clearcoatRoughness
+            float inputs:clearcoat = 0
+            float inputs:clearcoat.connect = </Root/BubbleMaterial.inputs:Shiny>
+            float inputs:clearcoatRoughness = 0.01
             color3f inputs:diffuseColor = (0.6899187, 0.6973368, 1) (
                 colorSpace = "srgb_texture"
             )
@@ -75,7 +91,8 @@ def Xform "Root"
             )
             color3f inputs:emissiveColor.connect = </Root/BubbleMaterial/Multiply_1.outputs:out>
             float inputs:ior
-            float inputs:metallic
+            float inputs:metallic = 0.47
+            float inputs:metallic.connect = </Root/BubbleMaterial.inputs:Metallic>
             float3 inputs:normal
             float inputs:occlusion.connect = </Root/BubbleMaterial/Step.outputs:out>
             float inputs:opacity = 0.15
@@ -83,8 +100,8 @@ def Xform "Root"
             float inputs:opacityThreshold
             float inputs:roughness = 0.5
             token outputs:out
-            float2 ui:nodegraph:node:pos = (-151.39653, 16.346899)
-            int ui:nodegraph:node:stackingOrder = 5494
+            float2 ui:nodegraph:node:pos = (-168.07622, -62.12185)
+            int ui:nodegraph:node:stackingOrder = 5533
             string[] ui:nodegraph:realitykit:node:attributesShowingChildren = ["Advanced", "inputs:occlusion"]
         }
 
@@ -492,8 +509,8 @@ def Xform "Root"
             float inputs:pivot
             float3 inputs:position.connect = </Root/BubbleMaterial/Multiply.outputs:out>
             float outputs:out
-            float2 ui:nodegraph:node:pos = (-963.0149, 0.9191465)
-            int ui:nodegraph:node:stackingOrder = 5227
+            float2 ui:nodegraph:node:pos = (-1072.2523, -121.15777)
+            int ui:nodegraph:node:stackingOrder = 6086
             string[] ui:nodegraph:realitykit:node:attributesShowingChildren = ["inputs:amplitude"]
         }
 
@@ -501,8 +518,8 @@ def Xform "Root"
         {
             uniform token info:id = "ND_position_vector3"
             float3 outputs:out
-            float2 ui:nodegraph:node:pos = (-1448.5934, -49.17451)
-            int ui:nodegraph:node:stackingOrder = 5227
+            float2 ui:nodegraph:node:pos = (-1557.8308, -171.25143)
+            int ui:nodegraph:node:stackingOrder = 6086
         }
 
         def Shader "PopHolesScale"
@@ -510,8 +527,8 @@ def Xform "Root"
             uniform token info:id = "ND_constant_float"
             float inputs:value = 50
             float outputs:out
-            float2 ui:nodegraph:node:pos = (-1466.3129, 44.109028)
-            int ui:nodegraph:node:stackingOrder = 5227
+            float2 ui:nodegraph:node:pos = (-1575.5503, -77.96789)
+            int ui:nodegraph:node:stackingOrder = 6086
         }
 
         def Shader "Multiply"
@@ -520,8 +537,8 @@ def Xform "Root"
             prepend float3 inputs:in1.connect = </Root/BubbleMaterial/Position.outputs:out>
             float inputs:in2.connect = </Root/BubbleMaterial/PopHolesScale.outputs:out>
             float3 outputs:out
-            float2 ui:nodegraph:node:pos = (-1311.0502, -48.941692)
-            int ui:nodegraph:node:stackingOrder = 5227
+            float2 ui:nodegraph:node:pos = (-1420.2876, -171.01862)
+            int ui:nodegraph:node:stackingOrder = 6086
         }
 
         def Shader "Step"
@@ -530,8 +547,8 @@ def Xform "Root"
             float inputs:edge
             float inputs:in.connect = </Root/BubbleMaterial/Add_3.outputs:out>
             float outputs:out
-            float2 ui:nodegraph:node:pos = (-668.0298, -64.82478)
-            int ui:nodegraph:node:stackingOrder = 5227
+            float2 ui:nodegraph:node:pos = (-754.3716, -82.11848)
+            int ui:nodegraph:node:stackingOrder = 6089
         }
 
         def Shader "Add_3"
@@ -540,8 +557,8 @@ def Xform "Root"
             float inputs:in1.connect = </Root/BubbleMaterial/Noise3D.outputs:out>
             float inputs:in2.connect = </Root/BubbleMaterial/Remap.outputs:out>
             float outputs:out
-            float2 ui:nodegraph:node:pos = (-770.87024, 158.93977)
-            int ui:nodegraph:node:stackingOrder = 5472
+            float2 ui:nodegraph:node:pos = (-880.1077, 36.862858)
+            int ui:nodegraph:node:stackingOrder = 6086
         }
 
         def Shader "Remap"
@@ -551,8 +568,8 @@ def Xform "Root"
             float inputs:outhigh = -1
             float inputs:outlow = 1
             float outputs:out
-            float2 ui:nodegraph:node:pos = (-965.71515, 272.04294)
-            int ui:nodegraph:node:stackingOrder = 5472
+            float2 ui:nodegraph:node:pos = (-1074.9526, 149.96602)
+            int ui:nodegraph:node:stackingOrder = 6086
         }
 
         def Shader "Remap_1"
@@ -564,8 +581,8 @@ def Xform "Root"
             float inputs:outhigh = 1.16
             float inputs:outlow
             float outputs:out
-            float2 ui:nodegraph:node:pos = (-398.50272, -116.22731)
-            int ui:nodegraph:node:stackingOrder = 5231
+            float2 ui:nodegraph:node:pos = (-591.8577, -188.83565)
+            int ui:nodegraph:node:stackingOrder = 6101
         }
 
         def Shader "Multiply_1"

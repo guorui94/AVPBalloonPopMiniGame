@@ -40,36 +40,21 @@ struct StartingInterface: View {
                         
                         HStack(spacing: 20) {
                             VStack (alignment: .leading) {
-                                DisplayBalloonColors(color:BalloonColor.red.swiftColor, points: 5)
+                                DisplayBalloonColors(color:BalloonColor.red.swiftColor, points: BalloonColor.red.poppingScore)
 
-                                DisplayBalloonColors(color:BalloonColor.blue.swiftColor, points: 10)
                                 
-                                DisplayBalloonColors(color:BalloonColor.green.swiftColor, points: 15)
+                                DisplayBalloonColors(color:BalloonColor.green.swiftColor, points: BalloonColor.green.poppingScore)
                             }
 
-                            VStack {
-                                DisplayBalloonColors(color:BalloonColor.darkBrown.swiftColor, points: 20)
+                            VStack (alignment: .leading) {
                                 
-                                DisplayBalloonColors(color:BalloonColor.purple.swiftColor, points: 30)
-                                    .font(.title)
-                                    .fontWeight(.heavy)
-                                    .foregroundColor(.cyan)
-                                    .background(
-                                        RoundedRectangle(cornerRadius: 6)
-                                            .fill(Color.white.opacity(0.15))
-                                            .padding(-4) // Makes background snug
-                                    )
+                                DisplayBalloonColors(color:BalloonColor.purple.swiftColor, points: BalloonColor.purple.poppingScore)
 
                                 
-                                DisplayBalloonColors(color:BalloonColor.teal.swiftColor, points: 50)
+                                DisplayBalloonColors(color:BalloonColor.gold.swiftColor, points: BalloonColor.gold.poppingScore)
                                     .font(.title)
                                     .fontWeight(.heavy)
                                     .foregroundColor(.cyan)
-                                    .background(
-                                        RoundedRectangle(cornerRadius: 6)
-                                            .fill(Color.white.opacity(0.15))
-                                            .padding(-4) // Makes background snug
-                                    )
                             }
                         }
                         
