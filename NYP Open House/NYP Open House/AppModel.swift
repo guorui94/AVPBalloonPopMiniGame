@@ -27,10 +27,8 @@ extension ImmersiveSpaceID {
 @MainActor
 @Observable
 class AppModel {
-    
+    // change the immersive space id before calling openImmersiveSpace()
     let immersiveSpaceId = ImmersiveSpaceID.bubbleSpace.stringValue
-    
-
     
     enum ImmersiveSpaceState {
         case closed

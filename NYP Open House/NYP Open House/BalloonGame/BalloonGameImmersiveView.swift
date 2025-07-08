@@ -158,7 +158,6 @@ struct BalloonGameImmersiveView: View {
                         entity.removeFromParent()
                         Task { @MainActor in
                             appModel.trackBalloonsRemoved()
-                            print(appModel.score.balloonsRemoved)
                         }
                     }
                 }
@@ -186,7 +185,6 @@ struct BalloonGameImmersiveView: View {
                             bubbleClones.remove(at: i)
                             Task { @MainActor in
                                 appModel.trackBalloonsRemoved()
-                                print(appModel.score.balloonsRemoved)
                             }
                         }
                     }
