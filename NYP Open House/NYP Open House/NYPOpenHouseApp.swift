@@ -20,16 +20,13 @@ struct NYPOpenHouseApp: App {
                 .environment(appModel)
         }
         .windowStyle(.plain)
-        // with the windowStyle as .plain, for each view, set the glass background effect as
-        //.glassBackgroundEffect(in: RoundedRectangle(
-        //            cornerRadius: 32,
-        //            style: .continuous
-        //        )
-        //    ) in order for the background to appear. Make sure spacer/Hstack/Vstack is added to fill the screen if needed. Use frame to set the size of the window
+        // windowStyle(.plain) means there is no background, for each view, set the background as
+        // .glassBackgroundEffect(in: RoundedRectangle(cornerRadius: 32, style: .continuous))
+        // in order for the background to appear. Make sure spacer/Hstack/Vstack is added to fill the screen if needed. Use frame to set the size of the window
         
         
         // add the different immersive spaces here
-        ImmersiveSpace(id: appModel.immersiveSpaceId) {
+        ImmersiveSpace(id: Module.bubbleSpace.name) {
             BalloonGameImmersiveView()
                 .environment(appModel)
                 .onAppear {

@@ -9,27 +9,10 @@ import SwiftUI
 import AVFoundation
 import RealityKit
 
-// create uniqie immersive space IDs for different spaces
-enum ImmersiveSpaceID {
-    case bubbleSpace
-}
-
-extension ImmersiveSpaceID {
-    var stringValue: String {
-        switch self {
-        case .bubbleSpace:
-            return "bubbleSpace"
-        }
-    }
-}
-
 /// Maintains app-wide state
 @MainActor
 @Observable
 class AppModel {
-    // change the immersive space id before calling openImmersiveSpace()
-    let immersiveSpaceId = ImmersiveSpaceID.bubbleSpace.stringValue
-    
     enum ImmersiveSpaceState {
         case closed
         case inTransition
@@ -37,7 +20,7 @@ class AppModel {
     }
     var immersiveSpaceState = ImmersiveSpaceState.closed
     
-    // files that need longer time to load/ when require to load multiple files should go into init
+    // files that need longer time to load/ load multiple files should go into init
     init() {
         Task { @MainActor in
             do {
@@ -51,7 +34,7 @@ class AppModel {
         }
     }
     
-    // App Model is the main model that manages the state of various interfaces basically this model binds/can be used in every interface including immersive interfaces
+    // App Model is the main model that manages the state of various interfaces. basically this model binds/can be used in every interface including immersive interfaces
     // To keep it neat and easy to integrate new functions, create other models as observable and call the functions here, then you'd only need to import one model across interfaces
     var score = ScoreModel()
     
