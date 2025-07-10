@@ -96,7 +96,7 @@ struct BalloonGameInterface: View {
                     progress = 0.0
                 }
 
-                if appModel.score.balloonsRemoved >= 30 {
+                if appModel.score.balloonsRemoved >= 25 {
                     prepareForEndGame()
                 }
 

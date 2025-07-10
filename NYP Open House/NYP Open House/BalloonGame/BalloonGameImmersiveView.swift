@@ -35,9 +35,9 @@ struct BalloonGameImmersiveView: View {
                 }
                 bubble.removeFromParent()
                 
-                let redCount = 6
+                let redCount = 7
                 let greenCount = 7
-                let purpleCount = 6
+                let purpleCount = 7
                 let goldCount = 4
 
                 // set a fixed number ot balloons to appear in the immersive space

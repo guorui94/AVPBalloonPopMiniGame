@@ -38,7 +38,7 @@ struct StartingInterface: View {
                         .multilineTextAlignment(.center)
                         .frame(maxWidth: 800)
                         
-                        HStack(spacing: 20) {
+                        HStack() {
                             VStack (alignment: .leading) {
                                 DisplayBalloonColors(color:BalloonColor.red.swiftColor, points: BalloonColor.red.poppingScore)
 
@@ -47,7 +47,6 @@ struct StartingInterface: View {
                             }
 
                             VStack (alignment: .leading) {
-                                
                                 DisplayBalloonColors(color:BalloonColor.purple.swiftColor, points: BalloonColor.purple.poppingScore)
 
                                 
@@ -57,11 +56,19 @@ struct StartingInterface: View {
                                     .foregroundColor(.cyan)
                             }
                         }
-                        
-                        Text("Balloons with higher points will move much faster and push other balloons!")
-                            .font(.title2)
+
+                        Text("Balloons with higher points move faster and push other balloons.")
+                            .font(.headline)
+                            .foregroundStyle(Color.white)
                             .multilineTextAlignment(.center)
-                            .frame(maxWidth: 800)
+                            .frame(maxWidth: 700)
+
+                        Text("Balloons will start blinking when they're about to fly away — pop them quickly!")
+                            .font(.title2)
+                            .foregroundStyle(.cyan)
+                            .multilineTextAlignment(.center)
+                            .frame(maxWidth: 650)
+                            .padding(.bottom, 10)
 
                         Button(action: {
                             startCountdown()
@@ -118,6 +125,9 @@ struct StartingInterface: View {
                 ZStack(alignment: .topLeading) {
                     BalloonGameInterface(gameEnds: $gameEnds)
                     Button(action: {
+                        Task {
+                            await dismissImmersiveSpace()
+                        }
                         changeInterface = false
                         isStarting = false
                         appModel.resetGame()
@@ -136,7 +146,7 @@ struct StartingInterface: View {
                         effect.scaleEffect(!isActive ? 1.0 : 1.2)
                     }
                 }
-                .offset(x: -250, y: -70)
+                .offset(x: -280, y: -70)
             }
         }
         .onChange(of: gameEnds) { oldValue, newValue in
@@ -160,7 +170,7 @@ struct StartingInterface: View {
             }
             countdown = nil
 
-            await openImmersiveSpace(id: appModel.immersiveSpaceId)
+            await openImmersiveSpace(id: Module.bubbleSpace.name)
             changeInterface = true
         }
     }
