@@ -28,6 +28,7 @@ class AppModel {
                     let resource = try await AudioFileResource(named: "balloonpopping\(number).mp3")
                     balloonPoppingsounds.append(resource)
                 }
+                await pose.runArSession()
             } catch {
                 fatalError("Error loading sound resources.")
             }
@@ -37,6 +38,8 @@ class AppModel {
     // App Model is the main model that manages the state of various interfaces. basically this model binds/can be used in every interface including immersive interfaces
     // To keep it neat and easy to integrate new functions, create other models as observable and call the functions here, then you'd only need to import one model across interfaces
     var score = ScoreModel()
+    var balloonPoppingsounds = [AudioFileResource]()
+    var pose = VisionProPose()
     
     func resetGame() {
         score.resetScore()
@@ -50,8 +53,6 @@ class AppModel {
     }
     
     // load audio files
-    var balloonPoppingsounds = [AudioFileResource]()
-    
     private var balloonEndGame = try! AVAudioPlayer(contentsOf: Bundle.main.url(forResource: "signalEndGame", withExtension: "mp3")!)
     
     private var applauses = try! AVAudioPlayer(contentsOf: Bundle.main.url(forResource: "highScoreApplause", withExtension: "mp3")!)
@@ -63,6 +64,5 @@ class AppModel {
     func highScoreApplause () {
         applauses.play()
     }
-    
 
 }

@@ -132,6 +132,7 @@ struct StartingInterface: View {
                         isStarting = false
                         appModel.resetGame()
                         appModel.resetBalloonsRemoved()
+                        appModel.pose.stopTracking()
                     }) {
                         Image(systemName: "chevron.left")
                             .font(.system(size: 24, weight: .medium))

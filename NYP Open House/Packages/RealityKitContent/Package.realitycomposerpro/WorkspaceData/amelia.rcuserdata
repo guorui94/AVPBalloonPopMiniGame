@@ -1,8 +1,7 @@
 {
-  "advancedEditorSelectedIdentifier" : "ProjectBrowser",
+  "advancedEditorSelectedIdentifier" : "ShaderGraphEditorPluginID",
   "openSceneRelativePaths" : [
-    "BubbleScene.usda",
-    "Untitled Scene.usda"
+    "BubbleScene.usda"
   ],
   "recentIdentifiers" : {
     "34BBF2A7-D0F0-4D0C-87E4-4D777089CCEE" : [
@@ -190,6 +189,50 @@
     ],
     "A165DA54-DE35-4088-BE35-A7AB56311B6D" : [
       {
+        "date" : 773802857.267496,
+        "title" : "Untitled",
+        "transform" : [
+          -0.029069481,
+          4.17463e-08,
+          -0.99957746,
+          0,
+          -0.2821933,
+          0.95932245,
+          0.0082067195,
+          0,
+          0.958917,
+          0.28231275,
+          -0.027887063,
+          0,
+          1.4668052,
+          0.41087374,
+          -0.042657558,
+          1
+        ]
+      },
+      {
+        "date" : 773735298.83037,
+        "title" : "Untitled",
+        "transform" : [
+          -0.51359934,
+          4.1610342e-08,
+          -0.8580302,
+          0,
+          -0.50561017,
+          0.8079373,
+          0.30264795,
+          0,
+          0.69323444,
+          0.58926857,
+          -0.414956,
+          0,
+          1.0664704,
+          0.881636,
+          -0.63836765,
+          1
+        ]
+      },
+      {
         "date" : 773735285.164457,
         "title" : "Untitled",
         "transform" : [
@@ -364,55 +407,11 @@
           -0.15467381,
           1
         ]
-      },
-      {
-        "date" : 773734689.508106,
-        "title" : "Untitled",
-        "transform" : [
-          -0.86514914,
-          3.951577e-08,
-          -0.5015146,
-          0,
-          -0.088407576,
-          0.9843399,
-          0.15250957,
-          0,
-          0.49366078,
-          0.17628117,
-          -0.85160077,
-          0,
-          0.26052126,
-          0.091427214,
-          -0.44941828,
-          1
-        ]
-      },
-      {
-        "date" : 773734678.280841,
-        "title" : "Untitled",
-        "transform" : [
-          0.9019466,
-          3.962914e-08,
-          -0.43184748,
-          0,
-          -0.21562599,
-          0.86642325,
-          -0.45035133,
-          0,
-          0.37416267,
-          0.49931034,
-          0.78146744,
-          0,
-          0.19769263,
-          0.2619953,
-          0.41289607,
-          1
-        ]
       }
     ]
   },
   "sceneViewportBackgroundColors" : {
 
   },
-  "selectedSceneRelativePath" : "Untitled Scene.usda"
+  "selectedSceneRelativePath" : "Room.usda"
 }

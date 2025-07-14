@@ -119,6 +119,7 @@ struct BalloonGameInterface: View {
         appModel.signalEndGame()
         timer.upstream.connect().cancel()
         gameEnds = true
+        appModel.pose.stopTracking()
     }
 }
 
