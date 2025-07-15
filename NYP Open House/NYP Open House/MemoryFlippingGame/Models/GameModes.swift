@@ -15,17 +15,31 @@ enum GameModes: CaseIterable {
     var cards: Int {
         switch self {
         case .easy:
-            return 10
+            return 3
         case .medium:
-            return 16
+            return 4
         case .challenging:
-            return 20
+            return 5
         }
     }
     
     
-    
-    
+    var images: [String] {
+        let baseImages: [String]
+        switch self {
+        case .easy:
+            baseImages = ["NYPLogo", "NYPSBM", "NYPSIT"]
+        case .medium:
+            baseImages = ["NYPLogo", "NYPSBM"]
+        case .challenging:
+            baseImages = ["NYPLogo", "NYPSBM"]
+        }
+
+        // Repeat each image twice
+        let doubled = baseImages.flatMap { Array(repeating: $0, count: 2) }
+        return doubled
+    }
+
     
 }
     

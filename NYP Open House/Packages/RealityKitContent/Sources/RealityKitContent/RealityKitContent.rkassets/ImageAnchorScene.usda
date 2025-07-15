@@ -7,26 +7,28 @@
 
 def Xform "Root"
 {
+    reorder nameChildren = ["tripo_convert_56e60980_2425_40f3_8b90_274ab4cb41fe", "TileMaterial", "tripo_convert_56e60980_2425_40f3_8b90_274ab4cb41fe_1"]
     def Cube "Anchor" (
         active = true
         prepend apiSchemas = ["MaterialBindingAPI"]
     )
     {
+        reorder nameChildren = ["Tile", "ImageTexture"]
         rel material:binding = </Root/Anchor/ImageTexture>
         double size = 0.2
         quatf xformOp:orient = (1, 0, 0, 0)
-        float3 xformOp:scale = (0.45, 0.45, 0.01)
-        float3 xformOp:translate = (0, 0, -0.0043)
+        float3 xformOp:scale = (0.6, 0.6, 0.01)
+        float3 xformOp:translate = (0, 0, -0.0001)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
 
         def Material "ImageTexture"
         {
-            asset inputs:GetImage (
+            asset inputs:GetImage = @MiddleTileFinal-Photoroom.png@ (
                 colorSpace = "lin_srgb"
                 customData = {
                     dictionary realitykit = {
                         float2 positionInSubgraph = (-925.25977, 38.384766)
-                        int stackingOrderInSubgraph = 332
+                        int stackingOrderInSubgraph = 452
                     }
                 }
             )
@@ -58,12 +60,12 @@ def Xform "Root"
                 uniform token info:id = "ND_UsdPreviewSurface_surfaceshader"
                 float inputs:clearcoat
                 float inputs:clearcoatRoughness
-                color3f inputs:diffuseColor = (0, 0, 0) (
+                color3f inputs:diffuseColor = (1, 1, 1) (
                     colorSpace = "lin_srgb"
                 )
                 color3f inputs:diffuseColor.connect = </Root/Anchor/ImageTexture/Image.outputs:out>
                 color3f inputs:emissiveColor
-                float inputs:ior
+                float inputs:ior = 1
                 float inputs:metallic
                 float3 inputs:normal
                 float inputs:opacity = 0
@@ -71,7 +73,7 @@ def Xform "Root"
                 float inputs:roughness.connect = None
                 token outputs:out
                 float2 ui:nodegraph:node:pos = (-255, 105)
-                int ui:nodegraph:node:stackingOrder = 321
+                int ui:nodegraph:node:stackingOrder = 449
                 string[] ui:nodegraph:realitykit:node:attributesShowingChildren = ["Advanced"]
             }
 
@@ -86,10 +88,68 @@ def Xform "Root"
                 string inputs:filtertype
                 float2 inputs:texcoord
                 string inputs:uaddressmode
-                string inputs:vaddressmode = "constant"
+                string inputs:vaddressmode = "periodic"
                 color3f outputs:out
                 float2 ui:nodegraph:node:pos = (-661.56055, 24.072266)
-                int ui:nodegraph:node:stackingOrder = 331
+                int ui:nodegraph:node:stackingOrder = 451
+            }
+        }
+
+        def "Tile" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+            customData = {
+                float3 rotationEulerHint = (0, 1.5707963, 0)
+            }
+            references = @Materials/tripo_convert_56e60980-2425-40f3-8b90-274ab4cb41fe.usdz@
+        )
+        {
+            reorder nameChildren = ["TileMaterial", "tripo_mesh_56e60980_2425_40f3_8b90_274ab4cb41fe"]
+            rel material:binding = </Root/Anchor/Tile/TileMaterial> (
+                bindMaterialAs = "strongerThanDescendants"
+            )
+            quatf xformOp:orient = (0.70710677, 0, 0.70710677, 0)
+            float3 xformOp:scale = (9.999999, 0.22222224, 0.22222221)
+            float3 xformOp:translate = (0, 0, 0.030000003)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+            over "tripo_mesh_56e60980_2425_40f3_8b90_274ab4cb41fe" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                rel material:binding = </Root/Anchor/Tile/TileMaterial> (
+                    bindMaterialAs = "weakerThanDescendants"
+                )
+            }
+
+            def Material "TileMaterial"
+            {
+                token outputs:mtlx:surface.connect = </Root/Anchor/Tile/TileMaterial/PreviewSurface.outputs:out>
+                token outputs:realitykit:vertex
+                token outputs:surface.connect = </Root/Anchor/Tile/TileMaterial/UsdPreviewSurface.outputs:surface>
+                float2 ui:nodegraph:realitykit:subgraphOutputs:pos = (0, 110.5)
+
+                def Shader "UsdPreviewSurface" (
+                    active = false
+                )
+                {
+                    uniform token info:id = "UsdPreviewSurface"
+                    color3f inputs:diffuseColor = (1, 1, 1) (
+                        colorSpace = "lin_srgb"
+                    )
+                    token outputs:surface
+                }
+
+                def Shader "PreviewSurface"
+                {
+                    uniform token info:id = "ND_UsdPreviewSurface_surfaceshader"
+                    color3f inputs:diffuseColor = (1, 1, 1) (
+                        colorSpace = "lin_srgb"
+                    )
+                    token outputs:out
+                    float2 ui:nodegraph:node:pos = (-255, 105)
+                    int ui:nodegraph:node:stackingOrder = 4
+                    string[] ui:nodegraph:realitykit:node:attributesShowingChildren = ["Advanced"]
+                }
             }
         }
     }
