@@ -1,0 +1,97 @@
+#usda 1.0
+(
+    defaultPrim = "Root"
+    metersPerUnit = 1
+    upAxis = "Y"
+)
+
+def Xform "Root"
+{
+    def Cube "Anchor" (
+        active = true
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        rel material:binding = </Root/Anchor/ImageTexture>
+        double size = 0.2
+        quatf xformOp:orient = (1, 0, 0, 0)
+        float3 xformOp:scale = (0.45, 0.45, 0.01)
+        float3 xformOp:translate = (0, 0, -0.0043)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+        def Material "ImageTexture"
+        {
+            asset inputs:GetImage (
+                colorSpace = "lin_srgb"
+                customData = {
+                    dictionary realitykit = {
+                        float2 positionInSubgraph = (-925.25977, 38.384766)
+                        int stackingOrderInSubgraph = 332
+                    }
+                }
+            )
+            float inputs:Opacity = 1 (
+                customData = {
+                    dictionary realitykit = {
+                        float2 positionInSubgraph = (-546.71484, 304.08594)
+                        int stackingOrderInSubgraph = 327
+                    }
+                }
+            )
+            token outputs:mtlx:surface.connect = </Root/Anchor/ImageTexture/PreviewSurface.outputs:out>
+            token outputs:realitykit:vertex
+            token outputs:surface.connect = </Root/Anchor/ImageTexture/DefaultSurfaceShader.outputs:surface>
+            float2 ui:nodegraph:realitykit:subgraphOutputs:pos = (0, 110.5)
+
+            def Shader "DefaultSurfaceShader" (
+                active = false
+            )
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                color3f inputs:diffuseColor = (1, 1, 1)
+                float inputs:roughness = 0.75
+                token outputs:surface
+            }
+
+            def Shader "PreviewSurface"
+            {
+                uniform token info:id = "ND_UsdPreviewSurface_surfaceshader"
+                float inputs:clearcoat
+                float inputs:clearcoatRoughness
+                color3f inputs:diffuseColor = (0, 0, 0) (
+                    colorSpace = "lin_srgb"
+                )
+                color3f inputs:diffuseColor.connect = </Root/Anchor/ImageTexture/Image.outputs:out>
+                color3f inputs:emissiveColor
+                float inputs:ior
+                float inputs:metallic
+                float3 inputs:normal
+                float inputs:opacity = 0
+                float inputs:opacity.connect = </Root/Anchor/ImageTexture.inputs:Opacity>
+                float inputs:roughness.connect = None
+                token outputs:out
+                float2 ui:nodegraph:node:pos = (-255, 105)
+                int ui:nodegraph:node:stackingOrder = 321
+                string[] ui:nodegraph:realitykit:node:attributesShowingChildren = ["Advanced"]
+            }
+
+            def Shader "Image"
+            {
+                uniform token info:id = "ND_image_color3"
+                color3f inputs:default = (0, 0, 0) (
+                    colorSpace = "lin_srgb"
+                )
+                asset inputs:file = @NYPLogo.jpg@
+                asset inputs:file.connect = </Root/Anchor/ImageTexture.inputs:GetImage>
+                string inputs:filtertype
+                float2 inputs:texcoord
+                string inputs:uaddressmode
+                string inputs:vaddressmode = "constant"
+                color3f outputs:out
+                float2 ui:nodegraph:node:pos = (-661.56055, 24.072266)
+                int ui:nodegraph:node:stackingOrder = 331
+            }
+        }
+    }
+}
+

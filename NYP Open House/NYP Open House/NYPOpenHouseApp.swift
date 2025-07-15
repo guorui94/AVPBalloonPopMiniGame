@@ -38,6 +38,19 @@ struct NYPOpenHouseApp: App {
         }
         .immersionStyle(selection: .constant(.mixed), in: .mixed)
         
+        ImmersiveSpace(id: Module.memoryFlippingSpace.name) {
+            MemoryFlippingGameImmersive()
+                .environment(appModel)
+                .onAppear {
+                    appModel.immersiveSpaceState = .open
+                }
+                .onDisappear {
+                    appModel.immersiveSpaceState = .closed
+                }
+        }
+        .immersionStyle(selection: .constant(.mixed), in: .mixed)
+        
+        
      }
 }
 

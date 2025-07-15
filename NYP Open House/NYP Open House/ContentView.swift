@@ -11,6 +11,7 @@ import RealityKitContent
 
 struct ContentView: View {
     @Environment(AppModel.self) private var appModel
+    @Environment(\.openImmersiveSpace) private var openImmersiveSpace
     @Environment(\.dismissImmersiveSpace) private var dismissImmersiveSpace
     @State private var selectedInterface: AnyView?
     @State var changeInterface = false
@@ -43,7 +44,9 @@ struct ContentView: View {
                     GameCard(
                         title: "Game 2", subtitle: "Game descriptions here...",
                         action: {
-                            // to add in the future
+                            Task {
+                                await openImmersiveSpace(id: Module.memoryFlippingSpace.name)
+                            }
                         })
 
                     GameCard(

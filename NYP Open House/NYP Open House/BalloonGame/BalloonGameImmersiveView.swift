@@ -16,7 +16,6 @@ struct AboutToDisappearComponent: Component {}
 struct BalloonGameImmersiveView: View {
     // match any entity with a visible model component aka a 3d model
     @State var predicate = QueryPredicate<Entity>.has(ModelComponent.self)
-    @State var bubble = Entity()
     @State private var bubbleClones: [Entity] = []
     @Environment(AppModel.self) var appModel
 

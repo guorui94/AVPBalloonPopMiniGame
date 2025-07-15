@@ -1,0 +1,17 @@
+//
+//  GameLogic.swift
+//  NYP Open House
+//
+//  Created by Amelia on 14/7/25.
+//
+
+import Foundation
+
+@Observable
+class GameLogic {
+    var flipCount: Int = 0
+    var flipped: String = ""
+    
+    
+    
+}
