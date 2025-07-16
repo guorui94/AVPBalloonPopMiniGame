@@ -98,15 +98,6 @@
       [
         "416F112E-9914-486E-8EFC-5970D6063AE3",
         "Root",
-        "TurningAnimation"
-      ],
-      {
-        "isExpanded" : true,
-        "isLocked" : false
-      },
-      [
-        "416F112E-9914-486E-8EFC-5970D6063AE3",
-        "Root",
         "Anchor",
         "Tile",
         "TileMaterial"
@@ -129,6 +120,16 @@
       [
         "416F112E-9914-486E-8EFC-5970D6063AE3",
         "Root",
+        "Tile_1",
+        "Image"
+      ],
+      {
+        "isExpanded" : true,
+        "isLocked" : false
+      },
+      [
+        "416F112E-9914-486E-8EFC-5970D6063AE3",
+        "Root",
         "TurningAnimation",
         "Track"
       ],
@@ -139,7 +140,7 @@
       [
         "416F112E-9914-486E-8EFC-5970D6063AE3",
         "Root",
-        "Tile_1",
+        "Tiles",
         "Image"
       ],
       {
@@ -161,16 +162,6 @@
         "Root",
         "Cube",
         "DefaultMaterial"
-      ],
-      {
-        "isExpanded" : true,
-        "isLocked" : false
-      },
-      [
-        "416F112E-9914-486E-8EFC-5970D6063AE3",
-        "Root",
-        "Tiles",
-        "Image"
       ],
       {
         "isExpanded" : true,

@@ -64,5 +64,6 @@ class AppModel {
     func highScoreApplause () {
         applauses.play()
     }
+    
 
 }
