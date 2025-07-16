@@ -13,6 +13,7 @@ struct NYPOpenHouseApp: App {
     @State private var appModel = AppModel()
     init () {
         ScoreComponent.registerComponent()
+        PairComponent.registerComponent()
     }
     var body: some Scene {
         WindowGroup {
