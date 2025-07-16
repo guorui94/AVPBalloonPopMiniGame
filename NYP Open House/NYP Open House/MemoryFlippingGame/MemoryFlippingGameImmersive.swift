@@ -12,22 +12,22 @@ import SwiftUI
 struct FlippedComponent: Component {}
 
 struct MemoryFlippingGameImmersive: View {
-    @State private var gameLogic = GameLogic()
     @State private var predicate = QueryPredicate<Entity>.has(ModelComponent.self)
-    @State private var worldAnchorRef: AnchorEntity?
+    @State private var worldAnchor: AnchorEntity?
     @State private var firstFlippedEntity: Entity? = nil
     @State private var firstFlippedImage: String = ""
     @State private var flippedCount = 0
+    @State private var gameMode = GameModes.easy
     var body: some View {
         RealityView { content in
-            worldAnchorRef = AnchorEntity(world: [0, 1.5, -0.8])
+            worldAnchor = AnchorEntity(world: [0, 1.5, -0.8])
             
             if let immersiveContentEntity = try? await Entity(named: "ImageAnchorScene", in: realityKitContentBundle),
                let baseTile = immersiveContentEntity.findEntity(named: "Tile")
             {
-                await createGameTiles(gameMode: gameLogic.currentGameMode, baseTile: baseTile, worldAnchor: worldAnchorRef!)
+                await createGameTiles(gameMode: gameMode, baseTile: baseTile, worldAnchor: worldAnchor!)
                 try? await Task.sleep(nanoseconds: 400_000_000)
-                content.add(worldAnchorRef!)
+                content.add(worldAnchor!)
             }
         }
         .gesture(
@@ -35,6 +35,9 @@ struct MemoryFlippingGameImmersive: View {
                 .targetedToEntity(where: predicate)
                 .onEnded { value in
                     let entity = value.entity
+                    if entity.components.has(FlippedComponent.self) {
+                        return
+                    }
                     let imagePair = entity.components[PairComponent.self]!.imageString
 
                     entity.components.set(FlippedComponent())
@@ -56,7 +59,7 @@ struct MemoryFlippingGameImmersive: View {
                                 firstFlippedEntity?.components.remove(FlippedComponent.self)
                                 entity.components.remove(FlippedComponent.self)
                             } else {
-                                if let anchor = worldAnchorRef {
+                                if let anchor = worldAnchor {
                                     flipBackAllCards(in: anchor)
                                 }
                             }
@@ -77,21 +80,23 @@ struct MemoryFlippingGameImmersive: View {
         let rows = gameMode.cards
         let spacing: Float = 0.17
 
-        let centerTile = baseTile.clone(recursive: true)
-        centerTile.position = [0, 0, 0]
-        centerTile.transform.rotation = simd_quatf(angle: -.pi/2, axis: [0, 1, 0])
-        centerTile.components.remove(InputTargetComponent.self)
-        worldAnchor.addChild(centerTile)
+        if gameMode.modes != "medium" {
+            let centerTile = baseTile.clone(recursive: true)
+            centerTile.position = [0, 0, 0]
+            centerTile.transform.rotation = simd_quatf(angle: -.pi/2, axis: [0, 1, 0])
+            centerTile.components.remove(InputTargetComponent.self)
+            worldAnchor.addChild(centerTile)
+        }
 
         var tileIndex = 0
 
         for row in 0..<rows {
             for col in 0..<columns {
-                if row == rows / 2 && col == columns / 2 {
+                if row == rows / 2 && col == columns / 2 && gameMode.modes != "medium" {
                     continue
                 }
                 if tileIndex >= images.count {
-                    break 
+                    break
                 }
 
                 let imageName = images[tileIndex]
@@ -120,15 +125,20 @@ struct MemoryFlippingGameImmersive: View {
                     print("Error setting texture: \(error)")
                 }
 
-                let x = Float(col - columns / 2) * spacing
-                let y = Float(rows / 2 - row) * spacing
+                let totalWidth = Float(columns - 1) * spacing
+                let totalHeight = Float(rows - 1) * spacing
+
+                let startX = -totalWidth / 2
+                let startY = totalHeight / 2
+                
+                let x = startX + Float(col) * spacing
+                let y = startY - Float(row) * spacing
                 let z: Float = 0
 
                 tileClone.position = [x, y, z]
                 worldAnchor.addChild(tileClone)
             }
         }
-
     }
 
     func animateFlip(entity: Entity) {

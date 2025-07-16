@@ -23,21 +23,31 @@ enum GameModes: CaseIterable {
         }
     }
     
-    
     var images: [String] {
         let baseImages: [String]
         switch self {
         case .easy:
             baseImages = ["NYPLogo", "NYPSBM", "NYPSIT"]
         case .medium:
-            baseImages = ["NYPLogo", "NYPSBM"]
+            baseImages = ["NYPLogo", "NYPSBM", "NYPSIT"]
         case .challenging:
-            baseImages = ["NYPLogo", "NYPSBM"]
+            baseImages = ["NYPLogo", "NYPSBM", "NYPSIT"]
         }
 
         // Repeat each image twice
         let doubled = baseImages.flatMap { Array(repeating: $0, count: 2) }
         return doubled
+    }
+    
+    var modes: String {
+        switch self {
+        case .easy:
+            return "easy"
+        case .medium:
+            return "medium"
+        case .challenging:
+            return "challenging"
+        }
     }
 
     
