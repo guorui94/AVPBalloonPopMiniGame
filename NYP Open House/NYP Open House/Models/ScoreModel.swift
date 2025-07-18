@@ -17,8 +17,7 @@ class ScoreModel {
             }
         }
     }
-    
-    
+
     var balloonsRemoved: Int = 0
     
     private(set) var highScore: Int = 0

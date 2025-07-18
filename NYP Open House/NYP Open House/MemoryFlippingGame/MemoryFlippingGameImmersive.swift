@@ -14,23 +14,25 @@ struct FlippedComponent: Component {}
 struct MemoryFlippingGameImmersive: View {
     @State private var predicate = QueryPredicate<Entity>.has(ModelComponent.self)
     @State private var worldAnchor: AnchorEntity?
+    @State private var gestureEnabled: Bool = true
     @State private var firstFlippedEntity: Entity? = nil
     @State private var firstFlippedImage: String = ""
     @State private var flippedCount = 0
-    @State private var gameMode = GameModes.easy
+    @State private var currentGameMode = GameModes.easy
+    @State private var cardsPairCount = 0
     var body: some View {
         RealityView { content in
             worldAnchor = AnchorEntity(world: [0, 1.5, -0.8])
-            
             if let immersiveContentEntity = try? await Entity(named: "ImageAnchorScene", in: realityKitContentBundle),
                let baseTile = immersiveContentEntity.findEntity(named: "Tile")
             {
-                await createGameTiles(gameMode: gameMode, baseTile: baseTile, worldAnchor: worldAnchor!)
+                await createGameTiles(gameMode: GameModes.easy, baseTile: baseTile, worldAnchor: worldAnchor!)
                 try? await Task.sleep(nanoseconds: 400_000_000)
                 content.add(worldAnchor!)
             }
         }
         .gesture(
+            gestureEnabled ?
             SpatialTapGesture()
                 .targetedToEntity(where: predicate)
                 .onEnded { value in
@@ -49,28 +51,30 @@ struct MemoryFlippingGameImmersive: View {
                         firstFlippedEntity = entity
                         firstFlippedImage = imagePair
                     } else if flippedCount == 2 {
+                        gestureEnabled = false
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                             if imagePair == firstFlippedImage {
                                 if let first = firstFlippedEntity {
                                     animateDisappear(entity: first)
                                 }
                                 animateDisappear(entity: entity)
-
-                                firstFlippedEntity?.components.remove(FlippedComponent.self)
-                                entity.components.remove(FlippedComponent.self)
+                                cardsPairCount += 1
+                                print(cardsPairCount)
                             } else {
                                 if let anchor = worldAnchor {
                                     flipBackAllCards(in: anchor)
                                 }
                             }
+                            gestureEnabled = true
                             flippedCount = 0
                             firstFlippedEntity = nil
                             firstFlippedImage = ""
                         }
                     }
                 }
-
+            : nil
         )
+        
     }
     
     func createGameTiles(gameMode: GameModes, baseTile: Entity, worldAnchor: AnchorEntity) async {
@@ -146,7 +150,6 @@ struct MemoryFlippingGameImmersive: View {
         var transform = entity.transform
         transform.rotation = newRotation
         entity.move(to: transform, relativeTo: entity.parent, duration: 0.5, timingFunction: .easeInOut)
-
     }
     
     func flipBackAllCards(in worldAnchor: AnchorEntity) {
@@ -166,14 +169,13 @@ struct MemoryFlippingGameImmersive: View {
         var transform = entity.transform
         transform.scale = [0, 0, 0]
         entity.move(to: transform, relativeTo: entity.parent, duration: 0.5, timingFunction: .easeInOut)
-
+        
+        // similar to task.sleep but runs on main thread instead of async background thread
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             entity.removeFromParent()
         }
     }
-
-
-
+    //
 }
 
 #Preview(immersionStyle: .mixed) {
