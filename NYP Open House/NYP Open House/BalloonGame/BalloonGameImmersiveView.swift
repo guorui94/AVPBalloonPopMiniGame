@@ -136,7 +136,6 @@ struct BalloonGameImmersiveView: View {
                 {
                     let transform = deviceAnchor.originFromAnchorTransform
                     spawnY = transform.columns.3.y - 0.25
-                    print("Headset position from ARKit: \(transform.columns.3.y - 0.3)")
                 }
 
                 // use a world anchor to make sure the balloons spawn in front of the user

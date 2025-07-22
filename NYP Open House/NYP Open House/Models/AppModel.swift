@@ -52,15 +52,13 @@ class AppModel {
     var isMemoryGame = false
     
     // functions
-    func resetGame() {
-        score.resetScore()
+    func resetBalloonGame() {
+        score.resetBalloonScore()
+        score.balloonsRemoved = 0
     }
     
     func trackBalloonsRemoved() {
         score.balloonsRemoved += 1
-    }
-    func resetBalloonsRemoved() {
-        score.balloonsRemoved = 0
     }
     
     func signalEndGame () {

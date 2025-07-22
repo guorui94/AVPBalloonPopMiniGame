@@ -11,32 +11,47 @@ import Foundation
 class ScoreModel {
     var poppingScore: Int = 0 {
         didSet {
-            if poppingScore > highScore {
-                highScore = poppingScore
-                saveHighScore()
+            if poppingScore > balloonHighScore {
+                balloonHighScore = poppingScore
+                saveBalloonHighScore()
             }
         }
     }
-
+    
+    var flipScore: Int = 0 {
+        didSet {
+            if flipScore > memoryGameHighScore {
+                memoryGameHighScore = flipScore
+                saveMemoryGameHighScore()
+            }
+        }
+    }
+    
     var balloonsRemoved: Int = 0
     
-    private(set) var highScore: Int = 0
+    private(set) var balloonHighScore: Int = 0
+    private(set) var memoryGameHighScore: Int = 0
     
     var isHighScore: Bool = false
     
-    func resetScore() {
+    func resetBalloonScore() {
         poppingScore = 0
         isHighScore = false
     }
     
-    private func saveHighScore() {
+    func resetMemoryGameScore() {
+        flipScore = 0
+        isHighScore = false
+    }
+    
+    private func saveBalloonHighScore() {
         isHighScore = true
-        UserDefaults.standard.set(highScore, forKey: "HighScore")
+        UserDefaults.standard.set(balloonHighScore, forKey: "BalloonHighScore")
     }
 
-    func loadHighScore() -> Int {
-        highScore = UserDefaults.standard.integer(forKey: "HighScore")
-        return highScore
+    private func saveMemoryGameHighScore() {
+        isHighScore = true
+        UserDefaults.standard.set(memoryGameHighScore, forKey: "MemoryGameHighScore")
     }
     
 }

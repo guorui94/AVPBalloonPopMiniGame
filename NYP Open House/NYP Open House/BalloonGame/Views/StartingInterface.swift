@@ -128,10 +128,7 @@ struct StartingInterface: View {
                         Task {
                             await dismissImmersiveSpace()
                         }
-                        changeInterface = false
-                        isStarting = false
-                        appModel.resetGame()
-                        appModel.resetBalloonsRemoved()
+                        resetGameState()
                         appModel.pose.stopTracking()
                     }) {
                         Image(systemName: "chevron.left")
@@ -176,7 +173,7 @@ struct StartingInterface: View {
         }
     }
     private func resetGameState () {
-        appModel.resetGame()
+        appModel.resetBalloonGame()
         changeInterface = false
         isStarting = false
         gameEnds = false
