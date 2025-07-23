@@ -25,7 +25,6 @@ struct BalloonGameImmersiveView: View {
             let pose = appModel.pose
             await pose.startIfNeeded()
 
-            // Add the initial RealityKit content
             if let immersiveContentEntity = try? await Entity(
                 named: "BubbleScene", in: realityKitContentBundle)
             {
@@ -37,98 +36,11 @@ struct BalloonGameImmersiveView: View {
                 }
                 bubble.removeFromParent()
 
-                let redCount = 7
-                let greenCount = 7
-                let purpleCount = 7
-                let goldCount = 4
-
                 // set a fixed number ot balloons to appear in the immersive space
-                var colorList: [BalloonColor] = []
-                colorList += Array(repeating: .red, count: redCount)
-                colorList += Array(repeating: .green, count: greenCount)
-                colorList += Array(repeating: .purple, count: purpleCount)
-                colorList += Array(repeating: .gold, count: goldCount)
+                let colorList = generateBalloonColorList()
 
-                colorList.shuffle()
-
-                for balloonColor in colorList {
-
-                    applyBalloonColor(to: bubble, using: balloonColor.color)
-
-                    guard
-                        var scoreComponent = bubble.components[
-                            ScoreComponent.self]
-                    else {
-                        fatalError()
-                    }
-                    scoreComponent.score = balloonColor.poppingScore
-                    bubble.components.set(scoreComponent)
-
-                    guard
-                        let modelComponent = bubble.components[
-                            ModelComponent.self],
-                        var mat = modelComponent.materials.first
-                            as? ShaderGraphMaterial
-                    else {
-                        fatalError()
-                    }
-
-                    do {
-                        if balloonColor.findColor == "gold" {
-                            try mat.setParameter(
-                                name: "Shiny", value: .float(1.0))
-                            try mat.setParameter(
-                                name: "Metallic", value: .float(0.8))
-                        } else {
-                            try mat.setParameter(
-                                name: "Shiny", value: .float(0.0))
-                            try mat.setParameter(
-                                name: "Metallic", value: .float(0.0))
-                        }
-
-                        bubble.components[ModelComponent.self]?.materials = [
-                            mat
-                        ]
-                    } catch {
-                        print(error.localizedDescription)
-                    }
-
-                    let bubbleClone = bubble.clone(recursive: true)
-
-                    var linearY = Float.random(in: 0.05...0.13)
-
-                    if balloonColor.findColor == "gold" {
-                        linearY = Float.random(in: 0.25...0.35)
-                    }
-
-                    let pm = PhysicsMotionComponent(linearVelocity: [
-                        0, linearY, 0,
-                    ])
-
-                    bubbleClone.components[PhysicsMotionComponent.self] = pm
-
-                    // randomly assign positions
-                    let x = Float.random(in: -0.7...0.7)
-                    var y = Float.random(in: -0.3...0)
-                    let z = Float.random(in: -1...0)
-
-                    if balloonColor.findColor == "gold" {
-                        y = 0
-                    }
-
-                    bubbleClone.position = [x, y, z]  // in meters
-                    if balloonColor.findColor == "gold" {
-                        // Delayed adding to scene
-                        Task {
-                            try? await Task.sleep(nanoseconds: 3_000_000_000)
-                            immersiveContentEntity.addChild(bubbleClone)
-                            bubbleClones.append(bubbleClone)
-                        }
-                    } else {
-                        immersiveContentEntity.addChild(bubbleClone)
-                        bubbleClones.append(bubbleClone)
-                    }
-                }
+                bubbleClones = await placeBalloons(from: bubble, into: immersiveContentEntity, using: colorList)
+                
                 try? await Task.sleep(nanoseconds: 500_000_000)
                 var spawnY: Float = 0.0
                 if let deviceAnchor = pose.worldTracking.queryDeviceAnchor(
@@ -217,6 +129,7 @@ struct BalloonGameImmersiveView: View {
         .task {
             Timer.scheduledTimer(withTimeInterval: 0.25 / 30.0, repeats: true) {
                 _ in
+                // similar to task.sleep but runs on main thread instead of async background thread
                 DispatchQueue.main.async {
                     for i in (0..<bubbleClones.count).reversed() {
                         let bubble = bubbleClones[i]
@@ -242,9 +155,80 @@ struct BalloonGameImmersiveView: View {
                 }
             }
         }
+    }
+    private func generateBalloonColorList() -> [BalloonColor] {
+        let redCount = 7
+        let greenCount = 7
+        let purpleCount = 7
+        let goldCount = 4
 
+        var colorList: [BalloonColor] = []
+        colorList += Array(repeating: .red, count: redCount)
+        colorList += Array(repeating: .green, count: greenCount)
+        colorList += Array(repeating: .purple, count: purpleCount)
+        colorList += Array(repeating: .gold, count: goldCount)
+
+        colorList.shuffle()
+        return colorList
     }
 
+    private func placeBalloons(from base: Entity, into parent: Entity, using colorList: [BalloonColor]) async -> [Entity] {
+        var clones: [Entity] = []
+
+        for balloonColor in colorList {
+            applyBalloonColor(to: base, using: balloonColor.color)
+
+            guard var scoreComponent = base.components[ScoreComponent.self] else { continue }
+            scoreComponent.score = balloonColor.poppingScore
+            base.components.set(scoreComponent)
+
+            guard let modelComponent = base.components[ModelComponent.self],
+                  var mat = modelComponent.materials.first as? ShaderGraphMaterial else { continue }
+
+            do {
+                if balloonColor.findColor == "gold" {
+                    try mat.setParameter(name: "Shiny", value: .float(1.0))
+                    try mat.setParameter(name: "Metallic", value: .float(0.8))
+                } else {
+                    try mat.setParameter(name: "Shiny", value: .float(0.0))
+                    try mat.setParameter(name: "Metallic", value: .float(0.0))
+                }
+                base.components[ModelComponent.self]?.materials = [mat]
+            } catch {
+                print(error.localizedDescription)
+            }
+
+            let clone = base.clone(recursive: true)
+
+            var linearY = Float.random(in: 0.05...0.13)
+            if balloonColor.findColor == "gold" {
+                linearY = Float.random(in: 0.25...0.35)
+            }
+
+            clone.components[PhysicsMotionComponent.self] = PhysicsMotionComponent(linearVelocity: [0, linearY, 0])
+
+            let x = Float.random(in: -0.7...0.7)
+            var y = Float.random(in: -0.3...0)
+            let z = Float.random(in: -1...0)
+            if balloonColor.findColor == "gold" { y = 0 }
+
+            clone.position = [x, y, z]
+
+            if balloonColor.findColor == "gold" {
+                Task {
+                    try? await Task.sleep(nanoseconds: 3_000_000_000)
+                    parent.addChild(clone)
+                }
+            } else {
+                parent.addChild(clone)
+            }
+
+            clones.append(clone)
+        }
+
+        return clones
+    }
+    
     private func applyBalloonColor(
         to entity: Entity, using balloonColor: CGColor
     ) {

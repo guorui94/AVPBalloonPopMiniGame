@@ -15,15 +15,16 @@ struct MemoryFlippingGameImmersive: View {
     @Environment(AppModel.self) var appModel
     @State private var predicate = QueryPredicate<Entity>.has(ModelComponent.self)
     @State private var worldAnchor: AnchorEntity?
-    @State private var gestureEnabled: Bool = true
     @State private var currentGameMode = GameModes.easy
     @State private var firstFlippedEntity: Entity? = nil
     @State private var firstFlippedImage: String = ""
+    @State private var pendingFlipCount = 0
     @State private var flippedCount = 0
     @State private var cardsPairCount = 0
+    @State private var moveToNextLevelSound: AudioFileResource?
+    @State private var flipSuccess: AudioFileResource?
     var body: some View {
         RealityView { content in
-            
             worldAnchor = AnchorEntity(world: [0, 1.5, -0.8])
             if let immersiveContentEntity = try? await Entity(named: "ImageAnchorScene", in: realityKitContentBundle),
                let baseTile = immersiveContentEntity.findEntity(named: "Tile")
@@ -34,75 +35,78 @@ struct MemoryFlippingGameImmersive: View {
             }
         }
         .gesture(
-            gestureEnabled ?
             SpatialTapGesture()
                 .targetedToEntity(where: predicate)
                 .onEnded { value in
                     let entity = value.entity
-                    if entity.components.has(FlippedComponent.self) {
-                        return
-                    }
+
+                    guard !entity.components.has(FlippedComponent.self), flippedCount < 2 else { return }
+                    
+                    entity.components.set(FlippedComponent())
+                    animateFlip(entity: entity)
+                    flippedCount += 1
+                    pendingFlipCount += 1
+                    
                     let imagePair = entity.components[PairComponent.self]!.imageString
                     let pairScore = entity.components[ScoreComponent.self]!.score
                     let score = appModel.score
-                    entity.components.set(FlippedComponent())
-                    animateFlip(entity: entity)
-                    
-                    flippedCount += 1
                     
                     if flippedCount == 1 {
                         firstFlippedEntity = entity
                         firstFlippedImage = imagePair
-                    } else if flippedCount == 2 {
-                        gestureEnabled = false
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    }
+                    
+                    Task {
+                        // wait for animation to finish before checking
+                        try? await Task.sleep(nanoseconds: 300_000_000)
+                        pendingFlipCount -= 1
+                        if flippedCount == 2 && pendingFlipCount == 0 {
                             if imagePair == firstFlippedImage {
-                                if let first = firstFlippedEntity {
-                                    animateDisappear(entity: first)
-                                }
+                                entity.playAudio(flipSuccess!)
+                                animateDisappear(entity: firstFlippedEntity!)
                                 animateDisappear(entity: entity)
                                 cardsPairCount += 1
-                                let totalPairs = currentGameMode.images.count / 2
                                 score.flipScore += pairScore
                                 
-                                if cardsPairCount == totalPairs {
-                                    print(score.flipScore)
-                                    print("Level complete!")
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                                        if let next = nextMode(after: currentGameMode) {
-                                            currentGameMode = next
-                                            cardsPairCount = 0
-
-                                            worldAnchor?.children.removeAll()
-
-                                            Task {
-                                                if let immersiveContentEntity = try? await Entity(named: "ImageAnchorScene", in: realityKitContentBundle),
-                                                   let baseTile = immersiveContentEntity.findEntity(named: "Tile"),
-                                                   let anchor = worldAnchor {
-                                                    await createGameTiles(gameMode: next, baseTile: baseTile, worldAnchor: anchor)
-                                                }
-                                            }
-                                        } else {
-                                            print(score.flipScore)
-                                            print("All levels complete!")
+                                if cardsPairCount == currentGameMode.images.count / 2 {
+                                    entity.playAudio(moveToNextLevelSound!)
+                                    try? await Task.sleep(nanoseconds: 1_000_000_000)
+                                    if let next = nextMode(after: currentGameMode) {
+                                        currentGameMode = next
+                                        cardsPairCount = 0
+                                        worldAnchor?.children.removeAll()
+                                        
+                                        if let immersiveContentEntity = try? await Entity(named: "ImageAnchorScene", in: realityKitContentBundle),
+                                           let baseTile = immersiveContentEntity.findEntity(named: "Tile") {
+                                            await createGameTiles(gameMode: next, baseTile: baseTile, worldAnchor: worldAnchor!)
                                         }
                                     }
                                 }
-
                             } else {
-                                if let anchor = worldAnchor {
-                                    flipBackAllCards(in: anchor)
+                                if let first = firstFlippedEntity {
+                                    shakeEntity(first)
                                 }
+                                shakeEntity(entity)
+                                try? await Task.sleep(nanoseconds: 400_000_000)
+                                flipBackAllCards(in: worldAnchor!)
                             }
-                            gestureEnabled = true
                             flippedCount = 0
                             firstFlippedEntity = nil
                             firstFlippedImage = ""
                         }
                     }
-                } 
-            : nil
+                }
         )
+        .task {
+            if moveToNextLevelSound == nil && flipSuccess == nil {
+                do {
+                    moveToNextLevelSound = try await AudioFileResource(named: "MoveToNextLevel.mp3")
+                    flipSuccess = try await AudioFileResource(named: "FlipSuccess.mp3")
+                } catch {
+                    print("Failed to load audio: \(error)")
+                }
+            }
+        }
     }
     
     func createGameTiles(gameMode: GameModes, baseTile: Entity, worldAnchor: AnchorEntity) async {
@@ -163,15 +167,34 @@ struct MemoryFlippingGameImmersive: View {
             }
         }
     }
-
     
     func animateFlip(entity: Entity) {
         let newRotation = entity.transform.rotation * simd_quatf(angle: .pi, axis: [-1, 0, 0])
         var transform = entity.transform
         transform.rotation = newRotation
-        entity.move(to: transform, relativeTo: entity.parent, duration: 0.5, timingFunction: .easeInOut)
+        entity.move(to: transform, relativeTo: entity.parent, duration: 0.3, timingFunction: .easeInOut)
     }
     
+    func shakeEntity(_ entity: Entity, repeatCount: Int = 4, distance: Float = 0.01) {
+        let originalPosition = entity.position
+
+        for i in 0..<repeatCount {
+            let delay = Double(i) * 0.05
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                var transform = entity.transform
+                let direction: Float = (i % 2 == 0) ? 1 : -1
+                transform.translation.x = originalPosition.x + direction * distance
+                entity.move(to: transform, relativeTo: entity.parent, duration: 0.03, timingFunction: .easeInOut)
+            }
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + Double(repeatCount) * 0.05) {
+            var transform = entity.transform
+            transform.translation = originalPosition
+            entity.move(to: transform, relativeTo: entity.parent, duration: 0.05, timingFunction: .easeInOut)
+        }
+    }
+
     func flipBackAllCards(in worldAnchor: AnchorEntity) {
         for entity in worldAnchor.children {
             if entity.components.has(FlippedComponent.self) {
@@ -186,16 +209,24 @@ struct MemoryFlippingGameImmersive: View {
     }
     
     func animateDisappear(entity: Entity) {
-        var transform = entity.transform
-        transform.scale = [0, 0, 0]
-        entity.move(to: transform, relativeTo: entity.parent, duration: 0.5, timingFunction: .easeInOut)
-        
-        // similar to task.sleep but runs on main thread instead of async background thread
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            entity.removeFromParent()
+        var bounceTransform = entity.transform
+        bounceTransform.scale *= 1.2
+        bounceTransform.translation.y += 0.05
+        entity.move(to: bounceTransform, relativeTo: entity.parent, duration: 0.2, timingFunction: .easeInOut)
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            var shrinkTransform = bounceTransform
+            shrinkTransform.scale = [0, 0, 0]
+            shrinkTransform.rotation *= simd_quatf(angle: .pi, axis: [0, 1, 0])
+
+            entity.move(to: shrinkTransform, relativeTo: entity.parent, duration: 0.3, timingFunction: .easeInOut)
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                entity.removeFromParent()
+            }
         }
     }
-    
+
     func nextMode(after mode: GameModes) -> GameModes? {
         switch mode {
         case .easy: return .medium
