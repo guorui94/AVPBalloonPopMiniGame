@@ -15,13 +15,13 @@ struct GameOverlay: View {
     @State private var progress = 1.0
     @State private var triggerColorChange = false
     @State private var isPulsing = false
-    @State private var secondsRemaining = 30
+    @State private var secondsRemaining = 120
 
     @Binding var gameEnds: Bool
 
     var body: some View {
 
-        let totalTime = 20.0
+        let totalTime = 120.0
         let displayScore = appModel.score
 
         VStack(spacing: 8) {
@@ -67,10 +67,14 @@ struct GameOverlay: View {
                 )
 
                 HStack {
+                    let minutes = secondsRemaining / 60
+                    let seconds = secondsRemaining % 60
+
                     Label(
-                        "\(secondsRemaining)",
+                        "\(String(format: "%02d:%02d", minutes, seconds))",
                         systemImage: "hourglass.tophalf.fill"
                     )
+
                     .font(.footnote)
                     .foregroundStyle(triggerColorChange ? .red : .white)
                     Text("Seconds Remaining")
@@ -115,7 +119,7 @@ struct GameOverlay: View {
         Task {
             await dismissImmersiveSpace()
         }
-        appModel.signalEndGame()
+//        appModel.signalEndGame()
         timer.upstream.connect().cancel()
         gameEnds = true
         appModel.pose.stopTracking()

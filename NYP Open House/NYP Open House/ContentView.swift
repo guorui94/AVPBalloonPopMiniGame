@@ -36,21 +36,21 @@ struct ContentView: View {
 
                     GameCard(
                         title: "Balloon Popping",
-                        subtitle: "Pop the balloons as fast as you can",
+                        subtitle: "A battle between the fastest fingers",
                         action: { showStartingInterface()
                         })
 
-                    // fillers
                     GameCard(
-                        title: "Game 2", subtitle: "Game descriptions here...",
+                        title: "Memory Game", subtitle: "Game descriptions here...",
                         action: {
                             Task {
                                 await openImmersiveSpace(id: Module.memoryFlippingSpace.name)
                             }
                         })
-
+                    
+                    // filler
                     GameCard(
-                        title: "Game 2", subtitle: "Game descriptions here...",
+                        title: "Game 3", subtitle: "Game descriptions here...",
                         action: {
                             // to add in the future
 

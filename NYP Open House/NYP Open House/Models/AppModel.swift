@@ -41,12 +41,13 @@ class AppModel {
     
     private var applauses = try! AVAudioPlayer(contentsOf: Bundle.main.url(forResource: "highScoreApplause", withExtension: "mp3")!)
     
-
     // App Model is the main model that manages the state of various interfaces. basically this model binds/can be used in every interface including immersive interfaces
     // To keep it neat and easy to integrate new functions, create other models as observable and call the functions here, then you'd only need to import one model across interfaces
     var score = ScoreModel()
 
     var pose = VisionProPose()
+    
+    var currentGameMode: GameModes? = .easy
     
     // set game states
     var isBalloonGame = false

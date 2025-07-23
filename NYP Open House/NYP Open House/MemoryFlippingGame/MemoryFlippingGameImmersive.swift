@@ -229,9 +229,15 @@ struct MemoryFlippingGameImmersive: View {
 
     func nextMode(after mode: GameModes) -> GameModes? {
         switch mode {
-        case .easy: return .medium
-        case .medium: return .challenging
-        case .challenging: return nil
+        case .easy:
+            appModel.currentGameMode = GameModes.medium
+            return .medium
+        case .medium:
+            appModel.currentGameMode = GameModes.challenging
+            return .challenging
+        case .challenging:
+            appModel.currentGameMode = nil
+            return nil
         }
     }
 
