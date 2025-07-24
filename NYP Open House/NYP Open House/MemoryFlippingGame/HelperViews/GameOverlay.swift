@@ -17,81 +17,80 @@ struct GameOverlay: View {
     @State private var isPulsing = false
     @State private var secondsRemaining = 120
 
-    @Binding var gameEnds: Bool
-
     var body: some View {
 
         let totalTime = 120.0
         let displayScore = appModel.score
 
-        VStack(spacing: 8) {
-            Text(
-                verbatim: "\(String(format: "%02d", displayScore.flipScore))"
-            )
-            .font(.system(size: 60, weight: .bold, design: .monospaced))
-            .foregroundStyle(.primary)
-
-            Text("Score")
-                .font(.system(size: 24, weight: .medium))
-                .foregroundStyle(.secondary)
-
-            VStack {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 10.0)
-                        .stroke(
-                            triggerColorChange
-                                ? Color.red : Color.white.opacity(0.7),
-                            lineWidth: 2
-                        )
-                        .frame(width: 285, height: 9)
-
-                    ProgressView(value: progress)
-                        .progressViewStyle(LinearProgressViewStyle())
-                        .frame(width: 280, height: 12)
-                        .padding(.horizontal, 30)
-                        .tint(
-                            triggerColorChange
-                                ? Color(
-                                    hue: 0.0, saturation: 0.3, brightness: 1.0)
-                                : .cyan)
-
-                }
-                .padding(.top, 20)
-                .scaleEffect(isPulsing ? 1.05 : 1.0)
-                .animation(
-                    triggerColorChange
-                        ? .easeInOut(duration: 1.0).repeatForever(
-                            autoreverses: true)
-                        : .default,
-                    value: isPulsing
+        VStack {
+            Spacer()
+            VStack(spacing: 8) {
+                Text(
+                    verbatim: "\(String(format: "%02d", displayScore.flipScore))"
                 )
+                .font(.system(size: 60, weight: .bold, design: .monospaced))
+                .foregroundStyle(.primary)
 
-                HStack {
-                    let minutes = secondsRemaining / 60
-                    let seconds = secondsRemaining % 60
+                Text("Score")
+                    .font(.system(size: 24, weight: .medium))
+                    .foregroundStyle(.secondary)
 
-                    Label(
-                        "\(String(format: "%02d:%02d", minutes, seconds))",
-                        systemImage: "hourglass.tophalf.fill"
+                VStack {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 10.0)
+                            .stroke(
+                                triggerColorChange
+                                    ? Color.red : Color.white.opacity(0.7),
+                                lineWidth: 2
+                            )
+                            .frame(width: 285, height: 9)
+
+                        ProgressView(value: progress)
+                            .progressViewStyle(LinearProgressViewStyle())
+                            .frame(width: 280, height: 12)
+                            .padding(.horizontal, 30)
+                            .tint(
+                                triggerColorChange
+                                    ? Color(
+                                        hue: 0.0, saturation: 0.3, brightness: 1.0)
+                                    : .cyan)
+
+                    }
+                    .padding(.top, 20)
+                    .scaleEffect(isPulsing ? 1.05 : 1.0)
+                    .animation(
+                        triggerColorChange
+                            ? .easeInOut(duration: 1.0).repeatForever(
+                                autoreverses: true)
+                            : .default,
+                        value: isPulsing
                     )
 
-                    .font(.footnote)
-                    .foregroundStyle(triggerColorChange ? .red : .white)
-                    Text("Seconds Remaining")
+                    HStack {
+                        let minutes = secondsRemaining / 60
+                        let seconds = secondsRemaining % 60
+
+                        Label(
+                            "\(String(format: "%02d:%02d", minutes, seconds))",
+                            systemImage: "hourglass.tophalf.fill"
+                        )
+
                         .font(.footnote)
                         .foregroundStyle(triggerColorChange ? .red : .white)
-                }
+                        Text("Seconds Remaining")
+                            .font(.footnote)
+                            .foregroundStyle(triggerColorChange ? .red : .white)
+                    }
 
+                }
             }
+            .padding(.horizontal, 30)
+            .padding(.vertical, 20)
+            .frame(width: 320)
+            .glassBackgroundEffect(in: .rect(cornerRadius: 32))
+            .offset(x: -250, y: -400)
         }
-        .padding(.vertical, 16)
-        .padding(.horizontal, 20)
-        .frame(width: 300)
-        .padding()
-        .glassBackgroundEffect(
-            in: RoundedRectangle(
-                cornerRadius: 32, style: .continuous)
-        )
+        
         .onReceive(timer) { _ in
             if progress > 0.0 {
                 progress -= 1 / totalTime
@@ -121,14 +120,14 @@ struct GameOverlay: View {
                 await dismissImmersiveSpace()
             }
         }
-        appModel.signalEndGame()
+//        appModel.signalEndGame()
         timer.upstream.connect().cancel()
-        gameEnds = true
+        appModel.gameEnds = true
         appModel.pose.stopTracking()
     }
 }
 
 #Preview {
-    GameOverlay(gameEnds: .constant(false))
+    GameOverlay()
         .environment(AppModel())
 }

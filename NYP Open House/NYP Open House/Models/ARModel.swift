@@ -30,9 +30,7 @@ class VisionProPose {
         }
     }
 
-    /// Optionally, reset running flag if you stop or dismiss immersive space
     func stopTracking() {
-        // You can later implement stop logic if needed
         isRunning = false
     }
 }

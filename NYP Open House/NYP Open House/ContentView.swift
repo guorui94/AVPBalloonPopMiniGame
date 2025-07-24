@@ -16,59 +16,66 @@ struct ContentView: View {
     @State private var selectedInterface: AnyView?
     @State var changeInterface = false
     @State var isStarting = false
+    
     var body: some View {
-        if let interface = selectedInterface {
-            interface
-        } else {
-            VStack(spacing: 20) {
-                Spacer()
-
-                Text("Welcome!")
-                    .font(.system(size: 80))
-                    .fontWeight(.bold)
-
-                Text("Explore immersive games....")
-                    .font(.title)
-                    .padding(.bottom, 20)
-
-                HStack(spacing: 50) {
+        ZStack {
+            GameOverlay()
+                .opacity(appModel.isMemoryGame ? 1 : 0)
+            
+            if let interface = selectedInterface {
+                interface
+            } else {
+                VStack(spacing: 20) {
                     Spacer()
 
-                    GameCard(
-                        title: "Balloon Popping",
-                        subtitle: "A battle between the fastest fingers",
-                        action: { showStartingInterface()
-                        })
+                    Text("Welcome!")
+                        .font(.system(size: 80))
+                        .fontWeight(.bold)
 
-                    GameCard(
-                        title: "Memory Game", subtitle: "Game descriptions here...",
-                        action: {
-                            Task {
-                                await openImmersiveSpace(id: Module.memoryFlippingSpace.name)
-                            }
-                        })
-                    
-                    // filler
-                    GameCard(
-                        title: "Game 3", subtitle: "Game descriptions here...",
-                        action: {
-                            // to add in the future
+                    Text("Explore immersive games....")
+                        .font(.title)
+                        .padding(.bottom, 20)
 
-                        })
+                    HStack(spacing: 50) {
+                        Spacer()
+
+                        GameCard(
+                            title: "Balloon Popping",
+                            subtitle: "A battle between the fastest fingers",
+                            action: { showStartingInterface()
+                            })
+
+                        GameCard(
+                            title: "Memory Game", subtitle: "Game descriptions here...",
+                            action: {
+                                Task {
+                                    await openImmersiveSpace(id: Module.memoryFlippingSpace.name)
+                                }
+                            })
+                        
+                        // filler
+                        GameCard(
+                            title: "Game 3", subtitle: "Game descriptions here...",
+                            action: {
+                                // to add in the future
+
+                            })
+
+                        Spacer()
+                    }
 
                     Spacer()
+
                 }
-
-                Spacer()
-
-            }
-            .padding()
-            .glassBackgroundEffect(
-                in: RoundedRectangle(
-                    cornerRadius: 32,
-                    style: .continuous
+                .padding()
+                .glassBackgroundEffect(
+                    in: RoundedRectangle(
+                        cornerRadius: 32,
+                        style: .continuous
+                    )
                 )
-            )
+                .opacity(appModel.isMemoryGame ? 0 : 1)
+            }
         }
         
     }

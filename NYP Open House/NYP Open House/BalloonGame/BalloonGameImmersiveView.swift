@@ -36,22 +36,23 @@ struct BalloonGameImmersiveView: View {
                 }
                 bubble.removeFromParent()
 
-                // set a fixed number ot balloons to appear in the immersive space
                 let colorList = generateBalloonColorList()
 
                 bubbleClones = await placeBalloons(from: bubble, into: immersiveContentEntity, using: colorList)
                 
                 try? await Task.sleep(nanoseconds: 500_000_000)
                 var spawnY: Float = 0.0
+                var spawnZ: Float = 0.0
                 if let deviceAnchor = pose.worldTracking.queryDeviceAnchor(
                     atTimestamp: CACurrentMediaTime())
                 {
                     let transform = deviceAnchor.originFromAnchorTransform
                     spawnY = transform.columns.3.y - 0.25
+                    spawnZ = transform.columns.3.z - 0.8
                 }
 
                 // use a world anchor to make sure the balloons spawn in front of the user
-                let worldAnchor = AnchorEntity(world: [0, spawnY, -0.8])
+                let worldAnchor = AnchorEntity(world: [0, spawnY, spawnZ])
 
                 worldAnchor.addChild(immersiveContentEntity)
                 content.add(worldAnchor)
@@ -122,7 +123,6 @@ struct BalloonGameImmersiveView: View {
                         }
                     }
                 }
-
             })
         )
         // sets the invisible boundary for balloons to disappear
@@ -156,6 +156,7 @@ struct BalloonGameImmersiveView: View {
             }
         }
     }
+    
     private func generateBalloonColorList() -> [BalloonColor] {
         let redCount = 7
         let greenCount = 7

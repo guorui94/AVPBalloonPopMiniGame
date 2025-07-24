@@ -52,6 +52,7 @@ class AppModel {
     // set game states
     var isBalloonGame = false
     var isMemoryGame = false
+    var gameEnds = false
     
     // functions
     func resetBalloonGame() {

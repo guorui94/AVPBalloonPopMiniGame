@@ -25,13 +25,17 @@ struct MemoryFlippingGameImmersive: View {
     @State private var flipSuccess: AudioFileResource?
     var body: some View {
         RealityView { content in
+            let pose = appModel.pose
+            await pose.startIfNeeded()
+            
             if let immersiveContentEntity = try? await Entity(named: "ImageAnchorScene", in: realityKitContentBundle),
                let baseTile = immersiveContentEntity.findEntity(named: "Tile")
             {
                 await createGameTiles(gameMode: GameModes.easy, baseTile: baseTile, worldAnchor: worldAnchor)
-
+                
                 try? await Task.sleep(nanoseconds: 400_000_000)
                 content.add(worldAnchor)
+                appModel.isMemoryGame = true
             }
         }
         .gesture(
