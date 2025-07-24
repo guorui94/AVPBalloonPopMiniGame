@@ -5,7 +5,7 @@
 //  Created by Amelia on 14/7/25.
 //
 
-import Foundation
+import SwiftUI
 
 enum GameModes: CaseIterable {
     case easy
@@ -46,11 +46,11 @@ enum GameModes: CaseIterable {
     var modes: String {
         switch self {
         case .easy:
-            return "easy"
+            return "Easy"
         case .medium:
-            return "medium"
+            return "Medium"
         case .challenging:
-            return "challenging"
+            return "Challenging"
         }
     }
 
@@ -62,6 +62,32 @@ enum GameModes: CaseIterable {
             return 100
         case .challenging:
             return 200
+        }
+    }
+    
+    var color: UIColor {
+        switch self {
+        case .easy:
+            return UIColor(red: 120/255, green: 200/255, blue: 65/255, alpha: 1.0)
+        case .medium:
+            return UIColor(red: 255/255, green: 155/255, blue: 47/255, alpha: 1.0)
+        case .challenging:
+            return UIColor(red: 251/255, green: 65/255, blue: 65/255, alpha: 1.0)
+        }
+    }
+    var shadowColor: UIColor {
+        switch self {
+        case .easy:
+            // Darker green shadow
+            return UIColor(red: 60/255, green: 100/255, blue: 32/255, alpha: 0.4)
+
+        case .medium:
+            // Darker orange shadow
+            return UIColor(red: 128/255, green: 78/255, blue: 24/255, alpha: 0.4)
+
+        case .challenging:
+            // Darker red shadow
+            return UIColor(red: 128/255, green: 32/255, blue: 32/255, alpha: 0.4)
         }
     }
 

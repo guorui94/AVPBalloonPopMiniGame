@@ -125,8 +125,10 @@ struct StartingInterface: View {
                 ZStack(alignment: .topLeading) {
                     BalloonGameInterface(gameEnds: $gameEnds)
                     Button(action: {
-                        Task {
-                            await dismissImmersiveSpace()
+                        if appModel.immersiveSpaceState == .open {
+                            Task {
+                                await dismissImmersiveSpace()
+                            }
                         }
                         resetGameState()
                         appModel.pose.stopTracking()

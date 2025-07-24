@@ -116,10 +116,12 @@ struct GameOverlay: View {
         }
     }
     func prepareForEndGame() {
-        Task {
-            await dismissImmersiveSpace()
+        if appModel.immersiveSpaceState == .open {
+            Task {
+                await dismissImmersiveSpace()
+            }
         }
-//        appModel.signalEndGame()
+        appModel.signalEndGame()
         timer.upstream.connect().cancel()
         gameEnds = true
         appModel.pose.stopTracking()

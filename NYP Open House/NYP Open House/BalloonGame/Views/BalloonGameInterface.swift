@@ -113,8 +113,10 @@ struct BalloonGameInterface: View {
         }
     }
     func prepareForEndGame() {
-        Task {
-            await dismissImmersiveSpace()
+        if appModel.immersiveSpaceState == .open {
+            Task {
+                await dismissImmersiveSpace()
+            }
         }
         appModel.signalEndGame()
         timer.upstream.connect().cancel()

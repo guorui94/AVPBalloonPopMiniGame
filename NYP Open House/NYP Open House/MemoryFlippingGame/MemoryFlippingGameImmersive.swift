@@ -14,7 +14,7 @@ struct FlippedComponent: Component {}
 struct MemoryFlippingGameImmersive: View {
     @Environment(AppModel.self) var appModel
     @State private var predicate = QueryPredicate<Entity>.has(ModelComponent.self)
-    @State private var worldAnchor: AnchorEntity?
+    @State private var worldAnchor = AnchorEntity(world: [0, 1.5, -0.8])
     @State private var currentGameMode = GameModes.easy
     @State private var firstFlippedEntity: Entity? = nil
     @State private var firstFlippedImage: String = ""
@@ -25,13 +25,13 @@ struct MemoryFlippingGameImmersive: View {
     @State private var flipSuccess: AudioFileResource?
     var body: some View {
         RealityView { content in
-            worldAnchor = AnchorEntity(world: [0, 1.5, -0.8])
             if let immersiveContentEntity = try? await Entity(named: "ImageAnchorScene", in: realityKitContentBundle),
                let baseTile = immersiveContentEntity.findEntity(named: "Tile")
             {
-                await createGameTiles(gameMode: GameModes.easy, baseTile: baseTile, worldAnchor: worldAnchor!)
+                await createGameTiles(gameMode: GameModes.easy, baseTile: baseTile, worldAnchor: worldAnchor)
+
                 try? await Task.sleep(nanoseconds: 400_000_000)
-                content.add(worldAnchor!)
+                content.add(worldAnchor)
             }
         }
         .gesture(
@@ -74,11 +74,11 @@ struct MemoryFlippingGameImmersive: View {
                                     if let next = nextMode(after: currentGameMode) {
                                         currentGameMode = next
                                         cardsPairCount = 0
-                                        worldAnchor?.children.removeAll()
+                                        worldAnchor.children.removeAll()
                                         
                                         if let immersiveContentEntity = try? await Entity(named: "ImageAnchorScene", in: realityKitContentBundle),
                                            let baseTile = immersiveContentEntity.findEntity(named: "Tile") {
-                                            await createGameTiles(gameMode: next, baseTile: baseTile, worldAnchor: worldAnchor!)
+                                            await createGameTiles(gameMode: next, baseTile: baseTile, worldAnchor: worldAnchor)
                                         }
                                     }
                                 }
@@ -88,7 +88,7 @@ struct MemoryFlippingGameImmersive: View {
                                 }
                                 shakeEntity(entity)
                                 try? await Task.sleep(nanoseconds: 400_000_000)
-                                flipBackAllCards(in: worldAnchor!)
+                                flipBackAllCards(in: worldAnchor)
                             }
                             flippedCount = 0
                             firstFlippedEntity = nil
@@ -166,8 +166,67 @@ struct MemoryFlippingGameImmersive: View {
                 worldAnchor.addChild(tileClone)
             }
         }
+        createGameModeText(gameMode, worldAnchor: worldAnchor)
+        
     }
-    
+
+    func createGameModeText(_ currentGameMode: GameModes, worldAnchor: AnchorEntity) {
+        let text = currentGameMode.modes
+        let mesh = MeshResource.generateText(
+            text,
+            extrusionDepth: 0.015,
+            font: .systemFont(ofSize: 0.18, weight: .heavy),
+            containerFrame: .zero,
+            alignment: .center,
+            lineBreakMode: .byWordWrapping
+        )
+        
+        
+        let textMaterial = UnlitMaterial(color: currentGameMode.color)
+        let textEntity = ModelEntity(mesh: mesh, materials: [textMaterial])
+        textEntity.name = "GameModeLabel"
+        textEntity.scale = [0.3, 0.3, 0.3]
+        
+        let shadowMaterial = UnlitMaterial(color: currentGameMode.shadowColor)
+        let shadowEntity = ModelEntity(mesh: mesh, materials: [shadowMaterial])
+        shadowEntity.scale = textEntity.scale
+        
+        
+        shadowEntity.position = [0.005, -0.005, 0.001]
+        
+        if let bounds = textEntity.model?.mesh.bounds {
+            let centerOffset = bounds.center.x * textEntity.scale.x
+            textEntity.position.x -= centerOffset
+            shadowEntity.position.x -= centerOffset
+        }
+
+        let totalHeight = Float(currentGameMode.rows - 1) * 0.13
+        let labelY = (totalHeight / 2) + 0.12
+        textEntity.position.y += labelY
+        shadowEntity.position.y += labelY
+        textEntity.position.z = 0.0
+        shadowEntity.position.z = -0.001
+
+        let originalY = textEntity.position.y
+        let animationDuration = 3.0
+        let floatAmplitude: Float = 0.02
+
+        var frame = 0
+        Timer.scheduledTimer(withTimeInterval: 1.0 / 60.0, repeats: true) { _ in
+            frame += 1
+            let time = Double(frame) / 60.0
+            let cycle = (.pi * 2.0) / animationDuration
+            let offset = Float(sin(time * cycle)) * floatAmplitude
+
+            textEntity.position.y = originalY + offset
+            shadowEntity.position.y = (originalY - 0.005) + offset
+        }
+
+        worldAnchor.addChild(shadowEntity)
+        worldAnchor.addChild(textEntity)
+    }
+
+
     func animateFlip(entity: Entity) {
         let newRotation = entity.transform.rotation * simd_quatf(angle: .pi, axis: [-1, 0, 0])
         var transform = entity.transform

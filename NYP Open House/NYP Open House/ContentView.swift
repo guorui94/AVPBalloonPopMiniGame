@@ -90,8 +90,10 @@ struct ContentView: View {
                                 showStartingInterface()
                             },
                             onBackToMenu: {
-                                Task {
-                                    await dismissImmersiveSpace()
+                                if appModel.immersiveSpaceState == .open {
+                                    Task {
+                                        await dismissImmersiveSpace()
+                                    }
                                 }
                                 appModel.resetBalloonGame()
                                 changeInterface = false
