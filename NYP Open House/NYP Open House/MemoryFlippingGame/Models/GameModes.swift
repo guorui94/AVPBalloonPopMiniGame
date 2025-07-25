@@ -78,15 +78,12 @@ enum GameModes: CaseIterable {
     var shadowColor: UIColor {
         switch self {
         case .easy:
-            // Darker green shadow
             return UIColor(red: 60/255, green: 100/255, blue: 32/255, alpha: 0.4)
 
         case .medium:
-            // Darker orange shadow
             return UIColor(red: 128/255, green: 78/255, blue: 24/255, alpha: 0.4)
 
         case .challenging:
-            // Darker red shadow
             return UIColor(red: 128/255, green: 32/255, blue: 32/255, alpha: 0.4)
         }
     }

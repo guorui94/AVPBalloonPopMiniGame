@@ -18,8 +18,18 @@ class AppModel {
         case inTransition
         case open
     }
-    var immersiveSpaceState = ImmersiveSpaceState.closed
     
+    enum AppScreen {
+        case menu
+        case balloonIntro
+        case balloonEnd
+        case memoryGame
+    }
+
+    var immersiveSpaceState = ImmersiveSpaceState.closed
+
+    var currentScreen: AppScreen = .menu
+
     var balloonPoppingsounds = [AudioFileResource]()
     // files that need longer time to load/ load multiple files should go into init
     init() {
@@ -62,6 +72,9 @@ class AppModel {
     
     func trackBalloonsRemoved() {
         score.balloonsRemoved += 1
+        if score.balloonsRemoved >= 25 {
+            gameEnds = true
+        }
     }
     
     func signalEndGame () {

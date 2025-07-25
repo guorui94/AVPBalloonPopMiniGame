@@ -14,7 +14,7 @@ struct FlippedComponent: Component {}
 struct MemoryFlippingGameImmersive: View {
     @Environment(AppModel.self) var appModel
     @State private var predicate = QueryPredicate<Entity>.has(ModelComponent.self)
-    @State private var worldAnchor = AnchorEntity(world: [0, 1.5, -0.8])
+    @State private var worldAnchor = AnchorEntity(world: [0, 1.45, -0.9])
     @State private var currentGameMode = GameModes.easy
     @State private var firstFlippedEntity: Entity? = nil
     @State private var firstFlippedImage: String = ""
@@ -23,19 +23,31 @@ struct MemoryFlippingGameImmersive: View {
     @State private var cardsPairCount = 0
     @State private var moveToNextLevelSound: AudioFileResource?
     @State private var flipSuccess: AudioFileResource?
+
     var body: some View {
-        RealityView { content in
+        RealityView { content, attachments in
             let pose = appModel.pose
             await pose.startIfNeeded()
             
             if let immersiveContentEntity = try? await Entity(named: "ImageAnchorScene", in: realityKitContentBundle),
                let baseTile = immersiveContentEntity.findEntity(named: "Tile")
             {
-                await createGameTiles(gameMode: GameModes.easy, baseTile: baseTile, worldAnchor: worldAnchor)
+                await createGameTiles(gameMode: currentGameMode, baseTile: baseTile, worldAnchor: worldAnchor)
                 
                 try? await Task.sleep(nanoseconds: 400_000_000)
                 content.add(worldAnchor)
-                appModel.isMemoryGame = true
+                
+                Task {
+                    if let overlayTag = attachments.entity(for: "scoreOverlay") {
+                        overlayTag.position = [-0.46, +0.7,  -0.1]
+                        worldAnchor.addChild(overlayTag)
+                    }
+                }
+
+            }
+        } attachments: {
+            Attachment(id: "scoreOverlay") {
+                GameOverlay()
             }
         }
         .gesture(
@@ -111,6 +123,8 @@ struct MemoryFlippingGameImmersive: View {
                 }
             }
         }
+
+
     }
     
     func createGameTiles(gameMode: GameModes, baseTile: Entity, worldAnchor: AnchorEntity) async {

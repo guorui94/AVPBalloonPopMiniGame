@@ -17,10 +17,11 @@ struct BalloonGameImmersiveView: View {
     // match any entity with a visible model component aka a 3d model
     @State var predicate = QueryPredicate<Entity>.has(ModelComponent.self)
     @State private var bubbleClones: [Entity] = []
+    
     @Environment(AppModel.self) var appModel
 
     var body: some View {
-        RealityView { content in
+        RealityView { content, attachments in
             // check the ar session first
             let pose = appModel.pose
             await pose.startIfNeeded()
@@ -56,6 +57,18 @@ struct BalloonGameImmersiveView: View {
 
                 worldAnchor.addChild(immersiveContentEntity)
                 content.add(worldAnchor)
+                
+                Task {
+                    if let overlayTag = attachments.entity(for: "scoreOverlay") {
+                        overlayTag.position = [-0.49, +0.85,  -0.35]
+                        worldAnchor.addChild(overlayTag)
+                    }
+                }
+            }
+            
+        } attachments: {
+            Attachment(id: "scoreOverlay"){
+                BalloonGameInterface()
             }
         }
         .gesture(
@@ -155,6 +168,7 @@ struct BalloonGameImmersiveView: View {
                 }
             }
         }
+        
     }
     
     private func generateBalloonColorList() -> [BalloonColor] {
@@ -203,15 +217,15 @@ struct BalloonGameImmersiveView: View {
 
             var linearY = Float.random(in: 0.05...0.13)
             if balloonColor.findColor == "gold" {
-                linearY = Float.random(in: 0.25...0.35)
+                linearY = Float.random(in: 0.28...0.35)
             }
 
             clone.components[PhysicsMotionComponent.self] = PhysicsMotionComponent(linearVelocity: [0, linearY, 0])
 
             let x = Float.random(in: -0.7...0.7)
             var y = Float.random(in: -0.3...0)
-            let z = Float.random(in: -1...0)
-            if balloonColor.findColor == "gold" { y = 0 }
+            let z = Float.random(in: -0.5...0)
+            if balloonColor.findColor == "gold" { y = -0.15 }
 
             clone.position = [x, y, z]
 

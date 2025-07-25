@@ -10,17 +10,19 @@ import RealityKitContent
 
 @main
 struct NYPOpenHouseApp: App {
+    @Environment(\.dismissImmersiveSpace) private var dismissImmersiveSpace
     @State private var appModel = AppModel()
     init () {
         ScoreComponent.registerComponent()
         PairComponent.registerComponent()
     }
     var body: some Scene {
-        WindowGroup {
+        WindowGroup(id: "content") {
             ContentView()
                 .environment(appModel)
         }
         .windowStyle(.plain)
+        
         // windowStyle(.plain) means there is no background, for each view, set the background as
         // .glassBackgroundEffect(in: RoundedRectangle(cornerRadius: 32, style: .continuous))
         // in order for the background to appear. Make sure spacer/Hstack/Vstack is added to fill the screen if needed. Use frame to set the size of the window

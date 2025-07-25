@@ -18,7 +18,6 @@ struct GameOverlay: View {
     @State private var secondsRemaining = 120
 
     var body: some View {
-
         let totalTime = 120.0
         let displayScore = appModel.score
 
@@ -88,9 +87,7 @@ struct GameOverlay: View {
             .padding(.vertical, 20)
             .frame(width: 320)
             .glassBackgroundEffect(in: .rect(cornerRadius: 32))
-            .offset(x: -250, y: -400)
         }
-        
         .onReceive(timer) { _ in
             if progress > 0.0 {
                 progress -= 1 / totalTime
@@ -120,7 +117,7 @@ struct GameOverlay: View {
                 await dismissImmersiveSpace()
             }
         }
-//        appModel.signalEndGame()
+        appModel.signalEndGame()
         timer.upstream.connect().cancel()
         appModel.gameEnds = true
         appModel.pose.stopTracking()

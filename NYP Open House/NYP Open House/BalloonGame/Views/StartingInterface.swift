@@ -11,18 +11,12 @@ struct StartingInterface: View {
     @Environment(\.openImmersiveSpace) private var openImmersiveSpace
     @Environment(\.dismissImmersiveSpace) private var dismissImmersiveSpace
     @Environment(AppModel.self) private var appModel
-    @Binding var changeInterface: Bool
-    @Binding var isStarting: Bool
+    @Environment(\.dismissWindow) private var dismissWindow
+    @State private var isStarting = false
     @State private var countdown: Int? = nil
-    @State var gameEnds = false
-    var onBack: () -> Void  // this sets the selected interface as nil (aka go back to ContentView)
-    var onShowEndGame:
-        (_ playAgain: @escaping () -> Void, _ backToMenu: @escaping () -> Void)
-            -> Void
 
     var body: some View {
         ZStack {
-            if !changeInterface {
                 HStack {
                     Spacer()
                     VStack(spacing: 30) {
@@ -101,11 +95,11 @@ struct StartingInterface: View {
                 .padding(40)
                 .glassBackgroundEffect(
                     in: RoundedRectangle(cornerRadius: 32, style: .continuous))
-            }
+            
         }
         .overlay(alignment: .topLeading) {
             Button(action: {
-                onBack()
+                appModel.currentScreen = .menu
             }) {
                 Image(systemName: "chevron.left")
                     .font(.system(size: 28, weight: .medium))
@@ -120,44 +114,8 @@ struct StartingInterface: View {
                 effect.scaleEffect(!isActive ? 1.0 : 1.2)
             }
         }
-        .overlay(alignment: .bottomTrailing) {
-            if changeInterface {
-                ZStack(alignment: .topLeading) {
-                    BalloonGameInterface(gameEnds: $gameEnds)
-                    Button(action: {
-                        if appModel.immersiveSpaceState == .open {
-                            Task {
-                                await dismissImmersiveSpace()
-                            }
-                        }
-                        resetGameState()
-                        appModel.pose.stopTracking()
-                    }) {
-                        Image(systemName: "chevron.left")
-                            .font(.system(size: 24, weight: .medium))
-                            .padding(14)
-                            .background(.ultraThinMaterial)
-                            .clipShape(Circle())
-                    }
-                    .clipShape(Circle())
-                    .padding([.top, .leading], 20)
-                    .buttonStyle(.plain)
-                    .hoverEffect { effect, isActive, proxy in
-                        effect.scaleEffect(!isActive ? 1.0 : 1.2)
-                    }
-                }
-                .offset(x: -280, y: -70)
-            }
-        }
-        .onChange(of: gameEnds) { oldValue, newValue in
-            onShowEndGame(
-                {
-                    resetGameState ()
-                },
-                {
-                    onBack()
-                    resetGameState ()
-                })
+        .onChange(of: appModel.gameEnds) { oldValue, newValue in
+            resetGameState ()
         }
     }
     private func startCountdown() {
@@ -171,25 +129,19 @@ struct StartingInterface: View {
             countdown = nil
 
             await openImmersiveSpace(id: Module.bubbleSpace.name)
-            changeInterface = true
+            dismissWindow(id: "content")
         }
     }
     private func resetGameState () {
         appModel.resetBalloonGame()
-        changeInterface = false
         isStarting = false
-        gameEnds = false
+        appModel.gameEnds = false
     }
     
 }
 
 #Preview {
-    StartingInterface(
-        changeInterface: .constant(false),
-        isStarting: .constant(false),
-        onBack: {},
-        onShowEndGame: { playAgain, backToMenu in
-        }
-    )
-    .environment(AppModel())
+    StartingInterface()
+        .environment(AppModel())
 }
+
