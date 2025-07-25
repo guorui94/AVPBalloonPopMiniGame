@@ -98,10 +98,10 @@ def Xform "Root"
             float inputs:opacity = 0.15
             float inputs:opacity.connect = </Root/BubbleMaterial/Remap_1.outputs:out>
             float inputs:opacityThreshold
-            float inputs:roughness = 0.5
+            float inputs:roughness = 0.3
             token outputs:out
             float2 ui:nodegraph:node:pos = (-168.07622, -62.12185)
-            int ui:nodegraph:node:stackingOrder = 6103
+            int ui:nodegraph:node:stackingOrder = 6110
             string[] ui:nodegraph:realitykit:node:attributesShowingChildren = ["Advanced", "inputs:occlusion"]
         }
 

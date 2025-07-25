@@ -26,7 +26,7 @@ class VisionProPose {
         if !isRunning {
             await runArSession()
         } else {
-            print("World tracking already running, skip restarting")
+            //
         }
     }
 

@@ -210,7 +210,7 @@ struct BalloonGameImmersiveView: View {
                     try mat.setParameter(name: "Metallic", value: .float(1.0))
                     try mat.setParameter(name: "DisappearingColor", value: .color(CGColor(red: 0.5, green: 0.5, blue: 0.5, alpha: 1.0)))
                 } else {
-                    try mat.setParameter(name: "Shiny", value: .float(0.3))
+                    try mat.setParameter(name: "Shiny", value: .float(0.15))
                     try mat.setParameter(name: "Metallic", value: .float(0.3))
                     try mat.setParameter(name: "DisappearingColor", value: .color(balloonColor.brightenedColor))
                 }

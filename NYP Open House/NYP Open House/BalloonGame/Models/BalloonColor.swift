@@ -30,7 +30,7 @@ enum BalloonColor: CaseIterable {
     }
 
     var brightenedColor: CGColor {
-        return color.adjustedBrightness(by: 0.35)
+        return color.adjustedBrightness(by: 0.7)
     }
 
     var darkenedColor: CGColor {

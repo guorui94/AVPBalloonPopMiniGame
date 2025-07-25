@@ -14,7 +14,6 @@ struct StartingInterface: View {
     @Environment(\.dismissWindow) private var dismissWindow
     @State private var isStarting = false
     @State private var countdown: Int? = nil
-    @State private var fadeOutOverlayOpacity: Double = 0.0
 
     var body: some View {
         ZStack {
@@ -96,10 +95,6 @@ struct StartingInterface: View {
                 .padding(40)
                 .glassBackgroundEffect(
                     in: RoundedRectangle(cornerRadius: 32, style: .continuous))
-            Color.black
-                .opacity(fadeOutOverlayOpacity)
-                .ignoresSafeArea()
-                .animation(.easeInOut(duration: 1.0), value: fadeOutOverlayOpacity)
             
         }
         .overlay(alignment: .topLeading) {
@@ -132,7 +127,7 @@ struct StartingInterface: View {
                 try? await Task.sleep(nanoseconds: 1_000_000_000)
             }
             countdown = nil
-            fadeOutOverlayOpacity = 1.0
+
             await openImmersiveSpace(id: Module.bubbleSpace.name)
             dismissWindow(id: "content")
         }
