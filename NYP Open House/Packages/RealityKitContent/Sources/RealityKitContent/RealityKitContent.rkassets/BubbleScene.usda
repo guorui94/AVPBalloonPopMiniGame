@@ -21,21 +21,21 @@ def Xform "Root"
                 }
             }
         )
-        color3f inputs:BalloonColor = (0.9085884, 0.7315051, 0.21568628) (
+        color3f inputs:BalloonColor = (0.9098039, 0.7315051, 0.21568628) (
             colorSpace = "srgb_texture"
             customData = {
                 dictionary realitykit = {
                     float2 positionInSubgraph = (-491.96896, -354.52432)
-                    int stackingOrderInSubgraph = 6103
+                    int stackingOrderInSubgraph = 6106
                 }
             }
         )
-        color3f inputs:DisappearingColor = (0, 0, 0) (
+        color3f inputs:DisappearingColor = (0.886265, 0.7628532, 0.3453107) (
             colorSpace = "srgb_texture"
             customData = {
                 dictionary realitykit = {
-                    float2 positionInSubgraph = (-397.68903, -395.08484)
-                    int stackingOrderInSubgraph = 5547
+                    float2 positionInSubgraph = (-351.697, -477.07068)
+                    int stackingOrderInSubgraph = 6111
                 }
             }
         )
@@ -66,7 +66,7 @@ def Xform "Root"
             customData = {
                 dictionary realitykit = {
                     float2 positionInSubgraph = (-417.28436, -63.53229)
-                    int stackingOrderInSubgraph = 6102
+                    int stackingOrderInSubgraph = 6104
                 }
             }
         )
@@ -89,7 +89,7 @@ def Xform "Root"
             color3f inputs:emissiveColor = (0.3640386, 0.3640386, 0.3640386) (
                 colorSpace = "srgb_texture"
             )
-            color3f inputs:emissiveColor.connect = </Root/BubbleMaterial/Multiply_1.outputs:out>
+            color3f inputs:emissiveColor.connect = </Root/BubbleMaterial/Multiply_2.outputs:out>
             float inputs:ior
             float inputs:metallic = 0.47
             float inputs:metallic.connect = </Root/BubbleMaterial.inputs:Metallic>
@@ -101,7 +101,7 @@ def Xform "Root"
             float inputs:roughness = 0.5
             token outputs:out
             float2 ui:nodegraph:node:pos = (-168.07622, -62.12185)
-            int ui:nodegraph:node:stackingOrder = 5533
+            int ui:nodegraph:node:stackingOrder = 6103
             string[] ui:nodegraph:realitykit:node:attributesShowingChildren = ["Advanced", "inputs:occlusion"]
         }
 
@@ -585,14 +585,18 @@ def Xform "Root"
             int ui:nodegraph:node:stackingOrder = 6101
         }
 
-        def Shader "Multiply_1"
+        def "Multiply_1"
+        {
+        }
+
+        def Shader "Multiply_2"
         {
             uniform token info:id = "ND_multiply_color3"
             color3f inputs:in1.connect = </Root/BubbleMaterial.inputs:DisappearingColor>
             color3f inputs:in2.connect = </Root/BubbleMaterial.inputs:BalloonColor>
             color3f outputs:out
-            float2 ui:nodegraph:node:pos = (101.8738, -346.598)
-            int ui:nodegraph:node:stackingOrder = 5523
+            float2 ui:nodegraph:node:pos = (-80.68243, -379.86804)
+            int ui:nodegraph:node:stackingOrder = 6109
         }
     }
 

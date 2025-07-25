@@ -11,8 +11,29 @@
       }
     ]
   },
+  "07EFAED4-A5FA-4D8B-AD05-A41AEC130B2C" : {
+    "objectMetadataList" : [
+      [
+        "07EFAED4-A5FA-4D8B-AD05-A41AEC130B2C",
+        "Root"
+      ],
+      {
+        "isExpanded" : true,
+        "isLocked" : false
+      }
+    ]
+  },
   "34BBF2A7-D0F0-4D0C-87E4-4D777089CCEE" : {
     "objectMetadataList" : [
+      [
+        "34BBF2A7-D0F0-4D0C-87E4-4D777089CCEE",
+        "Root",
+        "BubbleMaterial"
+      ],
+      {
+        "isExpanded" : true,
+        "isLocked" : false
+      },
       [
         "34BBF2A7-D0F0-4D0C-87E4-4D777089CCEE",
         "Root",
@@ -159,16 +180,6 @@
         "416F112E-9914-486E-8EFC-5970D6063AE3",
         "Root",
         "Tile1"
-      ],
-      {
-        "isExpanded" : true,
-        "isLocked" : false
-      },
-      [
-        "416F112E-9914-486E-8EFC-5970D6063AE3",
-        "Root",
-        "Timeline",
-        "Track"
       ],
       {
         "isExpanded" : true,
@@ -413,6 +424,38 @@
       }
     ]
   },
+  "84000158-1BCD-4ADA-B8EC-E42639DE2631" : {
+    "objectMetadataList" : [
+      [
+        "84000158-1BCD-4ADA-B8EC-E42639DE2631",
+        "Root",
+        "SkySphere"
+      ],
+      {
+        "disallowsFraming" : true,
+        "isExpanded" : true,
+        "isLocked" : false
+      },
+      [
+        "84000158-1BCD-4ADA-B8EC-E42639DE2631",
+        "Root"
+      ],
+      {
+        "isExpanded" : true,
+        "isLocked" : false
+      },
+      [
+        "84000158-1BCD-4ADA-B8EC-E42639DE2631",
+        "Root",
+        "SkyDome"
+      ],
+      {
+        "disallowsFraming" : true,
+        "isExpanded" : false,
+        "isLocked" : false
+      }
+    ]
+  },
   "A33BCBFB-5250-4D27-AC10-9EA9F874DD91" : {
     "objectMetadataList" : [
       [
@@ -438,7 +481,25 @@
       },
       [
         "A165DA54-DE35-4088-BE35-A7AB56311B6D",
+        "Root",
+        "SkySphere"
+      ],
+      {
+        "disallowsFraming" : true,
+        "isExpanded" : true,
+        "isLocked" : false
+      },
+      [
+        "A165DA54-DE35-4088-BE35-A7AB56311B6D",
         "Anchor"
+      ],
+      {
+        "isExpanded" : true,
+        "isLocked" : false
+      },
+      [
+        "A165DA54-DE35-4088-BE35-A7AB56311B6D",
+        "Root"
       ],
       {
         "isExpanded" : true,
@@ -542,6 +603,16 @@
   },
   "D66134B1-3681-4A8E-AFE5-29F257229F3B" : {
     "objectMetadataList" : [
+      [
+        "D66134B1-3681-4A8E-AFE5-29F257229F3B",
+        "Root",
+        "SkySphere"
+      ],
+      {
+        "disallowsFraming" : true,
+        "isExpanded" : false,
+        "isLocked" : false
+      },
       [
         "D66134B1-3681-4A8E-AFE5-29F257229F3B",
         "Root"

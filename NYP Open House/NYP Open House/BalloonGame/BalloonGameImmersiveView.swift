@@ -25,7 +25,11 @@ struct BalloonGameImmersiveView: View {
             // check the ar session first
             let pose = appModel.pose
             await pose.startIfNeeded()
-
+            if let skyEntity = try? await Entity(named: "SkyScene", in: realityKitContentBundle) {
+                    let skyAnchor = AnchorEntity()
+                    skyAnchor.addChild(skyEntity)
+                    content.add(skyAnchor)
+                }
             if let immersiveContentEntity = try? await Entity(
                 named: "BubbleScene", in: realityKitContentBundle)
             {
@@ -203,10 +207,12 @@ struct BalloonGameImmersiveView: View {
             do {
                 if balloonColor.findColor == "gold" {
                     try mat.setParameter(name: "Shiny", value: .float(1.0))
-                    try mat.setParameter(name: "Metallic", value: .float(0.8))
+                    try mat.setParameter(name: "Metallic", value: .float(1.0))
+                    try mat.setParameter(name: "DisappearingColor", value: .color(CGColor(red: 0.5, green: 0.5, blue: 0.5, alpha: 1.0)))
                 } else {
-                    try mat.setParameter(name: "Shiny", value: .float(0.0))
-                    try mat.setParameter(name: "Metallic", value: .float(0.0))
+                    try mat.setParameter(name: "Shiny", value: .float(0.3))
+                    try mat.setParameter(name: "Metallic", value: .float(0.3))
+                    try mat.setParameter(name: "DisappearingColor", value: .color(balloonColor.brightenedColor))
                 }
                 base.components[ModelComponent.self]?.materials = [mat]
             } catch {
@@ -254,9 +260,6 @@ struct BalloonGameImmersiveView: View {
             do {
                 try mat.setParameter(
                     name: "BalloonColor", value: .color(balloonColor))
-                try mat.setParameter(
-                    name: "DisappearingColor",
-                    value: .color(CGColor(red: 0, green: 0, blue: 0, alpha: 0)))
                 modelComponent.materials[0] = mat
                 modelEntity.components[ModelComponent.self] = modelComponent
 
@@ -272,13 +275,12 @@ struct BalloonGameImmersiveView: View {
     private func startBlinking(
         entity: Entity,
         colorName: String = "DisappearingColor",
-        blinkColor: CGColor = CGColor(
-            red: 0.7, green: 0.7, blue: 0.7, alpha: 1),
+        blinkColor: CGColor = CGColor(red: 0.9, green: 0.9, blue: 0.9, alpha: 1),
         times: Int = 3,
         fade: Bool = true
     ) {
         guard var modelComponent = entity.components[ModelComponent.self],
-            var mat = modelComponent.materials.first as? ShaderGraphMaterial
+              var mat = modelComponent.materials.first as? ShaderGraphMaterial
         else {
             return
         }
@@ -287,44 +289,41 @@ struct BalloonGameImmersiveView: View {
             for _ in 0..<times {
                 if fade {
                     for step in 0...10 {
-                        let t = Float(step) / 10
+                        let t = 0.6 + (Float(step) / 10) * 0.4
                         let blendedCG = CGColor(
                             red: CGFloat(t),
                             green: CGFloat(t),
                             blue: CGFloat(t),
                             alpha: 1.0
                         )
-                        try? mat.setParameter(
-                            name: colorName, value: .color(blendedCG))
+                        try? mat.setParameter(name: colorName, value: .color(blendedCG))
                         modelComponent.materials = [mat]
                         entity.components[ModelComponent.self] = modelComponent
                         try await Task.sleep(nanoseconds: 50_000_000)
                     }
                     for step in (0...10).reversed() {
-                        let t = Float(step) / 10
+                        let t = 0.6 + (Float(step) / 10) * 0.4
                         let blendedCG = CGColor(
                             red: CGFloat(t),
                             green: CGFloat(t),
                             blue: CGFloat(t),
                             alpha: 1.0
                         )
-                        try? mat.setParameter(
-                            name: colorName, value: .color(blendedCG))
+                        try? mat.setParameter(name: colorName, value: .color(blendedCG))
                         modelComponent.materials = [mat]
                         entity.components[ModelComponent.self] = modelComponent
                         try await Task.sleep(nanoseconds: 50_000_000)
                     }
                 } else {
-                    try? mat.setParameter(
-                        name: colorName, value: .color(blinkColor))
+                    try? mat.setParameter(name: colorName, value: .color(blinkColor))
                     modelComponent.materials = [mat]
                     entity.components[ModelComponent.self] = modelComponent
                     try await Task.sleep(nanoseconds: 500_000_000)
 
                     try? mat.setParameter(
                         name: colorName,
-                        value: .color(
-                            CGColor(red: 0, green: 0, blue: 0, alpha: 1)))
+                        value: .color(CGColor(red: 0.9, green: 0.9, blue: 0.9, alpha: 1))
+                    )
                     modelComponent.materials = [mat]
                     entity.components[ModelComponent.self] = modelComponent
                     try await Task.sleep(nanoseconds: 500_000_000)
@@ -332,10 +331,6 @@ struct BalloonGameImmersiveView: View {
             }
         }
     }
-    
-    
-    
-    
 
 }
 
