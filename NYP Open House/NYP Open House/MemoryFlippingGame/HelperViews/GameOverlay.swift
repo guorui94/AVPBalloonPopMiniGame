@@ -95,7 +95,7 @@ struct GameOverlay: View {
                     progress = 0.0
                 }
 
-                if appModel.score.balloonsRemoved >= 25 {
+                if appModel.gameEnds {
                     prepareForEndGame()
                 }
 

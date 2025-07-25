@@ -59,7 +59,7 @@ struct BalloonGameImmersiveView: View {
                 content.add(worldAnchor)
                 
                 Task {
-                    if let overlayTag = attachments.entity(for: "scoreOverlay") {
+                    if let overlayTag = attachments.entity(for: "overlay") {
                         overlayTag.position = [-0.49, +0.85,  -0.35]
                         worldAnchor.addChild(overlayTag)
                     }
@@ -67,7 +67,7 @@ struct BalloonGameImmersiveView: View {
             }
             
         } attachments: {
-            Attachment(id: "scoreOverlay"){
+            Attachment(id: "overlay"){
                 BalloonGameInterface()
             }
         }
@@ -172,10 +172,10 @@ struct BalloonGameImmersiveView: View {
     }
     
     private func generateBalloonColorList() -> [BalloonColor] {
-        let redCount = 7
+        let redCount = 8
         let greenCount = 7
-        let purpleCount = 7
-        let goldCount = 4
+        let purpleCount = 8
+        let goldCount = 5
 
         var colorList: [BalloonColor] = []
         colorList += Array(repeating: .red, count: redCount)
@@ -215,7 +215,7 @@ struct BalloonGameImmersiveView: View {
 
             let clone = base.clone(recursive: true)
 
-            var linearY = Float.random(in: 0.05...0.13)
+            var linearY = Float.random(in: 0.05...0.12)
             if balloonColor.findColor == "gold" {
                 linearY = Float.random(in: 0.28...0.35)
             }

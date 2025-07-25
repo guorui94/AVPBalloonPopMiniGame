@@ -98,7 +98,9 @@ struct BalloonGameInterface: View {
                     progress = 0.0
                 }
 
-                if appModel.gameEnds {
+                if appModel.score.balloonsRemoved >= 28 {
+                    appModel.currentScreen = .balloonEnd
+                    openWindow(id:"content")
                     prepareForEndGame()
                 }
 
@@ -115,14 +117,11 @@ struct BalloonGameInterface: View {
         }
     }
     func prepareForEndGame() {
-        appModel.currentScreen = .balloonEnd
-        openWindow(id:"content")
         appModel.signalEndGame()
         Task {
             await dismissImmersiveSpace()
         }
         timer.upstream.connect().cancel()
-        appModel.gameEnds = false
         appModel.pose.stopTracking()
     }
 }
