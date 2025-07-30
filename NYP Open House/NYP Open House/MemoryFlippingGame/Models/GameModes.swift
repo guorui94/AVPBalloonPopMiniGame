@@ -15,7 +15,7 @@ enum GameModes: CaseIterable {
     var rows: Int {
         switch self {
         case .easy: return 2
-        case .medium: return 4
+        case .medium: return 2
         case .challenging: return 4
         }
     }
@@ -24,7 +24,7 @@ enum GameModes: CaseIterable {
         switch self {
         case .easy: return 4
         case .medium: return 4
-        case .challenging: return 6
+        case .challenging: return 4
         }
     }
 
@@ -32,11 +32,11 @@ enum GameModes: CaseIterable {
         let baseImages: [String]
         switch self {
         case .easy:
-            baseImages = ["NYPLogo", "NYPSBM", "SIT", "NYPSDM"]
+            baseImages = ["CSITNanyang", "OSEP", "Technopreneurship", "IndustryCertification"]
         case .medium:
-            baseImages = ["NYPLogo", "NYPSBM", "NYPSIT", "NYPSDM"]
+            baseImages = ["UPP", "ITP", "FYP", "OITP"]
         case .challenging:
-            baseImages = ["NYPLogo", "NYPSBM", "NYPSIT", "NYPSDM"]
+            baseImages = ["CSITNanyang", "OSEP", "Technopreneurship", "IndustryCertification", "UPP", "ITP", "FYP", "OITP"]
         }
 
         let doubled = baseImages.flatMap { Array(repeating: $0, count: 2) }
@@ -75,6 +75,7 @@ enum GameModes: CaseIterable {
             return UIColor(red: 251/255, green: 65/255, blue: 65/255, alpha: 1.0)
         }
     }
+    
     var shadowColor: UIColor {
         switch self {
         case .easy:
@@ -85,6 +86,17 @@ enum GameModes: CaseIterable {
 
         case .challenging:
             return UIColor(red: 128/255, green: 32/255, blue: 32/255, alpha: 0.4)
+        }
+    }
+    
+    var timer: Double {
+        switch self {
+        case .easy:
+            return 120
+        case .medium:
+            return 60
+        case .challenging:
+            return 60
         }
     }
 

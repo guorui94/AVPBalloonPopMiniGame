@@ -22,7 +22,7 @@ class AppModel {
     enum AppScreen {
         case menu
         case balloonIntro
-        case balloonEnd
+        case endGame
         case memoryGame
     }
 
@@ -59,6 +59,7 @@ class AppModel {
     
     var currentGameMode: GameModes? = .easy
     
+    
     // set game states
     var isBalloonGame = false
     var isMemoryGame = false
@@ -68,6 +69,11 @@ class AppModel {
     func resetBalloonGame() {
         score.resetBalloonScore()
         score.balloonsRemoved = 0
+    }
+    
+    func resetMemoryGame() {
+        score.resetMemoryGameScore()
+        score.flipScore = 0
     }
     
     func trackBalloonsRemoved() {
@@ -85,5 +91,4 @@ class AppModel {
         applauses.play()
     }
     
-
 }

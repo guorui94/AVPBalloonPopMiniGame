@@ -12,14 +12,18 @@ def Xform "Root"
 {
     def "SkySphere" (
         active = true
+        customData = {
+            float3 rotationEulerHint = (0, -3.1415918, 0)
+        }
         prepend references = @SkySphere.usdz@
     )
     {
+        quatf xformOp:orient = (4.371139e-8, 0, 1, 0)
         float3 xformOp:scale = (1, 1, 1)
 
         over "SkySphere_mat"
         {
-            asset inputs:SkySphere_Texture = @Materials/textures/skybox3.hdr@
+            asset inputs:SkySphere_Texture = @Materials/textures/skybox2.hdr@
         }
     }
 }

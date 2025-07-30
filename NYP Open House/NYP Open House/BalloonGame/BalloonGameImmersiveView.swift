@@ -45,7 +45,7 @@ struct BalloonGameImmersiveView: View {
 
                 bubbleClones = await placeBalloons(from: bubble, into: immersiveContentEntity, using: colorList)
                 
-                try? await Task.sleep(nanoseconds: 500_000_000)
+                try? await Task.sleep(for: .seconds(0.5))
                 var spawnY: Float = 0.0
                 var spawnZ: Float = 0.0
                 if let deviceAnchor = pose.worldTracking.queryDeviceAnchor(
@@ -237,7 +237,7 @@ struct BalloonGameImmersiveView: View {
 
             if balloonColor.findColor == "gold" {
                 Task {
-                    try? await Task.sleep(nanoseconds: 3_000_000_000)
+                    try? await Task.sleep(for: .seconds(3))
                     parent.addChild(clone)
                 }
             } else {
@@ -299,7 +299,7 @@ struct BalloonGameImmersiveView: View {
                         try? mat.setParameter(name: colorName, value: .color(blendedCG))
                         modelComponent.materials = [mat]
                         entity.components[ModelComponent.self] = modelComponent
-                        try await Task.sleep(nanoseconds: 50_000_000)
+                        try await Task.sleep(for: .milliseconds(50))
                     }
                     for step in (0...10).reversed() {
                         let t = 0.6 + (Float(step) / 10) * 0.4
@@ -312,13 +312,13 @@ struct BalloonGameImmersiveView: View {
                         try? mat.setParameter(name: colorName, value: .color(blendedCG))
                         modelComponent.materials = [mat]
                         entity.components[ModelComponent.self] = modelComponent
-                        try await Task.sleep(nanoseconds: 50_000_000)
+                        try await Task.sleep(for: .milliseconds(50))
                     }
                 } else {
                     try? mat.setParameter(name: colorName, value: .color(blinkColor))
                     modelComponent.materials = [mat]
                     entity.components[ModelComponent.self] = modelComponent
-                    try await Task.sleep(nanoseconds: 500_000_000)
+                    try await Task.sleep(for: .milliseconds(500))
 
                     try? mat.setParameter(
                         name: colorName,
@@ -326,7 +326,7 @@ struct BalloonGameImmersiveView: View {
                     )
                     modelComponent.materials = [mat]
                     entity.components[ModelComponent.self] = modelComponent
-                    try await Task.sleep(nanoseconds: 500_000_000)
+                    try await Task.sleep(for: .milliseconds(500))
                 }
             }
         }
@@ -334,7 +334,7 @@ struct BalloonGameImmersiveView: View {
 
 }
 
-#Preview(immersionStyle: .mixed) {
+#Preview(immersionStyle: .full) {
     BalloonGameImmersiveView()
         .environment(AppModel())
 }

@@ -84,8 +84,29 @@ struct BalloonGameInterface: View {
             }
             .padding(.vertical, 16)
             .padding(.horizontal, 20)
-            .frame(width: 300)
-            .padding()
+            .frame(width: 330)
+
+            .overlay(alignment: .topLeading) {
+                Button(action: {
+                    appModel.currentScreen = .menu
+                    Task {
+                        openWindow(id:"content")
+                        await dismissImmersiveSpace()
+                    }
+                }) {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 28, weight: .medium))
+                        .padding(14)
+                        .background(.ultraThinMaterial)
+                        .clipShape(Circle())
+                }
+                .clipShape(Circle())
+                .padding([.top,.leading], 10)
+                .buttonStyle(.plain)
+                .hoverEffect { effect, isActive, proxy in
+                    effect.scaleEffect(!isActive ? 1.0 : 1.2)
+                }
+            }
             .glassBackgroundEffect(
                 in: RoundedRectangle(
                     cornerRadius: 32, style: .continuous)
@@ -99,9 +120,10 @@ struct BalloonGameInterface: View {
                 }
 
                 if appModel.score.balloonsRemoved >= 28 {
-                    appModel.currentScreen = .balloonEnd
-                    openWindow(id:"content")
-                    prepareForEndGame()
+                    appModel.currentScreen = .endGame
+                    withAnimation(.easeInOut(duration: 1.0)) {
+                        prepareForEndGame()
+                    }
                 }
 
                 secondsRemaining -= 1
@@ -119,6 +141,7 @@ struct BalloonGameInterface: View {
     func prepareForEndGame() {
         appModel.signalEndGame()
         Task {
+            openWindow(id:"content")
             await dismissImmersiveSpace()
         }
         timer.upstream.connect().cancel()

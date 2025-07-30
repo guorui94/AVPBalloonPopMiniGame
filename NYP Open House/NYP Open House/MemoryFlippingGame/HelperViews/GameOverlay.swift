@@ -10,15 +10,18 @@ import SwiftUI
 struct GameOverlay: View {
     @Environment(AppModel.self) var appModel
     @Environment(\.dismissImmersiveSpace) private var dismissImmersiveSpace
+    @Environment(\.openWindow) private var openWindow
     @State private var timer = Timer.publish(every: 1, on: .main, in: .common)
         .autoconnect()
     @State private var progress = 1.0
     @State private var triggerColorChange = false
     @State private var isPulsing = false
-    @State private var secondsRemaining = 120
+    @Binding var currentGameMode: GameModes
+    @State private var secondsRemaining: Int = 0
 
     var body: some View {
-        let totalTime = 120.0
+        let totalTime = currentGameMode.timer
+
         let displayScore = appModel.score
 
         VStack {
@@ -56,6 +59,7 @@ struct GameOverlay: View {
 
                     }
                     .padding(.top, 20)
+                    .padding(.bottom, 10)
                     .scaleEffect(isPulsing ? 1.05 : 1.0)
                     .animation(
                         triggerColorChange
@@ -66,15 +70,14 @@ struct GameOverlay: View {
                     )
 
                     HStack {
-                        let minutes = secondsRemaining / 60
-                        let seconds = secondsRemaining % 60
+                        let minutes = Int(secondsRemaining) / 60
+                        let seconds = Int(secondsRemaining) % 60
 
                         Label(
                             "\(String(format: "%02d:%02d", minutes, seconds))",
                             systemImage: "hourglass.tophalf.fill"
                         )
-
-                        .font(.footnote)
+                        .font(.callout)
                         .foregroundStyle(triggerColorChange ? .red : .white)
                         Text("Seconds Remaining")
                             .font(.footnote)
@@ -85,7 +88,29 @@ struct GameOverlay: View {
             }
             .padding(.horizontal, 30)
             .padding(.vertical, 20)
-            .frame(width: 320)
+            .overlay(alignment: .topLeading) {
+                Button(action: {
+                    appModel.currentScreen = .menu
+                    Task {
+                        openWindow(id:"content")
+                        await dismissImmersiveSpace()
+                    }
+                }) {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 28, weight: .medium))
+                        .padding(14)
+                        .background(.ultraThinMaterial)
+                        .clipShape(Circle())
+                }
+                .clipShape(Circle())
+                .padding(.top, 10)
+                .padding(.leading, 50)
+                .buttonStyle(.plain)
+                .hoverEffect { effect, isActive, proxy in
+                    effect.scaleEffect(!isActive ? 1.0 : 1.2)
+                }
+            }
+            .frame(width: 330)
             .glassBackgroundEffect(in: .rect(cornerRadius: 32))
         }
         .onReceive(timer) { _ in
@@ -95,7 +120,8 @@ struct GameOverlay: View {
                     progress = 0.0
                 }
 
-                if appModel.gameEnds {
+                if appModel.gameEnds || appModel.currentGameMode == nil {
+                    appModel.currentScreen = .endGame
                     prepareForEndGame()
                 }
 
@@ -110,21 +136,30 @@ struct GameOverlay: View {
                 prepareForEndGame()
             }
         }
+        .onAppear {
+            secondsRemaining = Int(currentGameMode.timer)
+            progress = 1.0
+        }
+        .onChange(of: currentGameMode, { oldMode, newMode in
+            secondsRemaining = Int(newMode.timer)
+            progress = 1.0
+        })
     }
     func prepareForEndGame() {
         if appModel.immersiveSpaceState == .open {
             Task {
+                openWindow(id:"content")
+                appModel.gameEnds = true
                 await dismissImmersiveSpace()
             }
         }
         appModel.signalEndGame()
         timer.upstream.connect().cancel()
-        appModel.gameEnds = true
         appModel.pose.stopTracking()
     }
 }
 
 #Preview {
-    GameOverlay()
+    GameOverlay(currentGameMode: .constant(GameModes.easy))
         .environment(AppModel())
 }

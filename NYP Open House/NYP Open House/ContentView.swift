@@ -20,10 +20,11 @@ struct ContentView: View {
             mainMenuView
         case .balloonIntro:
             StartingInterface()
-        case .balloonEnd:
-            BalloonEndGame()
+        case .endGame:
+            let score = appModel.score.poppingScore > 0 ? appModel.score.poppingScore : appModel.score.flipScore
+            EndGame(displayScore: score)
         case .memoryGame:
-            EmptyView() 
+            Instructions()
         }
     }
 
@@ -53,11 +54,7 @@ struct ContentView: View {
                     title: "Memory Game",
                     subtitle: "Game descriptions here...",
                     action: {
-                        Task {
-                            await openImmersiveSpace(id: Module.memoryFlippingSpace.name)
-                            dismissWindow(id: "content")
-                            appModel.currentScreen = .memoryGame
-                        }
+                        appModel.currentScreen = .memoryGame
                     })
 
                 GameCard(
@@ -76,7 +73,6 @@ struct ContentView: View {
         .glassBackgroundEffect(
             in: RoundedRectangle(cornerRadius: 32, style: .continuous)
         )
-        .opacity(appModel.isMemoryGame ? 0 : 1)
     }
 }
 
