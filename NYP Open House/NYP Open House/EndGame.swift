@@ -49,9 +49,8 @@ struct EndGame: View {
                     
                     HStack(spacing: 20) {
                         Button(action: {
-                            appModel.currentScreen = .balloonIntro
-                            appModel.gameEnds = false
-                            appModel.resetBalloonGame()
+                            let playAgainScreen: AppModel.AppScreen = appModel.isBalloonGame ? .balloonIntro : .memoryGame
+                            appModel.currentScreen = playAgainScreen
                         }) {
                             Text("Play Again")
                                 .padding()
@@ -64,8 +63,6 @@ struct EndGame: View {
 
                         Button(action: {
                             appModel.currentScreen = .menu
-                            appModel.gameEnds = false
-                            appModel.resetBalloonGame()
                         }) {
                             Text("Back to Menu")
                                 .padding()
@@ -92,6 +89,17 @@ struct EndGame: View {
                 appModel.highScoreApplause()
             }
         }
+    }
+    func resetGameState() {
+        appModel.gameEnds = false
+        if appModel.isBalloonGame {
+            appModel.resetBalloonGame()
+        }
+        else {
+            appModel.resetMemoryGame()
+        }
+
+    
     }
 }
 

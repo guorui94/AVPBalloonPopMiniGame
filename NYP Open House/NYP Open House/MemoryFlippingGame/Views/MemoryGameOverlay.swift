@@ -1,34 +1,34 @@
 //
-//  BalloonGameInterface.swift
+//  MemoryGameOverlay.swift
 //  NYP Open House
 //
-//  Created by Amelia on 20/6/25.
+//  Created by Amelia on 22/7/25.
 //
 
-import AVFoundation
 import SwiftUI
 
-struct BalloonGameInterface: View {
+struct MemoryGameOverlay: View {
     @Environment(AppModel.self) var appModel
-    @Environment(\.openWindow) private var openWindow
     @Environment(\.dismissImmersiveSpace) private var dismissImmersiveSpace
+    @Environment(\.openWindow) private var openWindow
     @State private var timer = Timer.publish(every: 1, on: .main, in: .common)
         .autoconnect()
     @State private var progress = 1.0
     @State private var triggerColorChange = false
     @State private var isPulsing = false
-    @State private var secondsRemaining = 20
+    @Binding var currentGameMode: GameModes
+    @State private var secondsRemaining: Int = 0
 
     var body: some View {
-        
-        let totalTime = 20.0
+        let totalTime = currentGameMode.timer
+
         let displayScore = appModel.score
 
         VStack {
             Spacer()
             VStack(spacing: 8) {
                 Text(
-                    verbatim: "\(String(format: "%02d", displayScore.poppingScore))"
+                    verbatim: "\(String(format: "%02d", displayScore.flipScore))"
                 )
                 .font(.system(size: 60, weight: .bold, design: .monospaced))
                 .foregroundStyle(.primary)
@@ -59,6 +59,7 @@ struct BalloonGameInterface: View {
 
                     }
                     .padding(.top, 20)
+                    .padding(.bottom, 10)
                     .scaleEffect(isPulsing ? 1.05 : 1.0)
                     .animation(
                         triggerColorChange
@@ -69,23 +70,23 @@ struct BalloonGameInterface: View {
                     )
 
                     HStack {
+                        let minutes = Int(secondsRemaining) / 60
+                        let seconds = Int(secondsRemaining) % 60
+
                         Label(
-                            "\(secondsRemaining)",
+                            "\(String(format: "%02d:%02d", minutes, seconds))",
                             systemImage: "hourglass.tophalf.fill"
                         )
-                        .font(.footnote)
+                        .font(.headline)
                         .foregroundStyle(triggerColorChange ? .red : .white)
                         Text("Seconds Remaining")
-                            .font(.footnote)
+                            .font(.headline)
                             .foregroundStyle(triggerColorChange ? .red : .white)
                     }
-
                 }
             }
-            .padding(.vertical, 16)
-            .padding(.horizontal, 20)
-            .frame(width: 330)
-
+            .padding(.horizontal, 30)
+            .padding(.vertical, 20)
             .overlay(alignment: .topLeading) {
                 Button(action: {
                     appModel.currentScreen = .menu
@@ -101,16 +102,15 @@ struct BalloonGameInterface: View {
                         .clipShape(Circle())
                 }
                 .clipShape(Circle())
-                .padding([.top,.leading], 10)
+                .padding(.top, 10)
+                .padding(.leading, 50)
                 .buttonStyle(.plain)
                 .hoverEffect { effect, isActive, proxy in
                     effect.scaleEffect(!isActive ? 1.0 : 1.2)
                 }
             }
-            .glassBackgroundEffect(
-                in: RoundedRectangle(
-                    cornerRadius: 32, style: .continuous)
-            )
+            .frame(width: 330)
+            .glassBackgroundEffect(in: .rect(cornerRadius: 32))
         }
         .onReceive(timer) { _ in
             if progress > 0.0 {
@@ -119,11 +119,8 @@ struct BalloonGameInterface: View {
                     progress = 0.0
                 }
 
-                if appModel.score.balloonsRemoved >= 28 {
-                    appModel.currentScreen = .endGame
-                    withAnimation(.easeInOut(duration: 1.0)) {
-                        prepareForEndGame()
-                    }
+                if appModel.gameEnds || appModel.currentGameMode == nil {
+                    prepareForEndGame()
                 }
 
                 secondsRemaining -= 1
@@ -137,19 +134,32 @@ struct BalloonGameInterface: View {
                 prepareForEndGame()
             }
         }
+        .onAppear {
+            secondsRemaining = Int(currentGameMode.timer)
+            progress = 1.0
+        }
+        .onChange(of: currentGameMode, { oldMode, newMode in
+            secondsRemaining = Int(newMode.timer)
+            progress = 1.0
+        })
     }
     func prepareForEndGame() {
-        appModel.signalEndGame()
-        Task {
-            openWindow(id:"content")
-            await dismissImmersiveSpace()
+        appModel.currentScreen = .endGame
+        if appModel.immersiveSpaceState == .open {
+            Task {
+                openWindow(id:"content")
+                appModel.gameEnds = true
+                await dismissImmersiveSpace()
+                appModel.currentGameMode = .easy
+            }
         }
+        appModel.signalEndGame()
         timer.upstream.connect().cancel()
         appModel.pose.stopTracking()
     }
 }
 
-#Preview() {
-    BalloonGameInterface()
+#Preview {
+    MemoryGameOverlay(currentGameMode: .constant(GameModes.easy))
         .environment(AppModel())
 }

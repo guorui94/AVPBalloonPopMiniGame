@@ -20,7 +20,7 @@ struct StartingInterface: View {
             Spacer()
             VStack(spacing: 30) {
                 Spacer()
-                Text("🎈 Pop Balloons 🎈")
+                Text("🎈 Balloon Frenzy 🎈")
                     .font(.extraLargeTitle)
                     .fontWeight(.bold)
 
@@ -146,6 +146,7 @@ struct StartingInterface: View {
 
             await openImmersiveSpace(id: Module.bubbleSpace.name)
             dismissWindow(id: "content")
+            appModel.isBalloonGame = true
         }
     }
 

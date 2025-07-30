@@ -37,8 +37,8 @@ struct MemoryFlippingGameImmersive: View {
                 atTimestamp: CACurrentMediaTime())
             {
                 let transform = deviceAnchor.originFromAnchorTransform
-                spawnY = transform.columns.3.y - 0.25
-                spawnZ = transform.columns.3.z - 0.8
+                spawnY = transform.columns.3.y - 0.1
+                spawnZ = transform.columns.3.z - 0.9
             }
             worldAnchor.position = [0, spawnY, spawnZ]
             
@@ -52,7 +52,7 @@ struct MemoryFlippingGameImmersive: View {
                 
                 Task {
                     if let overlayTag = attachments.entity(for: "scoreOverlay") {
-                        overlayTag.position = [-0.46, 0.7, -0.1]
+                        overlayTag.position = [-0.46, 0.7, -0.05]
                         overlayEntity = overlayTag
                         worldAnchor.addChild(overlayTag)
                     }
@@ -61,7 +61,7 @@ struct MemoryFlippingGameImmersive: View {
             }
         } attachments: {
             Attachment(id: "scoreOverlay") {
-                GameOverlay(currentGameMode: $currentGameMode)
+                MemoryGameOverlay(currentGameMode: $currentGameMode)
             }
         }
         .gesture(

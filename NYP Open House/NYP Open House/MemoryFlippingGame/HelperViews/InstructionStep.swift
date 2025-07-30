@@ -13,12 +13,12 @@ struct InstructionStep: View {
     var body: some View {
         HStack(alignment: .top) {
             Text("\(number).")
-                .font(.title2)
+                .font(.title)
                 .fontWeight(.bold)
                 .foregroundStyle(Color(red: 0x91 / 255, green: 0xC8 / 255, blue: 0xE4 / 255))
 
             Text(text)
-                .font(.title3)
+                .font(.title2)
                 .foregroundStyle(.white)
                 .multilineTextAlignment(.leading)
         }

@@ -24,12 +24,12 @@ struct Instructions: View {
                     .foregroundStyle(.cyan)
                     .multilineTextAlignment(.center)
                     .padding(.top, 32)
-                
+            
                 Text("Test your memory skills by flipping tiles to match pairs of images.")
-                    .font(.title2)
+                    .font(.largeTitle)
                     .multilineTextAlignment(.center)
                     .foregroundStyle(.white)
-                    .frame(maxWidth: 640)
+                    .frame(maxWidth: 650)
                 
                 VStack(alignment: .leading, spacing: 14) {
                     InstructionStep(number: 1, text: "Tap on any tile to flip it over.")
@@ -39,14 +39,14 @@ struct Instructions: View {
                 }
                 
                 Text("💡 Each image on the tiles represents an exciting opportunity at Nanyang Polytechnic — like Overseas Exchange, Scholarships, and more!")
-                    .font(.title3)
+                    .font(.title2)
                     .multilineTextAlignment(.center)
                     .foregroundStyle(.mint)
                     .padding(.horizontal)
-                    .frame(maxWidth: 720)
+                    .frame(maxWidth: 740)
                 
                 Text("Can you uncover them all?")
-                    .font(.title2)
+                    .font(.title)
                     .fontWeight(.semibold)
                     .foregroundStyle(.white)
                     .padding(.top, 4)
@@ -77,7 +77,24 @@ struct Instructions: View {
                 .padding(.bottom, 30)
             }
             .padding(.horizontal)
-            .frame(maxWidth: 850)
+            .frame(maxWidth: 870)
+            .overlay(alignment: .topLeading) {
+                Button(action: {
+                    appModel.currentScreen = .balloonIntro
+                }) {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 28, weight: .medium))
+                        .padding(14)
+                        .background(.ultraThinMaterial)
+                        .clipShape(Circle())
+                }
+                .clipShape(Circle())
+                .padding([.top, .leading], 20)
+                .buttonStyle(.plain)
+                .hoverEffect { effect, isActive, proxy in
+                    effect.scaleEffect(!isActive ? 1.0 : 1.2)
+                }
+            }
             .glassBackgroundEffect(in: RoundedRectangle(cornerRadius: 32, style: .continuous))
         }
         .opacity(isFadingOut ? 0 : 1)
@@ -100,6 +117,7 @@ struct Instructions: View {
 
             await openImmersiveSpace(id: Module.memoryFlippingSpace.name)
             dismissWindow(id: "content")
+            appModel.isMemoryGame = true
         }
     }
 }

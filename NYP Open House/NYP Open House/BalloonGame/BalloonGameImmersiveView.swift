@@ -63,7 +63,7 @@ struct BalloonGameImmersiveView: View {
                 content.add(worldAnchor)
                 
                 Task {
-                    if let overlayTag = attachments.entity(for: "overlay") {
+                    if let overlayTag = attachments.entity(for: "balloonOverlay") {
                         overlayTag.position = [-0.49, +0.85,  -0.35]
                         worldAnchor.addChild(overlayTag)
                     }
@@ -71,8 +71,8 @@ struct BalloonGameImmersiveView: View {
             }
             
         } attachments: {
-            Attachment(id: "overlay"){
-                BalloonGameInterface()
+            Attachment(id: "balloonOverlay"){
+                BalloonGameOverlay()
             }
         }
         .gesture(
