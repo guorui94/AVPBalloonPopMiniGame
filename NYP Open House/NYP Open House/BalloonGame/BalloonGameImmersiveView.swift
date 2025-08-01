@@ -334,7 +334,7 @@ struct BalloonGameImmersiveView: View {
 
 }
 
-#Preview(immersionStyle: .full) {
+#Preview(immersionStyle: .mixed) {
     BalloonGameImmersiveView()
         .environment(AppModel())
 }
