@@ -121,7 +121,6 @@ struct BalloonGameOverlay: View {
                 }
 
                 if appModel.score.balloonsRemoved >= 28 {
-                    appModel.currentScreen = .endGame
                     withAnimation(.easeInOut(duration: 1.0)) {
                         prepareForEndGame()
                     }
@@ -140,6 +139,7 @@ struct BalloonGameOverlay: View {
         }
     }
     func prepareForEndGame() {
+        appModel.currentScreen = .endGame
         appModel.signalEndGame()
         Task {
             openWindow(id:"content")

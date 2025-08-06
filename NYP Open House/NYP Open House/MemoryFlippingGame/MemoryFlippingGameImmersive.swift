@@ -115,6 +115,10 @@ struct MemoryFlippingGameImmersive: View {
                                             await createGameTiles(gameMode: next, baseTile: baseTile, worldAnchor: worldAnchor)
                                         }
                                         if let overlay = overlayEntity {
+                                            if currentGameMode == .challenging{
+                                                overlay.position.x -= 0.06
+                                                overlay.position.y += 0.05
+                                            }
                                             worldAnchor.addChild(overlay)
                                         }
 
@@ -155,7 +159,7 @@ struct MemoryFlippingGameImmersive: View {
         images.shuffle()
         let rows = gameMode.rows
         let columns = gameMode.columns
-        let spacing: Float = 0.13
+        let spacing: Float = 0.18
         
         var tileIndex = 0
         
@@ -187,7 +191,7 @@ struct MemoryFlippingGameImmersive: View {
                 
                 do {
                     let texture = try await TextureResource(named: imageName)
-                    try mat.setParameter(name: "GetImage", value: .textureResource(texture))
+                    try mat.setParameter(name: "FrontImage", value: .textureResource(texture))
                     modelComponent.materials[0] = mat
                     tileClone.components.set(modelComponent)
                 } catch {
@@ -238,9 +242,8 @@ struct MemoryFlippingGameImmersive: View {
             textEntity.position.x -= centerOffset
         }
 
-        let totalHeight = Float(currentGameMode.rows - 1) * 0.13
-        let labelY = (totalHeight / 2) + 0.12
-        textEntity.position.y += labelY
+        let totalHeight = Float(currentGameMode.rows) * 0.18
+        textEntity.position.y = totalHeight / 2  + 0.1
         textEntity.position.z = 0.0
 
         let originalY = textEntity.position.y

@@ -22,7 +22,7 @@ struct InstructionStep: View {
                 .foregroundStyle(.white)
                 .multilineTextAlignment(.leading)
         }
-        .frame(maxWidth: 600, alignment: .leading)
+        .frame(maxWidth: 800, alignment: .leading)
     }
 }
 

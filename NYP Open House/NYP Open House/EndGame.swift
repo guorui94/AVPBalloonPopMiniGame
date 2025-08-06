@@ -89,6 +89,9 @@ struct EndGame: View {
                 appModel.highScoreApplause()
             }
         }
+        .onDisappear {
+            resetGameState()
+        }
     }
     func resetGameState() {
         appModel.gameEnds = false
