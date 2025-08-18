@@ -12,7 +12,7 @@ import SwiftUI
 struct FlippedComponent: Component {}
 struct IsFlippingBackComponent: Component {}
 
-struct MemoryFlippingGameImmersive: View {
+struct MemoryGameImmersive: View {
     @Environment(AppModel.self) var appModel
     @State private var predicate = QueryPredicate<Entity>.has(ModelComponent.self)
     @State private var worldAnchor = AnchorEntity(world: [0, 0, 0])
@@ -28,6 +28,7 @@ struct MemoryFlippingGameImmersive: View {
 
     var body: some View {
         RealityView { content, attachments in
+            worldAnchor.children.removeAll()
             let pose = appModel.pose
             await pose.startIfNeeded()
             try? await Task.sleep(for: .seconds(0.5))
@@ -346,6 +347,6 @@ struct MemoryFlippingGameImmersive: View {
 }
 
 #Preview(immersionStyle: .mixed) {
-    MemoryFlippingGameImmersive()
+    MemoryGameImmersive()
         .environment(AppModel())
 }

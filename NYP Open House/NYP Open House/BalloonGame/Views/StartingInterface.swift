@@ -22,6 +22,7 @@ struct StartingInterface: View {
                 Spacer()
                 Text("🎈 Balloon Frenzy 🎈")
                     .font(.extraLargeTitle)
+                    .foregroundStyle(.cyan)
                     .fontWeight(.bold)
 
                 Text(

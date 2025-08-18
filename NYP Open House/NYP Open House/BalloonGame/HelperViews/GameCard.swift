@@ -8,30 +8,31 @@
 import Foundation
 import SwiftUI
 
-// reusable, in case more games are needed, for now other cards serves as a filler
 struct GameCard: View {
     var title: String
     var subtitle: String
     var action: () -> Void
 
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 10) { 
             Text(title)
                 .font(.title)
                 .fontWeight(.semibold)
+                .multilineTextAlignment(.center)
 
             Text(subtitle)
                 .font(.title3)
                 .foregroundColor(Color.white.opacity(0.5))
-                .padding()
+                .multilineTextAlignment(.center)
+                .frame(width: 200)
+                .lineLimit(2)
         }
-        .padding()
-        .frame(width: 230, height: 220)
+        .frame(width: 240, height: 220)
         .overlay(
             RoundedRectangle(cornerRadius: 20)
                 .stroke(Color.cyan.opacity(0.6), lineWidth: 6)
         )
-        .overlay(  // create a "glowing" effect
+        .overlay(
             RoundedRectangle(cornerRadius: 20)
                 .stroke(Color.white.opacity(0.3), lineWidth: 3)
         )
@@ -47,7 +48,7 @@ struct GameCard: View {
 }
 
 #Preview(windowStyle: .automatic) {
-    GameCard(title: "Game 1", subtitle: "Game description here...", action: {})
+    GameCard(title: "Memory Quest", subtitle: "Match pairs to unlock NYP’s hidden gems.", action: {})
         .environment(AppModel())
 
 }

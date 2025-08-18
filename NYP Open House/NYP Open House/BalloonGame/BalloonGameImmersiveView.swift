@@ -9,7 +9,6 @@ import RealityKit
 import RealityKitContent
 import SwiftUI
 
-// track if the balloon has been popped, to avoid re-triggering the shader graph animation
 struct PoppedComponent: Component {}
 struct AboutToDisappearComponent: Component {}
 
@@ -22,7 +21,6 @@ struct BalloonGameImmersiveView: View {
 
     var body: some View {
         RealityView { content, attachments in
-            // check the ar session first
             let pose = appModel.pose
             await pose.startIfNeeded()
             if let skyEntity = try? await Entity(named: "SkyScene", in: realityKitContentBundle) {
@@ -56,7 +54,6 @@ struct BalloonGameImmersiveView: View {
                     spawnZ = transform.columns.3.z - 0.8
                 }
 
-                // use a world anchor to make sure the balloons spawn in front of the user
                 let worldAnchor = AnchorEntity(world: [0, spawnY, spawnZ])
 
                 worldAnchor.addChild(immersiveContentEntity)
@@ -80,20 +77,17 @@ struct BalloonGameImmersiveView: View {
                 value in
                 let entity = value.entity
 
-                // check if the bubble has been "popped"
                 if entity.components.has(PoppedComponent.self) {
                     return
                 }
 
                 let popAudio = appModel.balloonPoppingsounds.randomElement()
 
-                // if not popped, set it to popped
                 entity.components.set(PoppedComponent())
                 if let audio = popAudio {
                     entity.playAudio(audio)
                 }
 
-                // makes sure that material is accessed before proceeding.
                 guard
                     let modelComponent = entity.components[ModelComponent.self],
                     var mat = modelComponent.materials.first
@@ -142,11 +136,9 @@ struct BalloonGameImmersiveView: View {
                 }
             })
         )
-        // sets the invisible boundary for balloons to disappear
         .task {
             Timer.scheduledTimer(withTimeInterval: 0.25 / 30.0, repeats: true) {
                 _ in
-                // similar to task.sleep but runs on main thread instead of async background thread
                 DispatchQueue.main.async {
                     for i in (0..<bubbleClones.count).reversed() {
                         let bubble = bubbleClones[i]

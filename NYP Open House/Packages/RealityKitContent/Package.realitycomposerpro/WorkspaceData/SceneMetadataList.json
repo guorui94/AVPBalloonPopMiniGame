@@ -174,15 +174,6 @@
       [
         "416F112E-9914-486E-8EFC-5970D6063AE3",
         "Root",
-        "_materials"
-      ],
-      {
-        "isExpanded" : true,
-        "isLocked" : false
-      },
-      [
-        "416F112E-9914-486E-8EFC-5970D6063AE3",
-        "Root",
         "Tile",
         "Tile",
         "Image"
@@ -246,15 +237,6 @@
         "Root",
         "Tile_1",
         "TileMaterial"
-      ],
-      {
-        "isExpanded" : true,
-        "isLocked" : false
-      },
-      [
-        "416F112E-9914-486E-8EFC-5970D6063AE3",
-        "Root",
-        "Tile"
       ],
       {
         "isExpanded" : true,

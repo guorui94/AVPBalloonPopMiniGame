@@ -62,6 +62,8 @@ struct EndGame: View {
                         .buttonStyle(.plain)
 
                         Button(action: {
+                            appModel.isMemoryGame = false
+                            appModel.isBalloonGame = false
                             appModel.currentScreen = .menu
                         }) {
                             Text("Back to Menu")

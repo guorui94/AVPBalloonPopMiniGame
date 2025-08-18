@@ -19,7 +19,7 @@ struct Instructions: View {
             Spacer()
             VStack(spacing: 28) {
                 Spacer()
-                Text("🧠 NYP Memory Quest")
+                Text("🕹️ ARcade of Memories 🃏")
                     .font(.extraLargeTitle)
                     .fontWeight(.bold)
                     .foregroundStyle(.cyan)
@@ -131,7 +131,7 @@ struct Instructions: View {
             }
             try? await Task.sleep(for: .seconds(0.5))
 
-            await openImmersiveSpace(id: Module.memoryFlippingSpace.name)
+            await openImmersiveSpace(id: Module.memorySpace.name)
             dismissWindow(id: "content")
             appModel.isMemoryGame = true
         }

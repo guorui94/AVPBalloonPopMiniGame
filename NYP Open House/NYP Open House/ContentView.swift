@@ -12,6 +12,7 @@ import RealityKitContent
 struct ContentView: View {
     @Environment(AppModel.self) private var appModel
     @Environment(\.openImmersiveSpace) private var openImmersiveSpace
+    @Environment(\.dismissImmersiveSpace) private var dismissImmersiveSpace
     @Environment(\.dismissWindow) private var dismissWindow
 
     var body: some View {
@@ -29,51 +30,54 @@ struct ContentView: View {
     }
 
     var mainMenuView: some View {
-        VStack(spacing: 20) {
-            Spacer()
-
-            Text("Welcome!")
-                .font(.system(size: 80))
-                .fontWeight(.bold)
-
-            Text("Explore immersive games....")
-                .font(.title)
-                .padding(.bottom, 20)
-
-            HStack(spacing: 50) {
+        ZStack(alignment: .bottomTrailing) { 
+            VStack(spacing: 20) {
                 Spacer()
 
-                GameCard(
-                    title: "Balloon Popping",
-                    subtitle: "A battle between the fastest fingers",
-                    action: {
-                        appModel.currentScreen = .balloonIntro
-                    })
+                Text("Welcome!")
+                    .font(.system(size: 80))
+                    .fontWeight(.bold)
 
-                GameCard(
-                    title: "Memory Game",
-                    subtitle: "Game descriptions here...",
-                    action: {
-                        appModel.currentScreen = .memoryGame
-                    })
+                Text("Explore immersive games....")
+                    .font(.title)
+                    .padding(.bottom, 20)
 
-                GameCard(
-                    title: "Game 3",
-                    subtitle: "Game descriptions here...",
-                    action: {
-                        // to add in the future
-                    })
+                HStack(spacing: 50) {
+                    Spacer()
+
+                    GameCard(
+                        title: "Balloon Frenzy",
+                        subtitle: "A battle between the fastest fingers",
+                        action: {
+                            appModel.currentScreen = .balloonIntro
+                        })
+
+                    GameCard(
+                        title: "Memory ARcade",
+                        subtitle: "Match pairs to unlock NYP’s hidden gems.",
+                        action: {
+                            appModel.currentScreen = .memoryGame
+                        })
+
+                    Spacer()
+                }
 
                 Spacer()
             }
-
-            Spacer()
+            .padding()
+            .glassBackgroundEffect(
+                in: RoundedRectangle(cornerRadius: 32, style: .continuous)
+            )
+            .onAppear {
+                if appModel.immersiveSpaceState == .open {
+                    Task {
+                        await dismissImmersiveSpace()
+                    }
+                }
+            }
         }
-        .padding()
-        .glassBackgroundEffect(
-            in: RoundedRectangle(cornerRadius: 32, style: .continuous)
-        )
     }
+
 }
 
 #Preview {

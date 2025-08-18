@@ -22,13 +22,7 @@ struct NYPOpenHouseApp: App {
                 .environment(appModel)
         }
         .windowStyle(.plain)
-        
-        // windowStyle(.plain) means there is no background, for each view, set the background as
-        // .glassBackgroundEffect(in: RoundedRectangle(cornerRadius: 32, style: .continuous))
-        // in order for the background to appear. Make sure spacer/Hstack/Vstack is added to fill the screen if needed. Use frame to set the size of the window
-        
-        
-        // add the different immersive spaces here
+
         ImmersiveSpace(id: Module.bubbleSpace.name) {
             BalloonGameImmersiveView()
                 .environment(appModel)
@@ -41,8 +35,8 @@ struct NYPOpenHouseApp: App {
         }
         .immersionStyle(selection: .constant(.full), in: .full)
         
-        ImmersiveSpace(id: Module.memoryFlippingSpace.name) {
-            MemoryFlippingGameImmersive()
+        ImmersiveSpace(id: Module.memorySpace.name) {
+            MemoryGameImmersive()
                 .environment(appModel)
                 .onAppear {
                     appModel.immersiveSpaceState = .open
@@ -53,7 +47,17 @@ struct NYPOpenHouseApp: App {
         }
         .immersionStyle(selection: .constant(.mixed), in: .mixed)
         
-        
+        ImmersiveSpace(id: Module.startingSpace.name) {
+            ImmersiveView()
+                .environment(appModel)
+                .onAppear {
+                    appModel.immersiveSpaceState = .open
+                }
+                .onDisappear {
+                    appModel.immersiveSpaceState = .closed
+                }
+        }
+        .immersionStyle(selection: .constant(.full), in: .full)
      }
 }
 
