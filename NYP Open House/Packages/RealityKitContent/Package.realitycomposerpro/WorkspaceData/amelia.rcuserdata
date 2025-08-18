@@ -1,7 +1,8 @@
 {
   "advancedEditorSelectedIdentifier" : "ProjectBrowser",
   "openSceneRelativePaths" : [
-    "ImageAnchorScene.usda"
+    "ImageAnchorScene.usda",
+    "BubbleScene.usda"
   ],
   "recentIdentifiers" : {
     "34BBF2A7-D0F0-4D0C-87E4-4D777089CCEE" : [
@@ -2463,5 +2464,5 @@
   "sceneViewportBackgroundColors" : {
 
   },
-  "selectedSceneRelativePath" : "ImageAnchorScene.usda"
+  "selectedSceneRelativePath" : "BubbleScene.usda"
 }
