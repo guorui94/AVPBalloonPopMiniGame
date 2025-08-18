@@ -9,111 +9,107 @@ import SwiftUI
 
 struct StartingInterface: View {
     @Environment(\.openImmersiveSpace) private var openImmersiveSpace
-    @Environment(\.dismissImmersiveSpace) private var dismissImmersiveSpace
     @Environment(AppModel.self) private var appModel
-    @Binding var changeInterface: Bool
-    @Binding var isStarting: Bool
+    @Environment(\.dismissWindow) private var dismissWindow
+    @State private var isStarting = false
     @State private var countdown: Int? = nil
-    @State var gameEnds = false
-    var onBack: () -> Void  // this sets the selected interface as nil (aka go back to ContentView)
-    var onShowEndGame:
-        (_ playAgain: @escaping () -> Void, _ backToMenu: @escaping () -> Void)
-            -> Void
+    @State private var isFadingOut = false
 
     var body: some View {
-        ZStack {
-            if !changeInterface {
+        HStack {
+            Spacer()
+            VStack(spacing: 30) {
+                Spacer()
+                Text("🎈 Balloon Frenzy 🎈")
+                    .font(.extraLargeTitle)
+                    .foregroundStyle(.cyan)
+                    .fontWeight(.bold)
+
+                Text(
+                    "You have 20 seconds to pop as many balloons as you can before they disappear at the top!"
+                )
+                .font(.title2)
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: 800)
+
                 HStack {
-                    Spacer()
-                    VStack(spacing: 30) {
-                        Spacer()
-                        Text("🎈 Pop Balloons 🎈")
-                            .font(.extraLargeTitle)
-                            .fontWeight(.bold)
+                    VStack(alignment: .leading) {
+                        DisplayBalloonColors(
+                            color: BalloonColor.red.swiftColor,
+                            points: BalloonColor.red.poppingScore)
 
-                        Text(
-                            "You have 20 seconds to pop as many balloons as you can before they disappear at the top!"
-                        )
-                        .font(.title2)
-                        .multilineTextAlignment(.center)
-                        .frame(maxWidth: 800)
-                        
-                        HStack(spacing: 20) {
-                            VStack (alignment: .leading) {
-                                DisplayBalloonColors(color:BalloonColor.red.swiftColor, points: 5)
-
-                                DisplayBalloonColors(color:BalloonColor.blue.swiftColor, points: 10)
-                                
-                                DisplayBalloonColors(color:BalloonColor.green.swiftColor, points: 15)
-                            }
-
-                            VStack {
-                                DisplayBalloonColors(color:BalloonColor.darkBrown.swiftColor, points: 20)
-                                
-                                DisplayBalloonColors(color:BalloonColor.purple.swiftColor, points: 30)
-                                    .font(.title)
-                                    .fontWeight(.heavy)
-                                    .foregroundColor(.cyan)
-                                    .background(
-                                        RoundedRectangle(cornerRadius: 6)
-                                            .fill(Color.white.opacity(0.15))
-                                            .padding(-4) // Makes background snug
-                                    )
-
-                                
-                                DisplayBalloonColors(color:BalloonColor.teal.swiftColor, points: 50)
-                                    .font(.title)
-                                    .fontWeight(.heavy)
-                                    .foregroundColor(.cyan)
-                                    .background(
-                                        RoundedRectangle(cornerRadius: 6)
-                                            .fill(Color.white.opacity(0.15))
-                                            .padding(-4) // Makes background snug
-                                    )
-                            }
-                        }
-                        
-                        Text("Balloons with higher points will move much faster and push other balloons!")
-                            .font(.title2)
-                            .multilineTextAlignment(.center)
-                            .frame(maxWidth: 800)
-
-                        Button(action: {
-                            startCountdown()
-                        }) {
-                            Group {
-                                if let currentCount = countdown {
-                                    Text("Starting in \(currentCount)...")
-                                } else {
-                                    Text("Let's Go!")
-                                }
-                            }
-                            .font(.title)
-                            .padding()
-                            .frame(width: 200)
-                            .foregroundStyle(.white)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(
-                                        isStarting ? Color.clear : .white,
-                                        lineWidth: 2.5)
-                            )
-                        }
-                        .disabled(isStarting)
-                        .buttonStyle(.plain)
-
-                        Spacer()
+                        DisplayBalloonColors(
+                            color: BalloonColor.green.swiftColor,
+                            points: BalloonColor.green.poppingScore)
                     }
-                    Spacer()
+
+                    VStack(alignment: .leading) {
+                        DisplayBalloonColors(
+                            color: BalloonColor.purple.swiftColor,
+                            points: BalloonColor.purple.poppingScore)
+
+                        DisplayBalloonColors(
+                            color: BalloonColor.gold.swiftColor,
+                            points: BalloonColor.gold.poppingScore
+                        )
+                        .font(.title)
+                        .fontWeight(.heavy)
+                        .foregroundColor(.cyan)
+                    }
                 }
-                .padding(40)
-                .glassBackgroundEffect(
-                    in: RoundedRectangle(cornerRadius: 32, style: .continuous))
+
+                Text(
+                    "Balloons with higher points move faster and push other balloons."
+                )
+                .font(.headline)
+                .foregroundStyle(Color.white)
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: 700)
+
+                Text(
+                    "Balloons will start blinking when they're about to fly away — pop them quickly!"
+                )
+                .font(.title2)
+                .foregroundStyle(.cyan)
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: 650)
+                .padding(.bottom, 10)
+
+                Button(action: {
+                    startCountdown()
+                }) {
+                    Group {
+                        if let currentCount = countdown {
+                            Text("Starting in \(currentCount)...")
+                        } else {
+                            Text("Let's Go!")
+                        }
+                    }
+                    .font(.title)
+                    .padding()
+                    .frame(width: 200)
+                    .foregroundStyle(.white)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(
+                                isStarting ? Color.clear : .white,
+                                lineWidth: 2.5)
+                    )
+                }
+                .disabled(isStarting)
+                .buttonStyle(.plain)
+
+                Spacer()
             }
+            Spacer()
         }
+        .padding(40)
+        .glassBackgroundEffect(
+            in: RoundedRectangle(cornerRadius: 32, style: .continuous)
+        )
         .overlay(alignment: .topLeading) {
             Button(action: {
-                onBack()
+                appModel.currentScreen = .menu
             }) {
                 Image(systemName: "chevron.left")
                     .font(.system(size: 28, weight: .medium))
@@ -128,41 +124,10 @@ struct StartingInterface: View {
                 effect.scaleEffect(!isActive ? 1.0 : 1.2)
             }
         }
-        .overlay(alignment: .bottomTrailing) {
-            if changeInterface {
-                ZStack(alignment: .topLeading) {
-                    BalloonGameInterface(gameEnds: $gameEnds)
-                    Button(action: {
-                        changeInterface = false
-                        isStarting = false
-                        appModel.resetGame()
-                        appModel.resetBalloonsRemoved()
-                    }) {
-                        Image(systemName: "chevron.left")
-                            .font(.system(size: 24, weight: .medium))
-                            .padding(14)
-                            .background(.ultraThinMaterial)
-                            .clipShape(Circle())
-                    }
-                    .clipShape(Circle())
-                    .padding([.top, .leading], 20)
-                    .buttonStyle(.plain)
-                    .hoverEffect { effect, isActive, proxy in
-                        effect.scaleEffect(!isActive ? 1.0 : 1.2)
-                    }
-                }
-                .offset(x: -250, y: -70)
-            }
-        }
-        .onChange(of: gameEnds) { oldValue, newValue in
-            onShowEndGame(
-                {
-                    resetGameState ()
-                },
-                {
-                    onBack()
-                    resetGameState ()
-                })
+        .opacity(isFadingOut ? 0 : 1)
+        .animation(.easeInOut(duration: 0.5), value: isFadingOut)
+        .onChange(of: appModel.gameEnds) { oldValue, newValue in
+            resetGameState()
         }
     }
     private func startCountdown() {
@@ -171,30 +136,30 @@ struct StartingInterface: View {
         Task {
             for i in (1...3).reversed() {
                 countdown = i
-                try? await Task.sleep(nanoseconds: 1_000_000_000)
+                try? await Task.sleep(for: .seconds(1))
             }
             countdown = nil
 
-            await openImmersiveSpace(id: appModel.immersiveSpaceId)
-            changeInterface = true
+            withAnimation {
+                isFadingOut = true
+            }
+            try? await Task.sleep(for: .seconds(0.5))
+
+            await openImmersiveSpace(id: Module.bubbleSpace.name)
+            dismissWindow(id: "content")
+            appModel.isBalloonGame = true
         }
     }
-    private func resetGameState () {
-        appModel.resetGame()
-        changeInterface = false
+
+    private func resetGameState() {
+        appModel.resetBalloonGame()
         isStarting = false
-        gameEnds = false
+        appModel.gameEnds = false
     }
-    
+
 }
 
 #Preview {
-    StartingInterface(
-        changeInterface: .constant(false),
-        isStarting: .constant(false),
-        onBack: {},
-        onShowEndGame: { playAgain, backToMenu in
-        }
-    )
-    .environment(AppModel())
+    StartingInterface()
+        .environment(AppModel())
 }

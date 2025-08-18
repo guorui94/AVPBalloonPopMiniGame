@@ -11,14 +11,26 @@ import RealityKitContent
 
 struct ContentView: View {
     @Environment(AppModel.self) private var appModel
+    @Environment(\.openImmersiveSpace) private var openImmersiveSpace
     @Environment(\.dismissImmersiveSpace) private var dismissImmersiveSpace
-    @State private var selectedInterface: AnyView?
-    @State var changeInterface = false
-    @State var isStarting = false
+    @Environment(\.dismissWindow) private var dismissWindow
+
     var body: some View {
-        if let interface = selectedInterface {
-            interface
-        } else {
+        switch appModel.currentScreen {
+        case .menu:
+            mainMenuView
+        case .balloonIntro:
+            StartingInterface()
+        case .endGame:
+            let score = appModel.score.poppingScore > 0 ? appModel.score.poppingScore : appModel.score.flipScore
+            EndGame(displayScore: score)
+        case .memoryGame:
+            Instructions()
+        }
+    }
+
+    var mainMenuView: some View {
+        ZStack(alignment: .bottomTrailing) { 
             VStack(spacing: 20) {
                 Spacer()
 
@@ -34,80 +46,41 @@ struct ContentView: View {
                     Spacer()
 
                     GameCard(
-                        title: "Balloon Popping",
-                        subtitle: "Pop the balloons as fast as you can",
-                        action: { showStartingInterface()
-                        })
-
-                    // fillers
-                    GameCard(
-                        title: "Game 2", subtitle: "Game descriptions here...",
+                        title: "Balloon Frenzy",
+                        subtitle: "A battle between the fastest fingers",
                         action: {
-                            // to add in the future
+                            appModel.currentScreen = .balloonIntro
                         })
 
                     GameCard(
-                        title: "Game 2", subtitle: "Game descriptions here...",
+                        title: "Memory ARcade",
+                        subtitle: "Match pairs to unlock NYP’s hidden gems.",
                         action: {
-                            // to add in the future
-
+                            appModel.currentScreen = .memoryGame
                         })
 
                     Spacer()
                 }
 
                 Spacer()
-
             }
             .padding()
             .glassBackgroundEffect(
-                in: RoundedRectangle(
-                    cornerRadius: 32,
-                    style: .continuous
-                )
+                in: RoundedRectangle(cornerRadius: 32, style: .continuous)
             )
-        }
-        
-    }
-    private func showStartingInterface() {
-        selectedInterface = AnyView(
-            StartingInterface(
-                changeInterface: $changeInterface,
-                isStarting: $isStarting,
-                onBack: {
-                    selectedInterface = nil
-                },
-                onShowEndGame: { playAgain, backToMenu in
-                    selectedInterface = AnyView(
-                        BalloonEndGame(
-                            onPlayAgain: {
-                                appModel.resetGame()
-                                appModel.resetBalloonsRemoved()
-                                changeInterface = false
-                                isStarting = false
-                                showStartingInterface()
-                            },
-                            onBackToMenu: {
-                                Task {
-                                    await dismissImmersiveSpace()
-                                }
-                                appModel.resetGame()
-                                appModel.resetBalloonsRemoved()
-                                changeInterface = false
-                                isStarting = false
-                                selectedInterface = nil
-                            }
-                        )
-                    )
+            .onAppear {
+                if appModel.immersiveSpaceState == .open {
+                    Task {
+                        await dismissImmersiveSpace()
+                    }
                 }
-            )
-        )
+            }
+        }
     }
-    
+
 }
 
-#Preview() {
+#Preview {
     ContentView()
         .environment(AppModel())
 }
-

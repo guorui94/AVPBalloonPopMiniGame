@@ -10,27 +10,33 @@ import RealityKitContent
 
 @main
 struct NYPOpenHouseApp: App {
+    @Environment(\.dismissImmersiveSpace) private var dismissImmersiveSpace
     @State private var appModel = AppModel()
     init () {
         ScoreComponent.registerComponent()
+        PairComponent.registerComponent()
     }
     var body: some Scene {
-        WindowGroup {
+        WindowGroup(id: "content") {
             ContentView()
                 .environment(appModel)
         }
         .windowStyle(.plain)
-        // with the windowStyle as .plain, for each view, set the glass background effect as
-        //.glassBackgroundEffect(in: RoundedRectangle(
-        //            cornerRadius: 32,
-        //            style: .continuous
-        //        )
-        //    ) in order for the background to appear. Make sure spacer/Hstack/Vstack is added to fill the screen if needed. Use frame to set the size of the window
-        
-        
-        // add the different immersive spaces here
-        ImmersiveSpace(id: appModel.immersiveSpaceId) {
+
+        ImmersiveSpace(id: Module.bubbleSpace.name) {
             BalloonGameImmersiveView()
+                .environment(appModel)
+                .onAppear {
+                    appModel.immersiveSpaceState = .open
+                }
+                .onDisappear {
+                    appModel.immersiveSpaceState = .closed
+                }
+        }
+        .immersionStyle(selection: .constant(.full), in: .full)
+        
+        ImmersiveSpace(id: Module.memorySpace.name) {
+            MemoryGameImmersive()
                 .environment(appModel)
                 .onAppear {
                     appModel.immersiveSpaceState = .open
@@ -41,6 +47,17 @@ struct NYPOpenHouseApp: App {
         }
         .immersionStyle(selection: .constant(.mixed), in: .mixed)
         
+        ImmersiveSpace(id: Module.startingSpace.name) {
+            ImmersiveView()
+                .environment(appModel)
+                .onAppear {
+                    appModel.immersiveSpaceState = .open
+                }
+                .onDisappear {
+                    appModel.immersiveSpaceState = .closed
+                }
+        }
+        .immersionStyle(selection: .constant(.full), in: .full)
      }
 }
 
