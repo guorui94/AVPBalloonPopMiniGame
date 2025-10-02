@@ -8,6 +8,7 @@
 import SwiftUI
 import AVFoundation
 import RealityKit
+import Observation   // <- needed for @Observable
 
 /// Maintains app-wide state
 @MainActor
@@ -26,12 +27,27 @@ class AppModel {
         case memoryGame
     }
 
+    // MARK: - App State
     var immersiveSpaceState = ImmersiveSpaceState.closed
-
     var currentScreen: AppScreen = .menu
-
     var balloonPoppingsounds = [AudioFileResource]()
+    private var balloonEndGame = try! AVAudioPlayer(
+        contentsOf: Bundle.main.url(forResource: "signalEndGame", withExtension: "mp3")!
+    )
+    private var applauses = try! AVAudioPlayer(
+        contentsOf: Bundle.main.url(forResource: "highScoreApplause", withExtension: "mp3")!
+    )
 
+    var score = ScoreModel()
+    var pose = VisionProPose()
+    var currentGameMode: GameModes? = .easy
+
+    // Game state flags
+    var isBalloonGame = false
+    var isMemoryGame = false
+    var gameEnds = false
+
+    // MARK: - Init
     init() {
         Task { @MainActor in
             do {
@@ -46,23 +62,7 @@ class AppModel {
         }
     }
     
-    private var balloonEndGame = try! AVAudioPlayer(contentsOf: Bundle.main.url(forResource: "signalEndGame", withExtension: "mp3")!)
-    
-    private var applauses = try! AVAudioPlayer(contentsOf: Bundle.main.url(forResource: "highScoreApplause", withExtension: "mp3")!)
-    
-    var score = ScoreModel()
-
-    var pose = VisionProPose()
-    
-    var currentGameMode: GameModes? = .easy
-    
-    
-    // set game states
-    var isBalloonGame = false
-    var isMemoryGame = false
-    var gameEnds = false
-    
-    // functions
+    // MARK: - Game Helpers
     func resetBalloonGame() {
         score.resetBalloonScore()
         score.balloonsRemoved = 0
@@ -87,5 +87,43 @@ class AppModel {
     func highScoreApplause () {
         applauses.play()
     }
-    
+
+    // MARK: - Player Info  ✅ (inside AppModel)
+    struct PlayerInfo: Codable {
+        var name: String
+        var email: String
+    }
+
+    /// Observed automatically because this is an @Observable class.
+    var playerInfo: PlayerInfo? = nil
+
+    /// Convenience to prefill fields if they played before.
+    var cachedPlayerInfo: PlayerInfo? {
+        if let data = UserDefaults.standard.data(forKey: "player_info"),
+           let info = try? JSONDecoder().decode(PlayerInfo.self, from: data) {
+            return info
+        }
+        return nil
+    }
+
+    /// Set + cache locally (so you can also push to your DB later).
+    func setPlayerInfo(name: String, email: String) {
+        let info = PlayerInfo(
+            name: name.trimmingCharacters(in: .whitespacesAndNewlines),
+            email: email.trimmingCharacters(in: .whitespacesAndNewlines)
+        )
+        playerInfo = info
+
+        if let data = try? JSONEncoder().encode(info) {
+            UserDefaults.standard.set(data, forKey: "player_info")
+        }
+    }
+
+    /// Call this wherever you want to persist to your backend.
+    func persistPlayerInfoToDatabaseIfNeeded() async {
+        guard let info = playerInfo else { return }
+        // TODO: integrate with Firebase/Supabase/your API.
+        // Example:
+        // try await database.players.insert(["name": info.name, "email": info.email])
+    }
 }
