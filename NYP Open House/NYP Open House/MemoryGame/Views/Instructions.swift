@@ -1,3 +1,8 @@
+//
+//  Instructions.swift
+//  NYP Open House
+//
+
 import SwiftUI
 
 struct Instructions: View {
@@ -9,7 +14,7 @@ struct Instructions: View {
     @State private var countdown: Int? = nil
     @State private var isFadingOut = false
 
-    // --- Form fields (MEMORY game)
+    // --- Form fields (memory game)
     @State private var playerName: String = ""
     @State private var playerEmail: String = ""
 
@@ -17,9 +22,11 @@ struct Instructions: View {
     @State private var showValidationAlert = false
     @State private var validationMessage = ""
 
+    // Email validation (UI-level)
     private var isValidEmail: Bool {
         let pattern = #"^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$"#
-        return NSPredicate(format: "SELF MATCHES[c] %@", pattern).evaluate(with: playerEmail)
+        return NSPredicate(format: "SELF MATCHES[c] %@", pattern)
+            .evaluate(with: playerEmail)
     }
     private var isFormValid: Bool {
         !playerName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && isValidEmail
@@ -29,20 +36,23 @@ struct Instructions: View {
         ZStack {
             GeometryReader { geo in
                 ScrollView(.vertical, showsIndicators: false) {
-                    VStack(spacing: 22) {
+                    VStack(spacing: 16) { // tighter overall spacing
+                        // Title
                         Text("🕹️ ARcade of Memories 🃏")
                             .font(.extraLargeTitle)
                             .fontWeight(.bold)
                             .foregroundStyle(.cyan)
                             .multilineTextAlignment(.center)
 
+                        // Subtitle
                         Text("Test your memory skills by flipping tiles to match pairs of images.")
                             .font(.title)
                             .multilineTextAlignment(.center)
                             .foregroundStyle(.white)
                             .frame(maxWidth: 900)
 
-                        VStack(alignment: .leading, spacing: 10) {
+                        // Steps
+                        VStack(alignment: .leading, spacing: 8) {
                             InstructionStep(number: 1, text: "Tap on any tile to flip it over.")
                             InstructionStep(number: 2, text: "Flip another tile to find a matching image.")
                             InstructionStep(number: 3, text: "Matched pairs will disappear from the board.")
@@ -50,20 +60,22 @@ struct Instructions: View {
                         }
                         .frame(maxWidth: 900, alignment: .leading)
 
+                        // 💡 Description — reduced top/bottom padding
                         Text("💡 Each image on the tiles represents an exciting opportunity at Nanyang Polytechnic — like Overseas Exchange, Scholarships, and more!")
                             .font(.title2)
                             .multilineTextAlignment(.center)
                             .foregroundStyle(.mint)
                             .frame(maxWidth: 900)
+                            .padding(.vertical, 2) // <— minimal vertical padding
 
                         Text("Can you uncover them all?")
                             .font(.title)
                             .fontWeight(.semibold)
                             .foregroundStyle(.white)
 
-                        // Fields
-                        VStack(spacing: 12) {
-                            VStack(alignment: .leading, spacing: 6) {
+                        // --- Name + Email fields
+                        VStack(spacing: 10) {
+                            VStack(alignment: .leading, spacing: 4) {
                                 Text("Your Name")
                                     .font(.headline)
                                     .foregroundStyle(.white.opacity(0.9))
@@ -78,7 +90,8 @@ struct Instructions: View {
                                     )
                                     .frame(maxWidth: 520)
                             }
-                            VStack(alignment: .leading, spacing: 6) {
+
+                            VStack(alignment: .leading, spacing: 4) {
                                 Text("Email")
                                     .font(.headline)
                                     .foregroundStyle(.white.opacity(0.9))
@@ -106,9 +119,8 @@ struct Instructions: View {
                                 }
                             }
                         }
-                        .padding(.top, 4)
 
-                        // Button (exact same style as StartingInterface)
+                        // --- Start Button (same style as Balloon)
                         Button(action: { handleStartTap() }) {
                             Group {
                                 if let currentCount = countdown {
@@ -118,8 +130,8 @@ struct Instructions: View {
                                 }
                             }
                             .font(.title2)
-                            .padding(.vertical, 12)
-                            .padding(.horizontal, 26)
+                            .padding(.vertical, 10)
+                            .padding(.horizontal, 22)
                             .frame(width: 260)
                             .foregroundStyle(.white)
                             .overlay(
@@ -127,12 +139,12 @@ struct Instructions: View {
                                     .stroke((isStarting || !isFormValid) ? Color.clear : .white, lineWidth: 2.5)
                             )
                         }
-                        .padding(.top, 14)
+                        .padding(.top, 10) // smaller gap above button
                         .disabled(isStarting)
                         .buttonStyle(.plain)
 
-                        // Footer note (same as StartingInterface)
-                        VStack(spacing: 6) {
+                        // Footer note (small & always visible)
+                        VStack(spacing: 4) {
                             Text("We only use your name and email to save scores and contact winners.")
                             Text("Nothing is shared externally.")
                         }
@@ -140,11 +152,15 @@ struct Instructions: View {
                         .foregroundStyle(.white.opacity(0.75))
                         .multilineTextAlignment(.center)
                         .frame(maxWidth: 700)
+                        .padding(.top, 10) // small space above footer
                     }
                     .frame(maxWidth: 1100)
-                    .padding(.horizontal, 28)
-                    .padding(.vertical, 12)
-                    .frame(minHeight: geo.size.height, alignment: .center) // center vertically
+                    .padding(.horizontal, 18) // reduced horizontal padding
+                    .padding(.vertical, 6)    // reduced vertical padding
+                    .padding(.bottom, 8)      // small bottom inset so footer clears the glass edge
+                    // Center within the live window size
+                    .frame(minHeight: geo.size.height, alignment: .center)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                 }
             }
         }
@@ -153,12 +169,12 @@ struct Instructions: View {
             Button(action: { appModel.currentScreen = .menu }) {
                 Image(systemName: "chevron.left")
                     .font(.system(size: 28, weight: .medium))
-                    .padding(14)
+                    .padding(12)
                     .background(.ultraThinMaterial)
                     .clipShape(Circle())
-                    .shadow(radius: 8)
+                    .shadow(radius: 6)
             }
-            .padding([.top, .leading], 22)
+            .padding([.top, .leading], 18)
             .buttonStyle(.plain)
             .hoverEffect { effect, isActive, _ in
                 effect.scaleEffect(!isActive ? 1.0 : 1.2)
@@ -177,6 +193,7 @@ struct Instructions: View {
         }
     }
 
+    // MARK: - Actions
     private func handleStartTap() {
         let nameEmpty  = playerName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         let emailEmpty = playerEmail.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -190,6 +207,7 @@ struct Instructions: View {
 
     private func startCountdown() {
         appModel.setMemoryPlayerInfo(name: playerName, email: playerEmail)
+
         countdown = 3
         isStarting = true
         Task {
@@ -198,8 +216,10 @@ struct Instructions: View {
                 try? await Task.sleep(for: .seconds(1))
             }
             countdown = nil
+
             withAnimation { isFadingOut = true }
             try? await Task.sleep(for: .seconds(0.5))
+
             await openImmersiveSpace(id: Module.memorySpace.name)
             dismissWindow(id: "content")
             appModel.isMemoryGame = true
@@ -207,9 +227,7 @@ struct Instructions: View {
     }
 }
 
-#if DEBUG
-#Preview("Instructions (centered)", traits: .fixedLayout(width: 1200, height: 800)) {
+#Preview {
     Instructions()
         .environment(AppModel())
 }
-#endif

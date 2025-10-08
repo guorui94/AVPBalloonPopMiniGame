@@ -32,6 +32,7 @@ struct StartingInterface: View {
             GeometryReader { geo in
                 ScrollView(.vertical, showsIndicators: false) {
                     VStack(spacing: 22) {
+
                         // Header
                         Text("🎈 Balloon Frenzy 🎈")
                             .font(.extraLargeTitle)
@@ -120,7 +121,7 @@ struct StartingInterface: View {
                         }
                         .padding(.top, 4)
 
-                        // ---------- Start Button (shared style with Instructions)
+                        // ---------- Start Button (shared style)
                         Button(action: { handleStartTap() }) {
                             Group {
                                 if let currentCount = countdown {
@@ -143,7 +144,7 @@ struct StartingInterface: View {
                         .disabled(isStarting)
                         .buttonStyle(.plain)
 
-                        // ---------- Footer note (fills the bottom visually)
+                        // ---------- Footer note
                         VStack(spacing: 6) {
                             Text("We only use your name and email to save scores and contact winners.")
                             Text("Nothing is shared externally.")
@@ -154,10 +155,11 @@ struct StartingInterface: View {
                         .frame(maxWidth: 700)
                     }
                     .frame(maxWidth: 1100)
-                    .padding(.horizontal, 28)
+                    .padding(.horizontal, 24)
                     .padding(.vertical, 12)
-                    // Center vertically within the viewport
+                    // Center within whatever window size the system provides
                     .frame(minHeight: geo.size.height, alignment: .center)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                 }
             }
         }
@@ -200,27 +202,16 @@ struct StartingInterface: View {
         let nameEmpty  = playerName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         let emailEmpty = playerEmail.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
 
-        if nameEmpty && emailEmpty {
-            validationMessage = "Please enter your name and email."
-            showValidationAlert = true; return
-        }
-        if nameEmpty {
-            validationMessage = "Please enter your name."
-            showValidationAlert = true; return
-        }
-        if emailEmpty {
-            validationMessage = "Please enter your email."
-            showValidationAlert = true; return
-        }
-        if !isValidEmail {
-            validationMessage = "Please enter a valid email (e.g., name@example.com)."
-            showValidationAlert = true; return
-        }
+        if nameEmpty && emailEmpty { validationMessage = "Please enter your name and email."; showValidationAlert = true; return }
+        if nameEmpty { validationMessage = "Please enter your name."; showValidationAlert = true; return }
+        if emailEmpty { validationMessage = "Please enter your email."; showValidationAlert = true; return }
+        if !isValidEmail { validationMessage = "Please enter a valid email (e.g., name@example.com)."; showValidationAlert = true; return }
         startCountdown()
     }
 
     private func startCountdown() {
         appModel.setPlayerInfo(name: playerName, email: playerEmail)
+
         countdown = 3
         isStarting = true
         Task {
@@ -229,8 +220,10 @@ struct StartingInterface: View {
                 try? await Task.sleep(for: .seconds(1))
             }
             countdown = nil
+
             withAnimation { isFadingOut = true }
             try? await Task.sleep(for: .seconds(0.5))
+
             await openImmersiveSpace(id: Module.bubbleSpace.name)
             dismissWindow(id: "content")
             appModel.isBalloonGame = true
@@ -244,9 +237,7 @@ struct StartingInterface: View {
     }
 }
 
-#if DEBUG
-#Preview("Balloon Start (centered)", traits: .fixedLayout(width: 1200, height: 800)) {
+#Preview {
     StartingInterface()
         .environment(AppModel())
 }
-#endif
