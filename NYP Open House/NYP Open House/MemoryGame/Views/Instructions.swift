@@ -61,12 +61,12 @@ struct Instructions: View {
                         .frame(maxWidth: 900, alignment: .leading)
 
                         // 💡 Description — reduced top/bottom padding
-                        Text("💡 Each image on the tiles represents an exciting opportunity at Nanyang Polytechnic — like Overseas Exchange, Scholarships, and more!")
+                        Text("💡 Each image on the tiles represents an exciting opportunity at Nanyang Polytechnic —\nlike Overseas Exchange, Scholarships, and more!")
                             .font(.title2)
                             .multilineTextAlignment(.center)
                             .foregroundStyle(.mint)
                             .frame(maxWidth: 900)
-                            .padding(.vertical, 2) // <— minimal vertical padding
+                            .fixedSize(horizontal: false, vertical: true)
 
                         Text("Can you uncover them all?")
                             .font(.title)
