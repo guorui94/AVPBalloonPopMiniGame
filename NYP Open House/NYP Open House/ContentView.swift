@@ -21,9 +21,15 @@ struct ContentView: View {
             mainMenuView
         case .balloonIntro:
             StartingInterface()
-        case .endGame:
-            let score = appModel.score.poppingScore > 0 ? appModel.score.poppingScore : appModel.score.flipScore
-            EndGame(displayScore: score)
+            // inside var body: some View switch
+            case .endGame:
+                let score = appModel.score.poppingScore > 0 ? appModel.score.poppingScore : appModel.score.flipScore
+                let isBalloon = appModel.isBalloonGame
+                // Both sides are AppModel.PlayerInfo? (same type), so no mismatch now.
+                let info: AppModel.PlayerInfo? = isBalloon ? appModel.cachedPlayerInfo : appModel.cachedMemoryPlayerInfo
+                let title = isBalloon ? "Balloon Frenzy" : "ARcade of Memories"
+                EndGame(displayScore: score, gameTitle: title, playerInfo: info)
+
         case .memoryGame:
             Instructions()
         }

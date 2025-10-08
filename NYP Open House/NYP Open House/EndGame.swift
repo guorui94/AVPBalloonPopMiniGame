@@ -2,113 +2,86 @@
 //  EndGame.swift
 //  NYP Open House
 //
-//  Created by Amelia on 1/7/25.
-//
 
 import SwiftUI
 
 struct EndGame: View {
+    let displayScore: Int
+    let gameTitle: String
+    let playerInfo: AppModel.PlayerInfo?   // matches AppModel's nested type
+
     @Environment(AppModel.self) private var appModel
-    @State private var pulse = false
-    var displayScore: Int
+
     var body: some View {
-        VStack {
-            Spacer()
-            HStack {
-                VStack(spacing: 30) {
-                    Text("MISSION COMPLETE!")
-                        .font(.system(size: 40, weight: .bold))
-                        .foregroundStyle(.white)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color.cyan, lineWidth: 2)
-                                .blur(radius: 4)
-                                .opacity(0.8)
-                        )
-                        .padding(.top, 50)
+        ZStack {
+            VStack(spacing: 20) {
+                // Title
+                Text(gameTitle)
+                    .font(.extraLargeTitle)
+                    .fontWeight(.bold)
+                    .foregroundStyle(.cyan)
+                    .multilineTextAlignment(.center)
 
-                    Text("Your results are in...")
-                        .font(.title)
-                        .foregroundStyle(Color(white: 0.9))
+                // Score
+                Text("Your Score")
+                    .font(.title2)
+                    .foregroundStyle(.white.opacity(0.85))
 
-                    Text(verbatim: "\(String(format: "%02d", displayScore))")
-                        .font(.system(size: 50, weight: .semibold, design: .monospaced))
-                        .foregroundStyle(.cyan)
-                    
-                    if appModel.score.isHighScore {
-                        Text("New high score!!")
-                            .font(.system(size: 30, weight: .semibold, design: .monospaced))
-                            .foregroundStyle(.cyan)
-                            .shadow(color: .cyan.opacity(0.7), radius: 10)
-                            .scaleEffect(pulse ? 1.1 : 1.0)
-                            .animation(.easeInOut(duration: 1).repeatForever(autoreverses: true), value: pulse)
-                            .onAppear {
-                                pulse = true
-                            }
+                Text("\(displayScore)")
+                    .font(.system(size: 96, weight: .heavy, design: .rounded))
+                    .foregroundStyle(.white)
+
+                // Player details (from the name/email screen)
+                if let p = playerInfo {
+                    VStack(spacing: 4) {
+                        Text("Player: \(p.name)")
+                        Text(p.email)
+                            .font(.subheadline)
+                            .foregroundStyle(.white.opacity(0.85))
                     }
-                    
-                    HStack(spacing: 20) {
-                        Button(action: {
-                            let playAgainScreen: AppModel.AppScreen = appModel.isBalloonGame ? .balloonIntro : .memoryGame
-                            appModel.currentScreen = playAgainScreen
-                        }) {
-                            Text("Play Again")
-                                .padding()
-                                .frame(width: 140)
-                                .background(Color.cyan.opacity(0.2))
-                                .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.cyan, lineWidth: 2))
-                        }
-                        .cornerRadius(12)
-                        .buttonStyle(.plain)
-
-                        Button(action: {
-                            appModel.isMemoryGame = false
-                            appModel.isBalloonGame = false
-                            appModel.currentScreen = .menu
-                        }) {
-                            Text("Back to Menu")
-                                .padding()
-                                .frame(width: 140)
-                                .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.white.opacity(0.7), lineWidth: 2))
-                        }
-                        .cornerRadius(12)
-                        .buttonStyle(.plain)
-                    }
-                    .padding(.bottom, 30)
+                    .font(.headline)
+                    .foregroundStyle(.white)
+                    .multilineTextAlignment(.center)
+                } else {
+                    Text("Player: (not provided)")
+                        .font(.headline)
+                        .foregroundStyle(.white.opacity(0.7))
                 }
-                .padding(.horizontal, 50)
-                .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 32, style: .continuous))
-                .shadow(color: .cyan.opacity(0.3), radius: 20, x: 0, y: 10)
 
-            }
-            .glassBackgroundEffect(
-                in: RoundedRectangle(
-                    cornerRadius: 32, style: .continuous)
-            )
-        }
-        .onAppear {
-            if appModel.score.isHighScore {
-                appModel.highScoreApplause()
-            }
-        }
-        .onDisappear {
-            resetGameState()
-        }
-    }
-    func resetGameState() {
-        appModel.gameEnds = false
-        if appModel.isBalloonGame {
-            appModel.resetBalloonGame()
-        }
-        else {
-            appModel.resetMemoryGame()
-        }
+                // Actions
+                HStack(spacing: 16) {
+                    Button("Play Again") {
+                        appModel.isBalloonGame = false
+                        appModel.isMemoryGame = false
+                        appModel.gameEnds = false
+                        appModel.currentScreen = .menu
+                    }
+                    .buttonStyle(.borderedProminent)
 
-    
+                    Button("Close") {
+                        appModel.isBalloonGame = false
+                        appModel.isMemoryGame = false
+                        appModel.gameEnds = false
+                        appModel.currentScreen = .menu
+                    }
+                    .buttonStyle(.bordered)
+                }
+                .padding(.top, 8)
+            }
+            .frame(maxWidth: 800)
+            .padding(.horizontal, 24)
+            .padding(.vertical, 22)
+            .glassBackgroundEffect(in: RoundedRectangle(cornerRadius: 32, style: .continuous))
+        }
     }
 }
 
 #Preview {
-    EndGame(displayScore: 100)
-        .environment(AppModel())
+    // Provide the required arguments so the preview builds.
+    EndGame(
+        displayScore: 100,
+        gameTitle: "Balloon Frenzy",
+        playerInfo: AppModel.PlayerInfo(name: "Preview Player", email: "preview@example.com")
+    )
+    .environment(AppModel())
 }
