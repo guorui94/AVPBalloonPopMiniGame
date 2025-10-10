@@ -1,3 +1,8 @@
+//
+//  StartingInterface.swift
+//  NYP Open House
+//
+
 import SwiftUI
 
 struct StartingInterface: View {
@@ -11,20 +16,22 @@ struct StartingInterface: View {
 
     // --- Form fields
     @State private var playerName: String = ""
-    @State private var playerEmail: String = ""
+    @State private var playerPhone: String = ""
 
     // --- Validation alert
     @State private var showValidationAlert = false
     @State private var validationMessage = ""
 
-    // Email validation (UI-level)
-    private var isValidEmail: Bool {
-        let pattern = #"^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$"#
-        return NSPredicate(format: "SELF MATCHES[c] %@", pattern)
-            .evaluate(with: playerEmail)
+    // Phone validation (SG: optional +65, then 8 digits starting with 6/8/9)
+    private var isValidPhone: Bool {
+        let trimmed = playerPhone.trimmingCharacters(in: .whitespacesAndNewlines)
+        let compact = trimmed.replacingOccurrences(of: #"[ \-]"#, with: "", options: .regularExpression)
+        let pattern = #"^(?:\+65)?(?:[689]\d{7})$"#
+        return NSPredicate(format: "SELF MATCHES %@", pattern).evaluate(with: compact)
     }
+
     private var isFormValid: Bool {
-        !playerName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && isValidEmail
+        !playerName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && isValidPhone
     }
 
     var body: some View {
@@ -73,7 +80,7 @@ struct StartingInterface: View {
                             .multilineTextAlignment(.center)
                             .frame(maxWidth: 1000)
 
-                        // ---------- Name + Email (above the button)
+                        // ---------- Name + Phone (above the button)
                         VStack(spacing: 12) {
                             VStack(alignment: .leading, spacing: 6) {
                                 Text("Your Name")
@@ -92,28 +99,28 @@ struct StartingInterface: View {
                             }
 
                             VStack(alignment: .leading, spacing: 6) {
-                                Text("Email")
+                                Text("Phone Number")
                                     .font(.headline)
                                     .foregroundStyle(.white.opacity(0.9))
-                                TextField("name@example.com", text: $playerEmail)
-                                    .textContentType(.emailAddress)
-                                    .keyboardType(.emailAddress)
-                                    .textInputAutocapitalization(.never)
+                                TextField("+65 9123 4567", text: $playerPhone)
+                                    .textContentType(.telephoneNumber)
+                                    .keyboardType(.phonePad)
                                     .submitLabel(.done)
                                     .padding(12)
                                     .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
                                     .overlay(
                                         RoundedRectangle(cornerRadius: 12)
                                             .stroke(
-                                                playerEmail.isEmpty ? .white.opacity(0.35)
-                                                : (isValidEmail ? .cyan.opacity(0.8) : .red.opacity(0.7)),
+                                                playerPhone.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                                                ? .white.opacity(0.35)
+                                                : (isValidPhone ? .cyan.opacity(0.8) : .red.opacity(0.7)),
                                                 lineWidth: 1
                                             )
                                     )
                                     .frame(maxWidth: 540)
 
-                                if !playerEmail.isEmpty && !isValidEmail {
-                                    Text("Please enter a valid email address.")
+                                if !playerPhone.isEmpty && !isValidPhone {
+                                    Text("Please enter a valid phone number (e.g., +65 9123 4567).")
                                         .font(.footnote)
                                         .foregroundStyle(.red)
                                 }
@@ -121,7 +128,7 @@ struct StartingInterface: View {
                         }
                         .padding(.top, 4)
 
-                        // ---------- Start Button (shared style)
+                        // ---------- Start Button
                         Button(action: { handleStartTap() }) {
                             Group {
                                 if let currentCount = countdown {
@@ -146,7 +153,7 @@ struct StartingInterface: View {
 
                         // ---------- Footer note
                         VStack(spacing: 6) {
-                            Text("We only use your name and email to save scores and contact winners.")
+                            Text("We only use your name and phone number to save scores and contact winners.")
                             Text("Nothing is shared externally.")
                         }
                         .font(.footnote)
@@ -157,7 +164,6 @@ struct StartingInterface: View {
                     .frame(maxWidth: 1100)
                     .padding(.horizontal, 24)
                     .padding(.vertical, 12)
-                    // Center within whatever window size the system provides
                     .frame(minHeight: geo.size.height, alignment: .center)
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                 }
@@ -182,9 +188,9 @@ struct StartingInterface: View {
         .opacity(isFadingOut ? 0 : 1)
         .animation(.easeInOut(duration: 0.5), value: isFadingOut)
         .onAppear {
-            if let cached = appModel.cachedPlayerInfo {
+            if let cached = appModel.cachedBalloonContact {
                 playerName = cached.name
-                playerEmail = cached.email
+                playerPhone = cached.phone
             }
         }
         .onChange(of: appModel.gameEnds) { _, _ in
@@ -200,17 +206,19 @@ struct StartingInterface: View {
     // Validate first; if invalid, show popup; else start.
     private func handleStartTap() {
         let nameEmpty  = playerName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-        let emailEmpty = playerEmail.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        let phoneEmpty = playerPhone.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
 
-        if nameEmpty && emailEmpty { validationMessage = "Please enter your name and email."; showValidationAlert = true; return }
+        if nameEmpty && phoneEmpty { validationMessage = "Please enter your name and phone number."; showValidationAlert = true; return }
         if nameEmpty { validationMessage = "Please enter your name."; showValidationAlert = true; return }
-        if emailEmpty { validationMessage = "Please enter your email."; showValidationAlert = true; return }
-        if !isValidEmail { validationMessage = "Please enter a valid email (e.g., name@example.com)."; showValidationAlert = true; return }
+        if phoneEmpty { validationMessage = "Please enter your phone number."; showValidationAlert = true; return }
+        if !isValidPhone { validationMessage = "Please enter a valid phone number (e.g., +65 9123 4567)."; showValidationAlert = true; return }
         startCountdown()
     }
 
     private func startCountdown() {
-        appModel.setPlayerInfo(name: playerName, email: playerEmail)
+        // Save contact + start a fresh session (resets score & creates session ID)
+        appModel.setBalloonContact(name: playerName, phone: playerPhone)
+        appModel.startBalloonSession()
 
         countdown = 3
         isStarting = true
@@ -226,7 +234,6 @@ struct StartingInterface: View {
 
             await openImmersiveSpace(id: Module.bubbleSpace.name)
             dismissWindow(id: "content")
-            appModel.isBalloonGame = true
         }
     }
 

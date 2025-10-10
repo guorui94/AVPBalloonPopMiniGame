@@ -19,24 +19,36 @@ struct ContentView: View {
         switch appModel.currentScreen {
         case .menu:
             mainMenuView
+
         case .balloonIntro:
             StartingInterface()
-            // inside var body: some View switch
-            case .endGame:
-                let score = appModel.score.poppingScore > 0 ? appModel.score.poppingScore : appModel.score.flipScore
-                let isBalloon = appModel.isBalloonGame
-                // Both sides are AppModel.PlayerInfo? (same type), so no mismatch now.
-                let info: AppModel.PlayerInfo? = isBalloon ? appModel.cachedPlayerInfo : appModel.cachedMemoryPlayerInfo
-                let title = isBalloon ? "Balloon Frenzy" : "ARcade of Memories"
-                EndGame(displayScore: score, gameTitle: title, playerInfo: info)
+
+        case .endGame:
+            endGameView   // keep the switch body clean
 
         case .memoryGame:
             Instructions()
         }
     }
 
+    // MARK: - End Game (choose correct score + contact)
+    private var endGameView: some View {
+        let isBalloon = appModel.isBalloonGame
+        // Pick the score *for that game only*
+        let score = isBalloon ? appModel.score.poppingScore : appModel.score.flipScore
+
+        let info: AppModel.PlayerInfo? = isBalloon
+            ? appModel.cachedBalloonContact
+            : appModel.cachedMemoryContact
+
+        let title = isBalloon ? "Balloon Frenzy" : "ARcade of Memories"
+
+        return EndGame(displayScore: score, gameTitle: title, playerInfo: info)
+    }
+
+    // MARK: - Main Menu
     var mainMenuView: some View {
-        ZStack(alignment: .bottomTrailing) { 
+        ZStack(alignment: .bottomTrailing) {
             VStack(spacing: 20) {
                 Spacer()
 
@@ -71,19 +83,14 @@ struct ContentView: View {
                 Spacer()
             }
             .padding()
-            .glassBackgroundEffect(
-                in: RoundedRectangle(cornerRadius: 32, style: .continuous)
-            )
+            .glassBackgroundEffect(in: RoundedRectangle(cornerRadius: 32, style: .continuous))
             .onAppear {
                 if appModel.immersiveSpaceState == .open {
-                    Task {
-                        await dismissImmersiveSpace()
-                    }
+                    Task { await dismissImmersiveSpace() }
                 }
             }
         }
     }
-
 }
 
 #Preview {
