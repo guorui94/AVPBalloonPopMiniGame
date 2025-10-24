@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2A67078B2EA2286B00BC1F75 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 2A67078A2EA2286B00BC1F75 /* FirebaseAnalytics */; };
+		2A67078D2EA2286B00BC1F75 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 2A67078C2EA2286B00BC1F75 /* FirebaseCore */; };
+		2A67078F2EA22C5500BC1F75 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 2A67078E2EA22C5500BC1F75 /* FirebaseAuth */; };
+		2A6707912EA22C5500BC1F75 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 2A6707902EA22C5500BC1F75 /* FirebaseFirestore */; };
+		2AB8C06A2EA9D769000833A6 /* FirebaseFirestoreCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = 2AB8C0692EA9D769000833A6 /* FirebaseFirestoreCombine-Community */; };
+		2AE2F0072EAA08B000E083ED /* FirebaseInstallations in Frameworks */ = {isa = PBXBuildFile; productRef = 2AE2F0062EAA08B000E083ED /* FirebaseInstallations */; };
 		94AAA6AB2E1CFE1B00870514 /* RealityKitContent in Frameworks */ = {isa = PBXBuildFile; productRef = 94AAA6AA2E1CFE1B00870514 /* RealityKitContent */; };
 /* End PBXBuildFile section */
 
@@ -41,7 +47,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2A67078B2EA2286B00BC1F75 /* FirebaseAnalytics in Frameworks */,
+				2AE2F0072EAA08B000E083ED /* FirebaseInstallations in Frameworks */,
+				2A67078D2EA2286B00BC1F75 /* FirebaseCore in Frameworks */,
 				94AAA6AB2E1CFE1B00870514 /* RealityKitContent in Frameworks */,
+				2AB8C06A2EA9D769000833A6 /* FirebaseFirestoreCombine-Community in Frameworks */,
+				2A6707912EA22C5500BC1F75 /* FirebaseFirestore in Frameworks */,
+				2A67078F2EA22C5500BC1F75 /* FirebaseAuth in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -94,6 +106,12 @@
 			name = "NYP Open House";
 			packageProductDependencies = (
 				94AAA6AA2E1CFE1B00870514 /* RealityKitContent */,
+				2A67078A2EA2286B00BC1F75 /* FirebaseAnalytics */,
+				2A67078C2EA2286B00BC1F75 /* FirebaseCore */,
+				2A67078E2EA22C5500BC1F75 /* FirebaseAuth */,
+				2A6707902EA22C5500BC1F75 /* FirebaseFirestore */,
+				2AB8C0692EA9D769000833A6 /* FirebaseFirestoreCombine-Community */,
+				2AE2F0062EAA08B000E083ED /* FirebaseInstallations */,
 			);
 			productName = "NYP Open House";
 			productReference = 94AAA6A52E1CFE1B00870514 /* NYP Open House.app */;
@@ -123,6 +141,9 @@
 			);
 			mainGroup = 94AAA69C2E1CFE1B00870514;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				2A6707892EA2286B00BC1F75 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 94AAA6A62E1CFE1B00870514 /* Products */;
 			projectDirPath = "";
@@ -162,7 +183,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"NYP Open House/Preview Content\"";
-				DEVELOPMENT_TEAM = 9M5QP98W44;
+				DEVELOPMENT_TEAM = FR63JFUGZJ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "$(TARGET_NAME)/Info.plist";
@@ -171,7 +192,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.Amelia.NYP-Open-House";
+				PRODUCT_BUNDLE_IDENTIFIER = com.nyp.openhouse;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "xros xrsimulator";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -188,7 +209,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"NYP Open House/Preview Content\"";
-				DEVELOPMENT_TEAM = 9M5QP98W44;
+				DEVELOPMENT_TEAM = FR63JFUGZJ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "$(TARGET_NAME)/Info.plist";
@@ -197,7 +218,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.Amelia.NYP-Open-House";
+				PRODUCT_BUNDLE_IDENTIFIER = com.nyp.openhouse;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "xros xrsimulator";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -348,7 +369,48 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		2A6707892EA2286B00BC1F75 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.4.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
+		2A67078A2EA2286B00BC1F75 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2A6707892EA2286B00BC1F75 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		2A67078C2EA2286B00BC1F75 /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2A6707892EA2286B00BC1F75 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		2A67078E2EA22C5500BC1F75 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2A6707892EA2286B00BC1F75 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		2A6707902EA22C5500BC1F75 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2A6707892EA2286B00BC1F75 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+		2AB8C0692EA9D769000833A6 /* FirebaseFirestoreCombine-Community */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2A6707892EA2286B00BC1F75 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = "FirebaseFirestoreCombine-Community";
+		};
+		2AE2F0062EAA08B000E083ED /* FirebaseInstallations */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2A6707892EA2286B00BC1F75 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseInstallations;
+		};
 		94AAA6AA2E1CFE1B00870514 /* RealityKitContent */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = RealityKitContent;
