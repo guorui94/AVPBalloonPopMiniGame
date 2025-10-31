@@ -1,30 +1,34 @@
+//
+//  EndGame.swift
+//  NYP Open House
+//
+
 import SwiftUI
 
 struct EndGame: View {
     let displayScore: Int
     let gameTitle: String
-    let playerInfo: AppModel.PlayerInfo?   // comes from AppModel
+    let playerInfo: AppModel.PlayerInfo?   // matches AppModel's nested type
 
     @Environment(AppModel.self) private var appModel
     @Environment(\.openImmersiveSpace) private var openImmersiveSpace
     @Environment(\.dismissWindow) private var dismissWindow
 
-    // Countdown state for replay button
+    // Countdown state for "Play Again"
     @State private var isRestarting: Bool = false
     @State private var restartCountdown: Int? = nil
-    @State private var hasSavedSession = false
 
     var body: some View {
         ZStack {
             VStack(spacing: 20) {
-                // Game title
+                // Title
                 Text(gameTitle)
                     .font(.extraLargeTitle)
                     .fontWeight(.bold)
                     .foregroundStyle(.cyan)
                     .multilineTextAlignment(.center)
 
-                // Score section
+                // Score
                 Text("Your Score")
                     .font(.title2)
                     .foregroundStyle(.white.opacity(0.85))
@@ -33,7 +37,7 @@ struct EndGame: View {
                     .font(.system(size: 96, weight: .heavy, design: .rounded))
                     .foregroundStyle(.white)
 
-                // Player info
+                // Player details (from the name/phone screen)
                 if let p = playerInfo {
                     VStack(spacing: 4) {
                         Text("Player: \(p.name)")
@@ -50,7 +54,7 @@ struct EndGame: View {
                         .foregroundStyle(.white.opacity(0.7))
                 }
 
-                // Replay and Close buttons
+                // Actions
                 HStack(spacing: 16) {
                     Button(action: { handlePlayAgainTap() }) {
                         Group {
@@ -62,6 +66,7 @@ struct EndGame: View {
                         }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
+                        
                     }
                     .buttonStyle(.borderedProminent)
                     .disabled(isRestarting)
@@ -83,51 +88,26 @@ struct EndGame: View {
             .glassBackgroundEffect(in: RoundedRectangle(cornerRadius: 32, style: .continuous))
         }
         .onAppear {
-            // Save to Firestore once per appearance
-            if !hasSavedSession {
-                hasSavedSession = true
-
-                Task {
-                    do {
-                        try await SessionService.saveSession(
-                            name: playerInfo?.name ?? "Unknown Player",
-                            phone: playerInfo?.phone ?? "N/A",
-                            gameType: gameTitle,
-                            score: displayScore
-                        )
-
-                        print("Session saved to Firestore ✅")
-                    } catch {
-                        print("❌ Firestore save failed:", error.localizedDescription)
-                    }
-                }
-
-                // Also update local model history
-                appModel.finalizeCurrentSession()
-            }
+            // Capture this run (writes to history with final score & session id)
+            appModel.finalizeCurrentSession()
         }
     }
 
-    // MARK: - Replay logic
+    // MARK: - Replay logic with countdown (skips info screen if contact already exists)
     private func handlePlayAgainTap() {
         if appModel.isBalloonGame {
-            // If we already have balloon contact, skip back to game immediately
             guard appModel.cachedBalloonContact != nil else {
                 appModel.currentScreen = .balloonIntro
                 return
             }
             startRestartCountdown(isBalloon: true)
-
         } else if appModel.isMemoryGame {
-            // If we already have memory contact, skip back to game immediately
             guard appModel.cachedMemoryContact != nil else {
                 appModel.currentScreen = .memoryGame
                 return
             }
             startRestartCountdown(isBalloon: false)
-
         } else {
-            // Fallback to menu
             appModel.currentScreen = .menu
         }
     }
@@ -144,11 +124,10 @@ struct EndGame: View {
             restartCountdown = nil
 
             if isBalloon {
-                // Reset session for balloon game
+                // Fresh session (resets score + new session ID)
                 appModel.startBalloonSession()
                 _ = await openImmersiveSpace(id: Module.bubbleSpace.name)
             } else {
-                // Reset session for memory game
                 appModel.startMemorySession()
                 _ = await openImmersiveSpace(id: Module.memorySpace.name)
             }
