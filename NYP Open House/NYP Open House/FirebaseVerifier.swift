@@ -1,23 +1,29 @@
+//
+//  FirebaseVerifier.swift
+//  NYP Open House
+//
+
 import Foundation
 import FirebaseCore
 import FirebaseAuth
 import FirebaseFirestore
 
-/// Debug helper you can call from anywhere (e.g. the "Verify Firebase Connection" button in ContentView)
+/// Call this using:
+///   Task { await verifyFirebasePlistAndConnection() }
 func verifyFirebasePlistAndConnection() async {
-    // A) Print which Firebase project we're actually pointing at
+    // A) Print which Firebase project we’re using
     if let opts = FirebaseApp.app()?.options {
-        print("🔍 Runtime Firebase check:")
-        print("   ProjectID:", opts.projectID ?? "nil")
-        print("   AppID:", opts.googleAppID)
-        print("   DB URL:", opts.databaseURL ?? "nil")
+        print("🔥 Firebase debug:")
+        print("  ProjectID:", opts.projectID ?? "nil")
+        print("  AppID:    ", opts.googleAppID)
+        print("  DB URL:   ", opts.databaseURL ?? "nil (OK for Firestore)")
     } else {
-        print("⚠️ No FirebaseApp configured. (Did AppDelegate run?)")
+        print("❌ No FirebaseApp configured (did AppDelegate.configure() run?).")
         return
     }
 
-    // B) Ensure we have an authenticated user (anonymous sign-in is fine)
-    var user: User?
+    // B) Ensure we have a Firebase Auth user (anonymous sign-in is fine)
+    let user: User
     if let current = Auth.auth().currentUser {
         user = current
     } else {
@@ -29,45 +35,69 @@ func verifyFirebasePlistAndConnection() async {
             return
         }
     }
+    print("✅ Auth user uid:", user.uid)
 
-    guard let u = user else {
-        print("⚠️ No user after sign-in?")
-        return
-    }
+    // C) Prepare a nice readable time (SGT) + server timestamp
+    let now = Date()
+    let sgtZone = TimeZone(identifier: "Asia/Singapore") ?? .current
+    let formatter = DateFormatter()
+    formatter.locale = Locale(identifier: "en_SG")
+    formatter.timeZone = sgtZone
+    formatter.dateFormat = "EEE, d MMM yyyy • h:mm:ss a 'SGT'"
+    let prettySGT = formatter.string(from: now)
 
-    print("✅ Auth user uid:", u.uid)
-
-    // We'll format a nice readable timestamp string
     let isoFormatter = ISO8601DateFormatter()
     isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-    let nowString = isoFormatter.string(from: Date())
+    let isoTime = isoFormatter.string(from: now)
 
-    // C) Try a Firestore write to a STABLE doc:
-    //    connectivity_check / status
-    //    This will overwrite the same doc each time, so you can just open it
-    //    in Firestore and see "ok", "when", and "uid".
+    // D) Write to a stable Firestore doc (so you can open it easily)
     let db = Firestore.firestore()
     let statusRef = db.collection("connectivity_check").document("status")
 
     do {
         try await statusRef.setData([
-            "ok": true,              // <- simple health flag
-            "when": nowString,       // <- readable time
-            "uid": u.uid,            // <- which Firebase Auth user was used
-            "platform": "visionOS",  // <- bonus: identify platform
-        ])
-        print("✅ Wrote connectivity_check/status")
+            "ok": true,                              // simple health flag
+            "uid": user.uid,                         // which Firebase Auth user
+            "platform": "visionOS",                  // device info
+            "when": FieldValue.serverTimestamp(),    // Firestore timestamp
+            "when_iso": isoTime,                     // ISO string for logs
+            "when_sgt": prettySGT                    // readable SGT time
+        ], merge: true)
+
+        print("✅ Wrote connectivity_check/status at \(prettySGT)")
     } catch {
-        print("❌ Test write failed:", error.localizedDescription)
+        print("❌ Firestore write failed:", error.localizedDescription)
+        suggestFixForPermissionsIfNeeded(error)
     }
 
-    // D) Try a read from sessions
+    // E) Try a read from sessions to confirm read access
     do {
-        _ = try await db.collection("sessions")
-            .limit(to: 1)
-            .getDocuments()
+        _ = try await db.collection("sessions").limit(to: 1).getDocuments()
         print("✅ Firestore read from 'sessions' succeeded.")
     } catch {
         print("❌ Firestore read from 'sessions' failed:", error.localizedDescription)
+        suggestFixForPermissionsIfNeeded(error)
+    }
+}
+
+/// If we hit permission errors, print quick guidance.
+private func suggestFixForPermissionsIfNeeded(_ error: Error) {
+    let msg = error.localizedDescription.lowercased()
+    if msg.contains("missing or insufficient permissions") || msg.contains("permission") {
+        print("""
+        🔐 Hint: Firestore security rules are blocking this request.
+        For quick testing, publish these temporary rules:
+
+          rules_version = '2';
+          service cloud.firestore {
+            match /databases/{database}/documents {
+              match /{document=**} {
+                allow read, write: if request.auth != null;
+              }
+            }
+          }
+
+        Then re-run the verifier.
+        """)
     }
 }
