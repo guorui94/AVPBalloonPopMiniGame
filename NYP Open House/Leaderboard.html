@@ -2,44 +2,35 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
-  />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>NYP Open House – Leaderboard</title>
   <style>
-    :root {
-      --bg: #0b0f1a;
-      --card: #111827;
-      --muted: #93a4b6;
-      --text: #e5eef7;
-      --accent: #22d3ee;
-    }
-    html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text);
-      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial; }
-    .wrap { max-width: 1100px; margin: 32px auto; padding: 0 16px; }
-    .title {
-      font-size: 40px; font-weight: 800; letter-spacing: .3px; margin: 0 0 4px;
-      background: linear-gradient(90deg, var(--accent), #60a5fa);
-      -webkit-background-clip: text; background-clip: text; color: transparent;
-    }
-    .subtitle { color: var(--muted); margin: 0 0 24px; }
-    .tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
-    .tab { background: #0f172a; border: 1px solid #1f2a44; color: var(--text);
-      padding: 8px 14px; border-radius: 999px; cursor: pointer; font-weight: 600; }
-    .tab.active { border-color: var(--accent); box-shadow: 0 0 0 2px #0a1722 inset; }
-    .card { background: var(--card); border: 1px solid #1f2a44; border-radius: 16px; overflow: hidden; }
-    .header, .row { display: grid; grid-template-columns: 72px 1fr 140px 220px;
-      padding: 14px 18px; align-items: center; gap: 12px; }
-    .header { color: #cbd5e1; font-weight: 700; border-bottom: 1px solid #1f2a44; background: #0f172a; }
-    .row:nth-child(even) { background: #0f172a; }
-    .rank { text-align: right; opacity: .9; font-variant-numeric: tabular-nums; }
-    .score { text-align: right; font-weight: 800; font-variant-numeric: tabular-nums; }
-    .when { text-align: right; color: var(--muted); font-variant-numeric: tabular-nums; }
-    .name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .footer { display: flex; justify-content: space-between; color: var(--muted);
-      font-size: 12px; padding: 10px 2px; margin-top: 10px; }
-    .ok { color: #34d399; } .err { color: #fca5a5; }
+    :root { --bg:#0b0f1a; --card:#111827; --muted:#93a4b6; --text:#e5eef7; --accent:#22d3ee; }
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
+      font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial}
+    .wrap{max-width:1100px;margin:32px auto;padding:0 16px}
+    .title{font-size:40px;font-weight:800;letter-spacing:.3px;margin:0 0 4px;
+      background:linear-gradient(90deg,var(--accent),#60a5fa);
+      -webkit-background-clip:text;background-clip:text;color:transparent}
+    .subtitle{color:var(--muted);margin:0 0 24px}
+    .tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+    .tab{background:#0f172a;border:1px solid #1f2a44;color:var(--text);
+      padding:8px 14px;border-radius:999px;cursor:pointer;font-weight:600}
+    .tab.active{border-color:var(--accent);box-shadow:0 0 0 2px #0a1722 inset}
+    .card{background:var(--card);border:1px solid #1f2a44;border-radius:16px;overflow:hidden}
+    .header,.row{display:grid;grid-template-columns:72px 1fr 170px 120px 180px;
+      padding:14px 18px;align-items:center;gap:12px}
+    .header{color:#cbd5e1;font-weight:700;border-bottom:1px solid #1f2a44;background:#0f172a}
+    .row:nth-child(even){background:#0f172a}
+    .rank{text-align:right;opacity:.9;font-variant-numeric:tabular-nums}
+    .score{text-align:right;font-weight:800;font-variant-numeric:tabular-nums}
+    .when{text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
+    .name{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .phone{color:#cbd5e1; display:flex; align-items:center; gap:8px}
+    .reveal{background:#0f172a;border:1px solid #1f2a44;color:var(--text);
+      padding:4px 8px;border-radius:8px;cursor:pointer;font-size:12px}
+    .footer{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;padding:10px 2px;margin-top:10px}
+    .ok{color:#34d399}.err{color:#fca5a5}
   </style>
 </head>
 <body>
@@ -53,6 +44,7 @@
       <div class="header">
         <div class="rank">#</div>
         <div>Player</div>
+        <div>Phone</div>
         <div class="score">Score</div>
         <div class="when">When</div>
       </div>
@@ -68,12 +60,10 @@
   <!-- Firebase v9 modular SDKs from CDN -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-    import {
-      getFirestore, collection, query, where, orderBy, limit, onSnapshot
-    } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+    import { getFirestore, collection, query, where, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
     import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
 
-    // Your Firebase Web App config
+    // --- Firebase config (your project) ---
     const firebaseConfig = {
       apiKey: "AIzaSyDGb2cB7XZe_ggOLahMLXdUOzolSIdvndA",
       authDomain: "nyp-open-house.firebaseapp.com",
@@ -89,8 +79,9 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
 
-    // Page wiring
+    // --- Page wiring ---
     const GAMES = ["Balloon Frenzy", "ARcade of Memories"];
+    const ROTATE_MS = 10000; // 10 seconds per game
     const tabsEl = document.getElementById("tabs");
     const rowsEl = document.getElementById("rows");
     const activeGameEl = document.getElementById("activeGame");
@@ -98,97 +89,123 @@
 
     let unsub = null;
     let selectedGame = (new URLSearchParams(location.search)).get("game") || GAMES[0];
+    let rotateTimer = null;
 
-    function fmtDate(ts) {
-      if (!ts) return "—";
+    function fmtDate(ts){
+      if(!ts) return "—";
       const d = ts.toDate ? ts.toDate() : new Date(ts);
-      return d.toLocaleString(undefined, {
-        year: "numeric", month: "2-digit", day: "2-digit",
-        hour: "2-digit", minute: "2-digit"
-      });
+      return d.toLocaleString(undefined,{year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"});
     }
+    function maskPhone(p){
+      if(!p) return "—";
+      const digits = (p+"").replace(/\D/g,"");
+      const last4 = digits.slice(-4);
+      return `****${last4}`;
+    }
+    function formatPhone(p){ // simple pretty format
+      if(!p) return "—";
+      const digits=(p+"").replace(/\D/g,"");
+      if(digits.length===8) return digits.replace(/(\d{4})(\d{4})/,"$1 $2");          // SG 8-digit
+      if(digits.length===10) return digits.replace(/(\d{3})(\d{3})(\d{4})/,"$1-$2-$3");
+      if(digits.length===11) return digits.replace(/(\d)(\d{4})(\d{3,4})(\d{3})/,"$1 $2 $3 $4");
+      return p; // fallback original
+    }
+    function esc(s){return s.toString().replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));}
 
-    function renderTabs() {
+    function renderTabs(){
       tabsEl.innerHTML = "";
-      GAMES.forEach(g => {
-        const b = document.createElement("button");
-        b.className = "tab" + (g === selectedGame ? " active" : "");
-        b.textContent = g;
-        b.onclick = () => {
-          if (g === selectedGame) return;
-          selectedGame = g;
-          history.replaceState({}, "", `?game=${encodeURIComponent(g)}`);
-          renderTabs();
-          watchGame(g);
-        };
+      GAMES.forEach(g=>{
+        const b=document.createElement("button");
+        b.className="tab"+(g===selectedGame?" active":"");
+        b.textContent=g;
+        b.onclick=()=>switchGame(g,true);
         tabsEl.appendChild(b);
       });
       activeGameEl.textContent = selectedGame;
     }
 
-    function renderRows(docs) {
-      rowsEl.innerHTML = "";
-      if (!docs.length) {
-        const empty = document.createElement("div");
-        empty.className = "row";
-        empty.innerHTML = `
-          <div class="rank">—</div>
-          <div class="name" style="opacity:.7">No scores yet</div>
-          <div class="score">—</div>
-          <div class="when">—</div>
-        `;
-        rowsEl.appendChild(empty);
+    function renderRows(docs){
+      rowsEl.innerHTML="";
+      if(!docs.length){
+        rowsEl.innerHTML = `<div class="row">
+            <div class="rank">—</div>
+            <div class="name" style="opacity:.7">No scores yet</div>
+            <div class="phone">—</div>
+            <div class="score">—</div>
+            <div class="when">—</div>
+          </div>`;
         return;
       }
-      docs.forEach((doc, i) => {
-        const d = doc.data();
-        const r = document.createElement("div");
-        r.className = "row";
-        r.innerHTML = `
-          <div class="rank">${i + 1}</div>
-          <div class="name">${(d.name || "Player")
-            .toString()
-            .replace(/[<>&]/g, s => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[s]))}</div>
+      docs.forEach((doc,i)=>{
+        const d=doc.data();
+        const masked = maskPhone(d.phone);
+        const fullPretty = formatPhone(d.phone);
+
+        const row=document.createElement("div");
+        row.className="row";
+        row.innerHTML=`
+          <div class="rank">${i+1}</div>
+          <div class="name">${esc(d.name || "Player")}</div>
+          <div class="phone">
+            <span class="phone-text">${masked}</span>
+            <button class="reveal" data-full="${esc(fullPretty)}" data-masked="${esc(masked)}" data-state="masked" aria-label="Toggle phone visibility">Show</button>
+          </div>
           <div class="score">${d.score ?? 0}</div>
           <div class="when">${fmtDate(d.createdAt)}</div>
         `;
-        rowsEl.appendChild(r);
+        rowsEl.appendChild(row);
+
+        // attach toggle handler
+        const btn = row.querySelector("button.reveal");
+        const span = row.querySelector("span.phone-text");
+        btn.addEventListener("click", ()=>{
+          const showingFull = btn.dataset.state === "full";
+          if(showingFull){
+            span.textContent = btn.dataset.masked;
+            btn.textContent = "Show";
+            btn.dataset.state = "masked";
+          }else{
+            span.textContent = btn.dataset.full;
+            btn.textContent = "Hide";
+            btn.dataset.state = "full";
+          }
+        });
       });
     }
 
-    function setStatus(ok, msg) {
-      statusEl.innerHTML = ok ? `<span class="ok">●</span> ${msg}` : `<span class="err">●</span> ${msg}`;
-    }
+    function setStatus(ok,msg){ statusEl.innerHTML = ok ? `<span class="ok">●</span> ${msg}` : `<span class="err">●</span> ${msg}`; }
 
-    // Live query for selected game
-    function watchGame(game) {
-      if (unsub) { unsub(); unsub = null; }
-      setStatus(true, "Live");
-
+    function watchGame(game){
+      if(unsub){unsub();unsub=null;}
+      setStatus(true,"Live");
       const qRef = query(
-        collection(db, "sessions"),
-        where("gameType", "==", game),
-        orderBy("score", "desc"),
+        collection(db,"sessions"),
+        where("gameType","==",game),
+        orderBy("score","desc"),
         limit(50)
       );
+      unsub = onSnapshot(qRef,(snap)=>renderRows(snap.docs),(err)=>{console.error(err);setStatus(false,err.message||"Listener error");});
+    }
 
-      unsub = onSnapshot(qRef, (snap) => {
-        renderRows(snap.docs);
-      }, (err) => {
-        console.error(err);
-        setStatus(false, err.message || "Listener error");
-      });
+    function switchGame(game,stopAuto=false){
+      selectedGame = game;
+      history.replaceState({}, "", `?game=${encodeURIComponent(game)}`);
+      renderTabs();
+      watchGame(game);
+      if(stopAuto && rotateTimer){ clearInterval(rotateTimer); rotateTimer=null; }
     }
 
     // Start
     renderTabs();
-
-    // Anonymous auth (safe to keep even if reads are public)
-    onAuthStateChanged(auth, (u) => {
-      if (!u) signInAnonymously(auth).catch(console.error);
-    });
-
+    onAuthStateChanged(auth,(u)=>{ if(!u) signInAnonymously(auth).catch(console.error); });
     watchGame(selectedGame);
+
+    // Auto-rotate every 10s
+    rotateTimer = setInterval(()=>{
+      const idx = GAMES.indexOf(selectedGame);
+      const next = GAMES[(idx+1)%GAMES.length];
+      switchGame(next,false);
+    }, ROTATE_MS);
   </script>
 </body>
 </html>
