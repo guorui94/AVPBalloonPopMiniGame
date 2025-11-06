@@ -12,11 +12,13 @@
 		2A67078F2EA22C5500BC1F75 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 2A67078E2EA22C5500BC1F75 /* FirebaseAuth */; };
 		2A6707912EA22C5500BC1F75 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 2A6707902EA22C5500BC1F75 /* FirebaseFirestore */; };
 		2AB8C06A2EA9D769000833A6 /* FirebaseFirestoreCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = 2AB8C0692EA9D769000833A6 /* FirebaseFirestoreCombine-Community */; };
+		2AD07F7A2EBCA41500E004B3 /* Leaderboard.html in Resources */ = {isa = PBXBuildFile; fileRef = 2AD07F792EBCA41500E004B3 /* Leaderboard.html */; };
 		2AE2F0072EAA08B000E083ED /* FirebaseInstallations in Frameworks */ = {isa = PBXBuildFile; productRef = 2AE2F0062EAA08B000E083ED /* FirebaseInstallations */; };
 		94AAA6AB2E1CFE1B00870514 /* RealityKitContent in Frameworks */ = {isa = PBXBuildFile; productRef = 94AAA6AA2E1CFE1B00870514 /* RealityKitContent */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2AD07F792EBCA41500E004B3 /* Leaderboard.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = Leaderboard.html; sourceTree = "<group>"; };
 		94AAA6A52E1CFE1B00870514 /* NYP Open House.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "NYP Open House.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		94AAA6A92E1CFE1B00870514 /* RealityKitContent */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = RealityKitContent; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -66,6 +68,7 @@
 				94AAA6A72E1CFE1B00870514 /* NYP Open House */,
 				94AAA6A82E1CFE1B00870514 /* Packages */,
 				94AAA6A62E1CFE1B00870514 /* Products */,
+				2AD07F792EBCA41500E004B3 /* Leaderboard.html */,
 			);
 			sourceTree = "<group>";
 		};
@@ -159,6 +162,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2AD07F7A2EBCA41500E004B3 /* Leaderboard.html in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
