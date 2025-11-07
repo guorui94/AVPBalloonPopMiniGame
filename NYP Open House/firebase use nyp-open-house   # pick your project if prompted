@@ -1,0 +1,19 @@
+// firestore.rules
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Sessions: app writes, leaderboard reads
+    match /sessions/{sid} {
+      allow create: if request.auth != null;   // your app writes
+      allow read: if true;                     // public read for demo
+      allow update, delete: if false;
+    }
+
+    // (Optional) Leaderboards materialized by a Cloud Function
+    match /leaderboards/{gameId}/scores/{uid} {
+      allow read: if true;
+      allow write: if false;
+    }
+  }
+}
