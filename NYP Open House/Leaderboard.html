@@ -1,47 +1,84 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
   <title>NYP Open House – Leaderboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <style>
-    :root { --bg:#0b0f1a; --card:#111827; --muted:#93a4b6; --text:#e5eef7; --accent:#22d3ee; }
-    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
-      font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial}
-    .wrap{max-width:1100px;margin:32px auto;padding:0 16px}
-    .title{font-size:40px;font-weight:800;letter-spacing:.3px;margin:0 0 4px;
-      background:linear-gradient(90deg,var(--accent),#60a5fa);
-      -webkit-background-clip:text;background-clip:text;color:transparent}
+    :root{
+      --bg:#0b0f1a; --text:#e5eef7; --muted:#93a4b6; --card:#0f172a; --line:#1f2a44;
+      --accent:#22d3ee; --accent2:#60a5fa; --ok:#34d399; --err:#f87171; --shadow:0 8px 24px rgba(0,0,0,.35);
+    }
+    @media (prefers-color-scheme: light){
+      :root{ --bg:#f9fafb; --text:#0f172a; --muted:#6b7280; --card:#ffffff; --line:#e5e7eb; --shadow:0 6px 16px rgba(0,0,0,.08); }
+    }
 
-    .toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:16px 0 12px}
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial}
+
+    /* Bring the gradient higher so the top band looks filled-in */
+    body{
+      background:
+        radial-gradient(1400px 720px at 10% -20%, rgba(34,211,238,.18), transparent 60%),
+        radial-gradient(1200px 600px at 90% -10%, rgba(96,165,250,.12), transparent 60%),
+        var(--bg);
+      animation:hueShift 40s linear infinite;
+    }
+    @media (prefers-reduced-motion: reduce){ body{animation:none} }
+    @keyframes hueShift{from{filter:hue-rotate(0)}to{filter:hue-rotate(360deg)}}
+
+    .wrap{max-width:1200px;margin:18px auto 32px; padding:0 16px} /* tighter top gap */
+    .title{
+      font-size:clamp(28px,3.5vw,44px);font-weight:800;margin:0 0 6px;
+      background:linear-gradient(90deg,var(--accent),var(--accent2));
+      -webkit-background-clip:text;background-clip:text;color:transparent;
+    }
+
+    .toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:10px 0 14px} /* less vertical space */
     .tabs{display:flex;gap:8px;flex-wrap:wrap}
-    .pill{background:#0f172a;border:1px solid #1f2a44;color:var(--text);
-      padding:8px 14px;border-radius:999px;cursor:pointer;font-weight:600}
-    .pill.active{border-color:var(--accent);box-shadow:0 0 0 2px #0a1722 inset}
-
-    .rotor{display:flex;gap:10px;align-items:center;background:#0f172a;border:1px solid #1f2a44;
-      padding:6px 10px;border-radius:10px}
-    .btn{background:#0f172a;border:1px solid #1f2a44;color:var(--text);
-      padding:6px 10px;border-radius:8px;cursor:pointer;font-size:12px}
+    .pill{background:var(--card);border:1px solid var(--line);padding:9px 14px;border-radius:999px;cursor:pointer;font-weight:600;color:var(--text);box-shadow:var(--shadow);transition:.25s}
+    .pill.active{border-color:var(--accent);box-shadow:inset 0 0 0 2px rgba(34,211,238,.22), var(--shadow)}
+    .pill:hover{transform:translateY(-1px)}
+    .rotor{display:flex;gap:10px;align-items:center;background:var(--card);border:1px solid var(--line);padding:8px 12px;border-radius:12px;box-shadow:var(--shadow)}
+    .btn{background:var(--card);border:1px solid var(--line);color:var(--text);padding:6px 10px;border-radius:8px;cursor:pointer;font-size:12px}
     .badge{font-size:12px;color:var(--muted)}
-    .progress{width:140px;height:6px;background:#0b1324;border-radius:999px;overflow:hidden}
-    .bar{height:100%;background:var(--accent);width:0%}
+    .progress{width:160px;height:6px;background:rgba(15,23,42,.35);border-radius:999px;overflow:hidden}
+    .bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0%}
 
-    .card{background:var(--card);border:1px solid #1f2a44;border-radius:16px;overflow:hidden}
-    .header,.row{display:grid;grid-template-columns:72px 1fr 120px 180px;
-      padding:14px 18px;align-items:center;gap:12px}
-    .header{color:#cbd5e1;font-weight:700;border-bottom:1px solid #1f2a44;background:#0f172a}
-    .row:nth-child(even){background:#0f172a}
-    .rank{text-align:right;opacity:.9;font-variant-numeric:tabular-nums}
-    .score{text-align:right;font-weight:800;font-variant-numeric:tabular-nums}
-    .played{text-align:right;color:#cbd5e1;font-variant-numeric:tabular-nums}
+    .card{background:rgba(15,23,42,.6);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
+    .header,.row{display:grid;grid-template-columns:84px 1fr 140px 220px;gap:12px;align-items:center;padding:14px 18px}
+    .header{color:#cbd5e1;font-weight:700;border-bottom:1px solid var(--line);background:linear-gradient(180deg, rgba(15,23,42,.85), rgba(15,23,42,.65))}
+    .row{background:rgba(2,6,23,.25);transition:.25s}
+    .row:nth-child(even){background:rgba(2,6,23,.35)}
+    .row:hover{transform:translateY(-1px);background:rgba(2,6,23,.45)}
+    .rank{text-align:right;opacity:.95;font-variant-numeric:tabular-nums}
     .name{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .score{text-align:right;font-weight:800;position:relative;font-variant-numeric:tabular-nums}
+    .played{text-align:right;color:#cbd5e1;font-variant-numeric:tabular-nums}
+
+    .row.top1{box-shadow:inset 0 0 0 2px rgba(255,215,0,.25)}
+    .row.top2{box-shadow:inset 0 0 0 2px rgba(192,192,192,.22)}
+    .row.top3{box-shadow:inset 0 0 0 2px rgba(205,127,50,.22)}
+    .medal{display:inline-block;width:22px;height:22px;border-radius:50%;margin-right:8px;vertical-align:-5px;box-shadow:0 0 10px rgba(255,255,255,.15)}
+    .m1{background:radial-gradient(circle at 35% 35%, #fff7b3, #ffd900)}
+    .m2{background:radial-gradient(circle at 35% 35%, #f6f6f6, #c0c0c0)}
+    .m3{background:radial-gradient(circle at 35% 35%, #ffe0bf, #cd7f32)}
 
     .footer{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;padding:10px 2px;margin-top:10px}
-    .ok{color:#34d399}.err{color:#fca5a5}
+    .ok{color:var(--ok)} .err{color:var(--err)}
+
+    .fade-enter{opacity:0;transform:translateY(6px)}
+    .fade-enter-active{opacity:1;transform:none;transition:opacity .25s ease, transform .25s ease}
+    .fade-exit{opacity:1}
+    .fade-exit-active{opacity:0;transition:opacity .2s ease}
+
+    #confettiCanvas{position:fixed;inset:0;pointer-events:none}
   </style>
 </head>
 <body>
+  <canvas id="confettiCanvas"></canvas>
+
   <div class="wrap">
     <h1 class="title">NYP Open House Leaderboard</h1>
 
@@ -52,16 +89,17 @@
         <div class="badge" id="countdownText">Next in 10s</div>
         <div class="progress"><div class="bar" id="progressBar"></div></div>
       </div>
+      <div class="badge" id="lastUpdated"></div>
     </div>
 
-    <div class="card">
-      <div class="header">
-        <div class="rank">#</div>
-        <div>Player</div>
-        <div class="score">Score</div>
-        <div class="played">Played on</div>
+    <div class="card" role="table" aria-label="Leaderboard">
+      <div class="header" role="row">
+        <div class="rank" role="columnheader">#</div>
+        <div role="columnheader">Player</div>
+        <div class="score" role="columnheader">Score</div>
+        <div class="played" role="columnheader">Played on</div>
       </div>
-      <div id="rows"></div>
+      <div id="rows" aria-live="polite"></div>
     </div>
 
     <div class="footer">
@@ -70,56 +108,54 @@
     </div>
   </div>
 
-  <!-- Firebase (v10+) CDN -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
     import { getFirestore, collection, query, where, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
     import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
 
-    // your project config
     const firebaseConfig = {
       apiKey: "AIzaSyDGb2cB7XZe_ggOLahMLXdUOzolSIdvndA",
       authDomain: "nyp-open-house.firebaseapp.com",
       projectId: "nyp-open-house",
       storageBucket: "nyp-open-house.firebasestorage.app",
       messagingSenderId: "401402380709",
-      appId: "1:401402380709:web:de63baa06171ff42cee84c",
-      measurementId: "G-P0D7ECHCSJ"
+      appId: "1:401402380709:web:de63baa06171ff42cee84c"
     };
 
-    // init
     const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    const db  = getFirestore(app);
     const auth = getAuth(app);
 
-    // page state
     const GAMES = ["Balloon Frenzy", "ARcade of Memories"];
-    const ROTATE_MS = 10000;
+    const params = new URLSearchParams(location.search);
+    const ROTATE_MS = Math.max(3000, parseInt(params.get("interval") || 10000, 10));
 
     const tabsEl = document.getElementById("tabs");
     const rowsEl = document.getElementById("rows");
     const activeGameEl = document.getElementById("activeGame");
     const statusEl = document.getElementById("status");
+    const lastUpdatedEl = document.getElementById("lastUpdated");
     const toggleRotateBtn = document.getElementById("toggleRotateBtn");
     const countdownText = document.getElementById("countdownText");
     const progressBar = document.getElementById("progressBar");
+    const confettiCanvas = document.getElementById("confettiCanvas");
+    const ctx = confettiCanvas.getContext('2d');
 
     let unsub = null;
-    let selectedGame = (new URLSearchParams(location.search)).get("game") || GAMES[0];
+    let selectedGame = params.get("game") || GAMES[0];
     let countdownTimer = null;
     let rotateEnabled = true;
     let secondsLeft = ROTATE_MS / 1000;
+    const bestTopScore = new Map();
 
-    // helpers
     const esc = (s) => s?.toString().replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c])) ?? "";
     const fmtDate = (ts) => {
       if(!ts) return "—";
       const d = ts.toDate ? ts.toDate() : new Date(ts);
-      return d.toLocaleString(undefined,{year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"});
+      return d.toLocaleString(undefined, { year:"numeric", month:"2-digit", day:"2-digit", hour:"2-digit", minute:"2-digit" });
     };
     const setStatus = (ok,msg) => statusEl.innerHTML = ok ? `<span class="ok">●</span> ${msg}` : `<span class="err">●</span> ${msg}`;
 
-    // ui
     function renderTabs(){
       tabsEl.innerHTML = "";
       GAMES.forEach(g=>{
@@ -132,55 +168,100 @@
       activeGameEl.textContent = selectedGame;
     }
 
-    function renderRows(docs){
-      rowsEl.innerHTML = "";
-      if(!docs.length){
-        rowsEl.innerHTML = `<div class="row">
-          <div class="rank">—</div>
-          <div class="name" style="opacity:.7">No scores yet</div>
-          <div class="score">—</div>
-          <div class="played">—</div>
-        </div>`;
-        return;
-      }
-      docs.forEach((doc,i)=>{
-        const d = doc.data();
-        const row=document.createElement("div");
-        row.className="row";
-        row.innerHTML=`
-          <div class="rank">${i+1}</div>
-          <div class="name">${esc(d.name || "Player")}</div>
-          <div class="score">${d.score ?? 0}</div>
-          <div class="played">${fmtDate(d.createdAt)}</div>
-        `;
-        rowsEl.appendChild(row);
-      });
+    function applyTableTransition(nextRender){
+      rowsEl.classList.add("fade-exit","fade-exit-active");
+      setTimeout(()=>{
+        rowsEl.className = "";
+        rowsEl.classList.add("fade-enter");
+        nextRender();
+        requestAnimationFrame(()=>{
+          rowsEl.classList.add("fade-enter-active");
+          setTimeout(()=>rowsEl.className="", 260);
+        });
+      }, 180);
     }
 
-    // data
+    function renderRows(docs){
+      const doRender = ()=>{
+        rowsEl.innerHTML = "";
+        if(!docs.length){
+          rowsEl.innerHTML = `<div class="row" role="row">
+            <div class="rank" role="cell">—</div>
+            <div class="name" role="cell" style="opacity:.7)">No scores yet</div>
+            <div class="score" role="cell">—</div>
+            <div class="played" role="cell">—</div>
+          </div>`;
+          return;
+        }
+        docs.forEach((doc,i)=>{
+          const d = doc.data();
+          const row=document.createElement("div");
+          row.className="row";
+          row.setAttribute("role","row");
+          if(i===0) row.classList.add("top1");
+          if(i===1) row.classList.add("top2");
+          if(i===2) row.classList.add("top3");
+
+          const medal = (i===0) ? `<span class="medal m1"></span>`
+                      : (i===1) ? `<span class="medal m2"></span>`
+                      : (i===2) ? `<span class="medal m3"></span>` : "";
+
+          row.innerHTML = `
+            <div class="rank" role="cell">${i<3 ? medal : ""}${i+1}</div>
+            <div class="name" role="cell">${esc(d.name || "Player")}</div>
+            <div class="score" role="cell">${d.score ?? 0}</div>
+            <div class="played" role="cell">${fmtDate(d.createdAt)}</div>
+          `;
+          rowsEl.appendChild(row);
+        });
+
+        const top = docs[0]?.data();
+        if(top && typeof top.score === "number"){
+          const best = bestTopScore.get(selectedGame) ?? -Infinity;
+          if(top.score > best){
+            bestTopScore.set(selectedGame, top.score);
+            burstConfetti('record');
+          } else if (best === -Infinity) {
+            bestTopScore.set(selectedGame, top.score);
+          }
+        }
+      };
+      applyTableTransition(doRender);
+    }
+
     function watchGame(game){
       if(unsub){unsub();unsub=null;}
       setStatus(true,"Live");
+
       const qRef = query(
-        collection(db,"sessions"),
+        collection(db, "sessions"),
         where("gameType","==",game),
         orderBy("score","desc"),
         limit(50)
       );
-      unsub = onSnapshot(qRef,(snap)=>renderRows(snap.docs),(err)=>{ console.error(err); setStatus(false, err.message||"Listener error");});
+
+      unsub = onSnapshot(qRef, (snap)=>{
+        renderRows(snap.docs);
+        lastUpdatedEl.textContent = "Last update " + new Date().toLocaleTimeString();
+      }, (err)=>{
+        console.error(err);
+        setStatus(false, err.message || "Listener error");
+      });
     }
 
-    function switchGame(game,stopRotate=false){
+    function switchGame(game, stopRotate=false){
       selectedGame = game;
-      history.replaceState({}, "", `?game=${encodeURIComponent(game)}`);
+      const p = new URLSearchParams(location.search);
+      p.set("game", game);
+      history.replaceState({}, "", `?${p.toString()}`);
       renderTabs();
       watchGame(game);
+      burstConfetti('switch');  // lighter burst on every game change
       if(stopRotate) resetCountdown();
     }
 
-    // rotation + countdown
     function resetCountdown(){
-      secondsLeft = ROTATE_MS/1000;
+      secondsLeft = Math.round(ROTATE_MS/1000);
       progressBar.style.width = "0%";
       countdownText.textContent = `Next in ${secondsLeft}s`;
     }
@@ -192,13 +273,12 @@
       countdownText.textContent = `Next in ${Math.max(0, secondsLeft)}s`;
       if(secondsLeft <= 0){
         const idx = GAMES.indexOf(selectedGame);
-        const next = GAMES[(idx+1)%GAMES.length];
-        switchGame(next,false);
+        switchGame(GAMES[(idx+1)%GAMES.length], false);
         resetCountdown();
       }
     }
     function startRotate(){
-      stopRotate(); // clear old timer
+      stopRotate();
       rotateEnabled = true;
       toggleRotateBtn.textContent = "⏸ Pause";
       resetCountdown();
@@ -209,15 +289,54 @@
       toggleRotateBtn.textContent = "▶ Resume";
       if(countdownTimer){ clearInterval(countdownTimer); countdownTimer=null; }
     }
+    toggleRotateBtn.addEventListener("click", ()=> rotateEnabled ? stopRotate() : startRotate());
 
-    // controls
-    toggleRotateBtn.addEventListener("click", ()=>{
-      if(rotateEnabled) stopRotate(); else startRotate();
-    });
+    function resizeCanvas(){ confettiCanvas.width = innerWidth; confettiCanvas.height = innerHeight; }
+    addEventListener('resize', resizeCanvas, { passive:true }); resizeCanvas();
 
-    // start
+    function burstConfetti(mode='switch'){
+      if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      const colors = selectedGame === "Balloon Frenzy"
+        ? ['#22d3ee','#60a5fa','#38bdf8','#a5f3fc','#06b6d4']
+        : ['#f472b6','#c084fc','#f9a8d4','#f0abfc','#ec4899'];
+
+      const N = mode === 'record' ? 180 : 110;
+      const gravity = mode === 'record' ? 0.10 : 0.08;
+      const lifeBase = mode === 'record' ? 80 : 60;
+
+      const parts = Array.from({length:N}, () => ({
+        x: Math.random()*confettiCanvas.width,
+        y: -20,
+        vx: (Math.random()-0.5)*(mode==='record'?7:6),
+        vy: (Math.random()*(mode==='record'?5:4)) + (mode==='record'?3.5:3),
+        size: (Math.random()*4)+2,
+        color: colors[Math.floor(Math.random()*colors.length)],
+        life: (Math.random()*lifeBase) + lifeBase
+      }));
+
+      let raf = null;
+      function step(){
+        ctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
+        parts.forEach(p=>{
+          p.x += p.vx; p.y += p.vy; p.vy += gravity; p.life -= 1;
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = Math.max(0, Math.min(1, p.life/(lifeBase*1.2)));
+          ctx.fillRect(p.x, p.y, p.size, p.size*1.6);
+        });
+        ctx.globalAlpha = 1;
+        if(parts.some(p=>p.life>0 && p.y < confettiCanvas.height+20)){
+          raf = requestAnimationFrame(step);
+        } else {
+          ctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
+          cancelAnimationFrame(raf);
+        }
+      }
+      requestAnimationFrame(step);
+    }
+
     renderTabs();
-    onAuthStateChanged(auth,(u)=>{ if(!u) signInAnonymously(auth).catch(console.error); });
+    onAuthStateChanged(auth, (u)=>{ if(!u) signInAnonymously(auth).catch(console.error); });
     watchGame(selectedGame);
     startRotate();
   </script>

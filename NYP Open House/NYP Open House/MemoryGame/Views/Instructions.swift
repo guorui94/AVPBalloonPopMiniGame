@@ -14,24 +14,15 @@ struct Instructions: View {
     @State private var countdown: Int? = nil
     @State private var isFadingOut = false
 
-    // --- Form fields (memory game)
+    // --- Form field (name only)
     @State private var playerName: String = ""
-    @State private var playerPhone: String = ""
 
     // --- Validation alert
     @State private var showValidationAlert = false
     @State private var validationMessage = ""
 
-    // Phone validation (SG: optional +65, then 8 digits starting with 6/8/9)
-    private var isValidPhone: Bool {
-        let trimmed = playerPhone.trimmingCharacters(in: .whitespacesAndNewlines)
-        let compact = trimmed.replacingOccurrences(of: #"[ \-]"#, with: "", options: .regularExpression)
-        let pattern = #"^(?:\+65)?(?:[689]\d{7})$"#
-        return NSPredicate(format: "SELF MATCHES %@", pattern).evaluate(with: compact)
-    }
-
     private var isFormValid: Bool {
-        !playerName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && isValidPhone
+        !playerName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
     var body: some View {
@@ -75,7 +66,7 @@ struct Instructions: View {
                             .fontWeight(.semibold)
                             .foregroundStyle(.white)
 
-                        // --- Name + Phone fields
+                        // --- Name field
                         VStack(spacing: 10) {
                             VStack(alignment: .leading, spacing: 4) {
                                 Text("Your Name")
@@ -88,41 +79,18 @@ struct Instructions: View {
                                     .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
                                     .overlay(
                                         RoundedRectangle(cornerRadius: 12)
-                                            .stroke(playerName.isEmpty ? .white.opacity(0.35) : .cyan.opacity(0.8), lineWidth: 1)
-                                    )
-                                    .frame(maxWidth: 520)
-                            }
-
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Phone Number")
-                                    .font(.headline)
-                                    .foregroundStyle(.white.opacity(0.9))
-                                TextField("+65 9123 4567", text: $playerPhone)
-                                    .textContentType(.telephoneNumber)
-                                    .keyboardType(.phonePad)
-                                    .submitLabel(.done)
-                                    .padding(12)
-                                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 12)
                                             .stroke(
-                                                playerPhone.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                                                playerName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
                                                 ? .white.opacity(0.35)
-                                                : (isValidPhone ? .cyan.opacity(0.8) : .red.opacity(0.7)),
+                                                : .cyan.opacity(0.8),
                                                 lineWidth: 1
                                             )
                                     )
-                                    .frame(maxWidth: 540)
-
-                                if !playerPhone.isEmpty && !isValidPhone {
-                                    Text("Please enter a valid phone number (e.g., +65 9123 4567).")
-                                        .font(.footnote)
-                                        .foregroundStyle(.red)
-                                }
+                                    .frame(maxWidth: 520)
                             }
                         }
 
-                        // --- Start Button (same style as Balloon)
+                        // --- Start Button (same style)
                         Button(action: { handleStartTap() }) {
                             Group {
                                 if let currentCount = countdown {
@@ -142,13 +110,12 @@ struct Instructions: View {
                             )
                         }
                         .padding(.top, 10)
-                        .disabled(isStarting)
+                        .disabled(isStarting || !isFormValid)
                         .buttonStyle(.plain)
 
                         // Footer note
                         VStack(spacing: 4) {
-                            Text("We only use your name and phone number to save scores and contact winners.")
-                            Text("Nothing is shared externally.")
+                            Text("We only use your name to save scores.")
                         }
                         .font(.footnote)
                         .foregroundStyle(.white.opacity(0.75))
@@ -182,10 +149,9 @@ struct Instructions: View {
             }
         }
         .onAppear {
-            // Load per-game (memory) cached contact
+            // Load per-game (memory) cached contact; ignore phone going forward
             if let cached = appModel.cachedMemoryContact {
                 playerName = cached.name
-                playerPhone = cached.phone
             }
         }
         .alert("Incomplete Information", isPresented: $showValidationAlert) {
@@ -198,18 +164,18 @@ struct Instructions: View {
     // MARK: - Actions
     private func handleStartTap() {
         let nameEmpty  = playerName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-        let phoneEmpty = playerPhone.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-
-        if nameEmpty && phoneEmpty { validationMessage = "Please enter your name and phone number."; showValidationAlert = true; return }
-        if nameEmpty { validationMessage = "Please enter your name."; showValidationAlert = true; return }
-        if phoneEmpty { validationMessage = "Please enter your phone number."; showValidationAlert = true; return }
-        if !isValidPhone { validationMessage = "Please enter a valid phone number (e.g., +65 9123 4567)."; showValidationAlert = true; return }
+        if nameEmpty {
+            validationMessage = "Please enter your name."
+            showValidationAlert = true
+            return
+        }
         startCountdown()
     }
 
     private func startCountdown() {
         // Save per-game (memory) contact + start fresh session
-        appModel.setMemoryContact(name: playerName, phone: playerPhone)
+        // Pass empty string for phone to avoid changing AppModel for now.
+        appModel.setMemoryContact(name: playerName, phone: "")
         appModel.startMemorySession()
 
         countdown = 3

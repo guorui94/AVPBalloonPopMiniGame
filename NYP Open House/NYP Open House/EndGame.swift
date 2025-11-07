@@ -1,12 +1,10 @@
-//  EndGame.swift
-//  NYP Open House
-
+// Views/EndGame.swift
 import SwiftUI
 
 struct EndGame: View {
     let displayScore: Int
     let gameTitle: String
-    let playerInfo: AppModel.PlayerInfo?
+    let playerInfo: AppModel.PlayerInfo?   // now only has `name`
 
     @Environment(AppModel.self) private var appModel
     @Environment(\.openImmersiveSpace) private var openImmersiveSpace
@@ -19,14 +17,14 @@ struct EndGame: View {
     var body: some View {
         ZStack {
             VStack(spacing: 20) {
-                // Title
+                // Game title
                 Text(gameTitle)
                     .font(.extraLargeTitle)
                     .fontWeight(.bold)
                     .foregroundStyle(.cyan)
                     .multilineTextAlignment(.center)
 
-                // Score
+                // Score section
                 Text("Your Score")
                     .font(.title2)
                     .foregroundStyle(.white.opacity(0.85))
@@ -35,24 +33,18 @@ struct EndGame: View {
                     .font(.system(size: 96, weight: .heavy, design: .rounded))
                     .foregroundStyle(.white)
 
-                // Player details
+                // Player info (name only)
                 if let p = playerInfo {
-                    VStack(spacing: 4) {
-                        Text("Player: \(p.name)")
-                        Text(p.phone)
-                            .font(.subheadline)
-                            .foregroundStyle(.white.opacity(0.85))
-                    }
-                    .font(.headline)
-                    .foregroundStyle(.white)
-                    .multilineTextAlignment(.center)
+                    Text("Player: \(p.name)")
+                        .font(.headline)
+                        .foregroundStyle(.white)
                 } else {
                     Text("Player: (not provided)")
                         .font(.headline)
                         .foregroundStyle(.white.opacity(0.7))
                 }
 
-                // Actions
+                // Replay and Close buttons
                 HStack(spacing: 16) {
                     Button(action: { handlePlayAgainTap() }) {
                         Group {
@@ -91,7 +83,6 @@ struct EndGame: View {
             do {
                 try await SessionService.saveSession(
                     name: playerInfo?.name ?? "Unknown Player",
-                    phone: playerInfo?.phone ?? "N/A",
                     gameType: gameTitle,
                     score: displayScore
                 )
@@ -99,13 +90,12 @@ struct EndGame: View {
             } catch {
                 print("❌ Firestore save failed:", error.localizedDescription)
             }
-            // Update any local history you track
+            // update local history
             appModel.finalizeCurrentSession()
         }
     }
 
     // MARK: - Replay logic
-
     private func handlePlayAgainTap() {
         if appModel.isBalloonGame {
             guard appModel.cachedBalloonContact != nil else {
@@ -113,12 +103,14 @@ struct EndGame: View {
                 return
             }
             startRestartCountdown(isBalloon: true)
+
         } else if appModel.isMemoryGame {
             guard appModel.cachedMemoryContact != nil else {
                 appModel.currentScreen = .memoryGame
                 return
             }
             startRestartCountdown(isBalloon: false)
+
         } else {
             appModel.currentScreen = .menu
         }
@@ -128,7 +120,7 @@ struct EndGame: View {
         isRestarting = true
         restartCountdown = 3
 
-        Task { // only used for the 3-2-1 delay
+        Task {
             for i in (1...3).reversed() {
                 restartCountdown = i
                 try? await Task.sleep(for: .seconds(1))
@@ -136,9 +128,11 @@ struct EndGame: View {
             restartCountdown = nil
 
             if isBalloon {
+                // Reset session for balloon game
                 appModel.startBalloonSession()
                 _ = await openImmersiveSpace(id: Module.bubbleSpace.name)
             } else {
+                // Reset session for memory game
                 appModel.startMemorySession()
                 _ = await openImmersiveSpace(id: Module.memorySpace.name)
             }
@@ -153,7 +147,7 @@ struct EndGame: View {
     EndGame(
         displayScore: 100,
         gameTitle: "Balloon Frenzy",
-        playerInfo: AppModel.PlayerInfo(name: "Preview Player", phone: "+65 9123 4567")
+        playerInfo: AppModel.PlayerInfo(name: "Preview Player")
     )
     .environment(AppModel())
 }

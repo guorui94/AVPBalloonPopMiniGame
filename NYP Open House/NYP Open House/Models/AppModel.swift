@@ -33,8 +33,12 @@ class AppModel {
         }
     }
 
-    private var balloonEndGame = try! AVAudioPlayer(contentsOf: Bundle.main.url(forResource: "signalEndGame", withExtension: "mp3")!)
-    private var applauses = try! AVAudioPlayer(contentsOf: Bundle.main.url(forResource: "highScoreApplause", withExtension: "mp3")!)
+    private var balloonEndGame = try! AVAudioPlayer(
+        contentsOf: Bundle.main.url(forResource: "signalEndGame", withExtension: "mp3")!
+    )
+    private var applauses = try! AVAudioPlayer(
+        contentsOf: Bundle.main.url(forResource: "highScoreApplause", withExtension: "mp3")!
+    )
 
     var score = ScoreModel()
     var pose = VisionProPose()
@@ -67,31 +71,43 @@ class AppModel {
     func highScoreApplause() { applauses.play() }
 
     // ---------------------------------------------------------
-    // MARK: - Player Info (shared type, used by BOTH games)
+    // MARK: - Player Info (no phone)
     // ---------------------------------------------------------
     struct PlayerInfo: Codable {
         var name: String
+    }
+
+    /// Legacy shape stored previously (with phone).
+    private struct LegacyPlayerInfo: Codable {
+        var name: String
         var phone: String
-        // Back-compat: some UI still references "email". Return phone.
-        var email: String { phone }
     }
 
     // ---------- Balloon game contact ----------
     var balloonContact: PlayerInfo? = nil
 
     var cachedBalloonContact: PlayerInfo? {
-        if let data = UserDefaults.standard.data(forKey: "balloon_contact"),
-           let info = try? JSONDecoder().decode(PlayerInfo.self, from: data) {
-            return info
+        if let data = UserDefaults.standard.data(forKey: "balloon_contact") {
+            // Try new shape first
+            if let info = try? JSONDecoder().decode(PlayerInfo.self, from: data) {
+                return info
+            }
+            // Fallback to legacy (with phone) and map to new type
+            if let legacy = try? JSONDecoder().decode(LegacyPlayerInfo.self, from: data) {
+                return PlayerInfo(name: legacy.name)
+            }
+            // Extra safety: if someone stored as a simple dict before
+            if let dict = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+               let name = dict["name"] as? String {
+                return PlayerInfo(name: name)
+            }
         }
         return nil
     }
 
-    func setBalloonContact(name: String, phone: String) {
-        let info = PlayerInfo(
-            name: name.trimmingCharacters(in: .whitespacesAndNewlines),
-            phone: phone.trimmingCharacters(in: .whitespacesAndNewlines)
-        )
+    /// New API: set only name
+    func setBalloonContact(name: String) {
+        let info = PlayerInfo(name: name.trimmingCharacters(in: .whitespacesAndNewlines))
         balloonContact = info
         if let data = try? JSONEncoder().encode(info) {
             UserDefaults.standard.set(data, forKey: "balloon_contact")
@@ -102,32 +118,49 @@ class AppModel {
     var memoryContact: PlayerInfo? = nil
 
     var cachedMemoryContact: PlayerInfo? {
-        if let data = UserDefaults.standard.data(forKey: "memory_contact"),
-           let info = try? JSONDecoder().decode(PlayerInfo.self, from: data) {
-            return info
+        if let data = UserDefaults.standard.data(forKey: "memory_contact") {
+            if let info = try? JSONDecoder().decode(PlayerInfo.self, from: data) {
+                return info
+            }
+            if let legacy = try? JSONDecoder().decode(LegacyPlayerInfo.self, from: data) {
+                return PlayerInfo(name: legacy.name)
+            }
+            if let dict = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+               let name = dict["name"] as? String {
+                return PlayerInfo(name: name)
+            }
         }
         return nil
     }
 
-    func setMemoryContact(name: String, phone: String) {
-        let info = PlayerInfo(
-            name: name.trimmingCharacters(in: .whitespacesAndNewlines),
-            phone: phone.trimmingCharacters(in: .whitespacesAndNewlines)
-        )
+    /// New API: set only name
+    func setMemoryContact(name: String) {
+        let info = PlayerInfo(name: name.trimmingCharacters(in: .whitespacesAndNewlines))
         memoryContact = info
         if let data = try? JSONEncoder().encode(info) {
             UserDefaults.standard.set(data, forKey: "memory_contact")
         }
     }
 
-    // ---------- Back-compat shims (older calls still compile) ----------
+    // ---------- Back-compat shims (old calls keep compiling) ----------
+    /// Old signature kept for source compatibility (phone ignored).
+    func setBalloonContact(name: String, phone: String) {
+        setBalloonContact(name: name)
+    }
+    /// Old signature kept for source compatibility (phone ignored).
+    func setMemoryContact(name: String, phone: String) {
+        setMemoryContact(name: name)
+    }
+
+    /// Older generic accessors that some files may still reference:
     var playerInfo: PlayerInfo? {
         get { balloonContact }
         set { balloonContact = newValue }
     }
     var cachedPlayerInfo: PlayerInfo? { cachedBalloonContact }
+    /// Old shim: `email` param existed before; now ignored.
     func setPlayerInfo(name: String, email: String) {
-        setBalloonContact(name: name, phone: email) // email param treated as phone
+        setBalloonContact(name: name)
     }
 
     var memoryPlayerInfo: PlayerInfo? {
@@ -135,8 +168,9 @@ class AppModel {
         set { memoryContact = newValue }
     }
     var cachedMemoryPlayerInfo: PlayerInfo? { cachedMemoryContact }
+    /// Old shim: `email` param existed before; now ignored.
     func setMemoryPlayerInfo(name: String, email: String) {
-        setMemoryContact(name: name, phone: email) // email param treated as phone
+        setMemoryContact(name: name)
     }
 
     // ---------------------------------------------------------
