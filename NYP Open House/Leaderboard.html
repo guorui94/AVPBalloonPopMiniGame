@@ -28,14 +28,14 @@
     @media (prefers-reduced-motion: reduce){ body{animation:none} }
     @keyframes hueShift{from{filter:hue-rotate(0)}to{filter:hue-rotate(360deg)}}
 
-    .wrap{max-width:1200px;margin:18px auto 32px; padding:0 16px} /* tighter top gap */
+    .wrap{max-width:1200px;margin:18px auto 32px; padding:0 16px}
     .title{
       font-size:clamp(28px,3.5vw,44px);font-weight:800;margin:0 0 6px;
       background:linear-gradient(90deg,var(--accent),var(--accent2));
       -webkit-background-clip:text;background-clip:text;color:transparent;
     }
 
-    .toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:10px 0 14px} /* less vertical space */
+    .toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:10px 0 14px}
     .tabs{display:flex;gap:8px;flex-wrap:wrap}
     .pill{background:var(--card);border:1px solid var(--line);padding:9px 14px;border-radius:999px;cursor:pointer;font-weight:600;color:var(--text);box-shadow:var(--shadow);transition:.25s}
     .pill.active{border-color:var(--accent);box-shadow:inset 0 0 0 2px rgba(34,211,238,.22), var(--shadow)}
@@ -113,6 +113,7 @@
     import { getFirestore, collection, query, where, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
     import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
 
+    // --- Firebase ---
     const firebaseConfig = {
       apiKey: "AIzaSyDGb2cB7XZe_ggOLahMLXdUOzolSIdvndA",
       authDomain: "nyp-open-house.firebaseapp.com",
@@ -121,11 +122,11 @@
       messagingSenderId: "401402380709",
       appId: "1:401402380709:web:de63baa06171ff42cee84c"
     };
-
     const app = initializeApp(firebaseConfig);
     const db  = getFirestore(app);
     const auth = getAuth(app);
 
+    // --- State / DOM ---
     const GAMES = ["Balloon Frenzy", "ARcade of Memories"];
     const params = new URLSearchParams(location.search);
     const ROTATE_MS = Math.max(3000, parseInt(params.get("interval") || 10000, 10));
@@ -143,11 +144,13 @@
 
     let unsub = null;
     let selectedGame = params.get("game") || GAMES[0];
-    let countdownTimer = null;
     let rotateEnabled = true;
-    let secondsLeft = ROTATE_MS / 1000;
-    const bestTopScore = new Map();
+    let ticker = null;                 // rotation interval
+    let nextSwitchAt = Date.now() + ROTATE_MS; // time-based rotation
+    const bestTopScore = new Map();    // per-game best for confetti
+    const backoffByGame = new Map();   // for reconnect
 
+    // --- Helpers ---
     const esc = (s) => s?.toString().replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c])) ?? "";
     const fmtDate = (ts) => {
       if(!ts) return "—";
@@ -156,6 +159,7 @@
     };
     const setStatus = (ok,msg) => statusEl.innerHTML = ok ? `<span class="ok">●</span> ${msg}` : `<span class="err">●</span> ${msg}`;
 
+    // --- Tabs ---
     function renderTabs(){
       tabsEl.innerHTML = "";
       GAMES.forEach(g=>{
@@ -168,6 +172,7 @@
       activeGameEl.textContent = selectedGame;
     }
 
+    // --- Table transition ---
     function applyTableTransition(nextRender){
       rowsEl.classList.add("fade-exit","fade-exit-active");
       setTimeout(()=>{
@@ -181,13 +186,14 @@
       }, 180);
     }
 
+    // --- Render rows ---
     function renderRows(docs){
       const doRender = ()=>{
         rowsEl.innerHTML = "";
         if(!docs.length){
           rowsEl.innerHTML = `<div class="row" role="row">
             <div class="rank" role="cell">—</div>
-            <div class="name" role="cell" style="opacity:.7)">No scores yet</div>
+            <div class="name" role="cell" style="opacity:.7">No scores yet</div>
             <div class="score" role="cell">—</div>
             <div class="played" role="cell">—</div>
           </div>`;
@@ -215,6 +221,7 @@
           rowsEl.appendChild(row);
         });
 
+        // Confetti on new record
         const top = docs[0]?.data();
         if(top && typeof top.score === "number"){
           const best = bestTopScore.get(selectedGame) ?? -Infinity;
@@ -222,16 +229,17 @@
             bestTopScore.set(selectedGame, top.score);
             burstConfetti('record');
           } else if (best === -Infinity) {
-            bestTopScore.set(selectedGame, top.score);
+            bestTopScore.set(selectedGame, top.score); // seed without burst on first load
           }
         }
       };
       applyTableTransition(doRender);
     }
 
+    // --- Firestore watch with backoff ---
     function watchGame(game){
-      if(unsub){unsub();unsub=null;}
-      setStatus(true,"Live");
+      if(unsub){ try{unsub();}catch{}; unsub=null; }
+      setStatus(navigator.onLine, navigator.onLine ? "Live" : "Offline");
 
       const qRef = query(
         collection(db, "sessions"),
@@ -241,14 +249,25 @@
       );
 
       unsub = onSnapshot(qRef, (snap)=>{
+        backoffByGame.set(game, 0);
         renderRows(snap.docs);
         lastUpdatedEl.textContent = "Last update " + new Date().toLocaleTimeString();
       }, (err)=>{
         console.error(err);
         setStatus(false, err.message || "Listener error");
+
+        const prev = backoffByGame.get(game) || 0;
+        const next = Math.min(prev ? prev*2 : 1000, 60000);
+        backoffByGame.set(game, next);
+        setTimeout(()=>{ if(selectedGame===game) watchGame(game); }, next);
       });
     }
 
+    // --- Online / Offline indicators ---
+    window.addEventListener('online',  ()=>{ setStatus(true,"Live");  watchGame(selectedGame); });
+    window.addEventListener('offline', ()=>{ setStatus(false,"Offline"); });
+
+    // --- Game switching ---
     function switchGame(game, stopRotate=false){
       selectedGame = game;
       const p = new URLSearchParams(location.search);
@@ -256,25 +275,29 @@
       history.replaceState({}, "", `?${p.toString()}`);
       renderTabs();
       watchGame(game);
-      burstConfetti('switch');  // lighter burst on every game change
-      if(stopRotate) resetCountdown();
+      burstConfetti('switch');              // lighter burst on every change
+      if(stopRotate) resetCountdown();      // reset rotation timer
     }
 
+    // --- Drift-free rotation (time-based) ---
     function resetCountdown(){
-      secondsLeft = Math.round(ROTATE_MS/1000);
-      progressBar.style.width = "0%";
-      countdownText.textContent = `Next in ${secondsLeft}s`;
+      nextSwitchAt = Date.now() + ROTATE_MS;
+      updateCountdown();
+    }
+    function updateCountdown(){
+      const remaining = Math.max(0, nextSwitchAt - Date.now());
+      const pct = 1 - (remaining / ROTATE_MS);
+      progressBar.style.width = `${Math.max(0, Math.min(100, pct*100))}%`;
+      countdownText.textContent = `Next in ${Math.ceil(remaining/1000)}s`;
     }
     function tick(){
-      if(!rotateEnabled) return;
-      secondsLeft -= 1;
-      const pct = (1 - (secondsLeft/(ROTATE_MS/1000))) * 100;
-      progressBar.style.width = `${Math.max(0, Math.min(100, pct))}%`;
-      countdownText.textContent = `Next in ${Math.max(0, secondsLeft)}s`;
-      if(secondsLeft <= 0){
+      if (!rotateEnabled) return;
+      updateCountdown();
+      const now = Date.now();
+      if (now >= nextSwitchAt){
         const idx = GAMES.indexOf(selectedGame);
         switchGame(GAMES[(idx+1)%GAMES.length], false);
-        resetCountdown();
+        nextSwitchAt = now + ROTATE_MS; // fixed stride
       }
     }
     function startRotate(){
@@ -282,15 +305,40 @@
       rotateEnabled = true;
       toggleRotateBtn.textContent = "⏸ Pause";
       resetCountdown();
-      countdownTimer = setInterval(tick, 1000);
+      ticker = setInterval(tick, 250); // smoother progress, low cost
     }
     function stopRotate(){
       rotateEnabled = false;
       toggleRotateBtn.textContent = "▶ Resume";
-      if(countdownTimer){ clearInterval(countdownTimer); countdownTimer=null; }
+      if (ticker){ clearInterval(ticker); ticker = null; }
     }
     toggleRotateBtn.addEventListener("click", ()=> rotateEnabled ? stopRotate() : startRotate());
 
+    // --- Screen Wake Lock (keep display on) ---
+    let wakeLock = null;
+    async function lockScreen(){
+      try{
+        if ('wakeLock' in navigator){
+          wakeLock = await navigator.wakeLock.request('screen');
+          wakeLock.addEventListener('release', () => {
+            if (document.visibilityState === 'visible') lockScreen();
+          });
+        }
+      }catch{}
+    }
+    document.addEventListener('visibilitychange', ()=>{
+      if (document.visibilityState === 'visible') lockScreen();
+    });
+    lockScreen();
+
+    // --- Safety hard refresh every 12 hours ---
+    setInterval(()=>{
+      if (navigator.onLine && document.visibilityState === 'visible'){
+        location.reload();
+      }
+    }, 1000*60*60*12);
+
+    // --- Confetti (lightweight) ---
     function resizeCanvas(){ confettiCanvas.width = innerWidth; confettiCanvas.height = innerHeight; }
     addEventListener('resize', resizeCanvas, { passive:true }); resizeCanvas();
 
@@ -329,12 +377,13 @@
           raf = requestAnimationFrame(step);
         } else {
           ctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
-          cancelAnimationFrame(raf);
+          if (raf) cancelAnimationFrame(raf);
         }
       }
       requestAnimationFrame(step);
     }
 
+    // --- Boot ---
     renderTabs();
     onAuthStateChanged(auth, (u)=>{ if(!u) signInAnonymously(auth).catch(console.error); });
     watchGame(selectedGame);
