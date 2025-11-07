@@ -12,9 +12,8 @@
     .title{font-size:40px;font-weight:800;letter-spacing:.3px;margin:0 0 4px;
       background:linear-gradient(90deg,var(--accent),#60a5fa);
       -webkit-background-clip:text;background-clip:text;color:transparent}
-    .subtitle{color:var(--muted);margin:0 0 24px}
 
-    .toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+    .toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:16px 0 12px}
     .tabs{display:flex;gap:8px;flex-wrap:wrap}
     .pill{background:#0f172a;border:1px solid #1f2a44;color:var(--text);
       padding:8px 14px;border-radius:999px;cursor:pointer;font-weight:600}
@@ -29,17 +28,14 @@
     .bar{height:100%;background:var(--accent);width:0%}
 
     .card{background:var(--card);border:1px solid #1f2a44;border-radius:16px;overflow:hidden}
-    .header,.row{display:grid;grid-template-columns:72px 1fr 170px 120px 180px;
+    .header,.row{display:grid;grid-template-columns:72px 1fr 120px 180px;
       padding:14px 18px;align-items:center;gap:12px}
     .header{color:#cbd5e1;font-weight:700;border-bottom:1px solid #1f2a44;background:#0f172a}
     .row:nth-child(even){background:#0f172a}
     .rank{text-align:right;opacity:.9;font-variant-numeric:tabular-nums}
     .score{text-align:right;font-weight:800;font-variant-numeric:tabular-nums}
-    .when{text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
+    .played{text-align:right;color:#cbd5e1;font-variant-numeric:tabular-nums}
     .name{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .phone{color:#cbd5e1;display:flex;align-items:center;gap:8px}
-    .reveal{background:#0f172a;border:1px solid #1f2a44;color:var(--text);
-      padding:4px 8px;border-radius:8px;cursor:pointer;font-size:12px}
 
     .footer{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;padding:10px 2px;margin-top:10px}
     .ok{color:#34d399}.err{color:#fca5a5}
@@ -48,11 +44,9 @@
 <body>
   <div class="wrap">
     <h1 class="title">NYP Open House Leaderboard</h1>
-    <p class="subtitle">Live high scores from Firestore</p>
 
     <div class="toolbar">
       <div class="tabs" id="tabs"></div>
-
       <div class="rotor">
         <button class="btn" id="toggleRotateBtn" title="Pause/Resume">⏸ Pause</button>
         <div class="badge" id="countdownText">Next in 10s</div>
@@ -64,9 +58,8 @@
       <div class="header">
         <div class="rank">#</div>
         <div>Player</div>
-        <div>Phone</div>
         <div class="score">Score</div>
-        <div class="when">When</div>
+        <div class="played">Played on</div>
       </div>
       <div id="rows"></div>
     </div>
@@ -124,20 +117,6 @@
       const d = ts.toDate ? ts.toDate() : new Date(ts);
       return d.toLocaleString(undefined,{year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"});
     };
-    const maskPhone = (p) => {
-      if(!p) return "—";
-      const digits = (p+"").replace(/\D/g,"");
-      const last4 = digits.slice(-4);
-      return `****${last4}`;
-    };
-    const prettyPhone = (p) => {
-      if(!p) return "—";
-      const digits=(p+"").replace(/\D/g,"");
-      if(digits.length===8)  return digits.replace(/(\d{4})(\d{4})/,"$1 $2");
-      if(digits.length===10) return digits.replace(/(\d{3})(\d{3})(\d{4})/,"$1-$2-$3");
-      if(digits.length===11) return digits.replace(/(\d)(\d{4})(\d{3,4})(\d{3})/,"$1 $2 $3 $4");
-      return p;
-    };
     const setStatus = (ok,msg) => statusEl.innerHTML = ok ? `<span class="ok">●</span> ${msg}` : `<span class="err">●</span> ${msg}`;
 
     // ui
@@ -159,43 +138,22 @@
         rowsEl.innerHTML = `<div class="row">
           <div class="rank">—</div>
           <div class="name" style="opacity:.7">No scores yet</div>
-          <div class="phone">—</div>
           <div class="score">—</div>
-          <div class="when">—</div>
+          <div class="played">—</div>
         </div>`;
         return;
       }
       docs.forEach((doc,i)=>{
         const d = doc.data();
-        const masked = maskPhone(d.phone);
-        const fullPretty = esc(prettyPhone(d.phone));
         const row=document.createElement("div");
         row.className="row";
         row.innerHTML=`
           <div class="rank">${i+1}</div>
           <div class="name">${esc(d.name || "Player")}</div>
-          <div class="phone">
-            <span class="phone-text">${masked}</span>
-            <button class="reveal" data-full="${fullPretty}" data-masked="${esc(masked)}" data-state="masked">Show</button>
-          </div>
           <div class="score">${d.score ?? 0}</div>
-          <div class="when">${fmtDate(d.createdAt)}</div>
+          <div class="played">${fmtDate(d.createdAt)}</div>
         `;
         rowsEl.appendChild(row);
-        const btn = row.querySelector("button.reveal");
-        const span = row.querySelector("span.phone-text");
-        btn.addEventListener("click", ()=>{
-          const isFull = btn.dataset.state === "full";
-          if(isFull){
-            span.textContent = btn.dataset.masked;
-            btn.textContent = "Show";
-            btn.dataset.state = "masked";
-          }else{
-            span.textContent = btn.dataset.full;
-            btn.textContent = "Hide";
-            btn.dataset.state = "full";
-          }
-        });
       });
     }
 
