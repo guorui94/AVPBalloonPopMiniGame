@@ -240,7 +240,7 @@ def Xform "Root"
             def Shader "Image_Texture"
             {
                 uniform token info:id = "UsdUVTexture"
-                asset inputs:file = @./textures/01 Cover Card.png@
+                asset inputs:file = @./textures/1.png@
                 token inputs:sourceColorSpace = "sRGB"
                 float2 inputs:st.connect = </Root/_materials/BackMaterial/uvmap.outputs:result>
                 token inputs:wrapS = "repeat"
@@ -258,7 +258,7 @@ def Xform "Root"
             def Shader "diffuseColor"
             {
                 uniform token info:id = "UsdUVTexture"
-                asset inputs:file = @Materials/textures/01 Cover Card.png@
+                asset inputs:file = @Materials/textures/1.png@
                 float2 inputs:st.connect = </Root/_materials/BackMaterial/diffuseColor/TexCoordReader.outputs:result>
                 color3f outputs:rgb
 

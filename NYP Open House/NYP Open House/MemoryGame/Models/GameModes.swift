@@ -32,11 +32,11 @@ enum GameModes: CaseIterable {
         let baseImages: [String]
         switch self {
         case .easy:
-            baseImages = ["CSITNanyang", "OSEP", "Technopreneurship", "IndustryCertification"]
+            baseImages = ["2", "3", "4", "5"]
         case .medium:
-            baseImages = ["UPP", "ITP", "FYP", "OITP"]
+            baseImages = ["6", "7", "8", "9"]
         case .challenging:
-            baseImages = ["CSITNanyang", "OSEP", "Technopreneurship", "IndustryCertification", "UPP", "ITP", "FYP", "OITP"]
+            baseImages = ["2", "3", "4", "5", "6", "7", "8", "9"]
         }
 
         let doubled = baseImages.flatMap { Array(repeating: $0, count: 2) }
