@@ -53,92 +53,81 @@ struct ContentView: View {
         )
     }
 
-    // MARK: - Main Menu (no GameCard view)
+    // MARK: - Main Menu (dimensions aligned with game screens)
     var mainMenuView: some View {
-        ZStack(alignment: .bottomTrailing) {
-            VStack(spacing: 32) {
-                Spacer()
+        ZStack {
+            GeometryReader { geo in
+                VStack(spacing: 32) {
+                    Spacer()
 
-                // Header text
-                VStack(spacing: 12) {
-                    Text("Welcome!")
-                        .font(.system(size: 80))
-                        .fontWeight(.bold)
+                    // Header text
+                    VStack(spacing: 12) {
+                        Text("Welcome!")
+                            .font(.system(size: 80))
+                            .fontWeight(.bold)
 
-                    Text("Explore immersive games....")
-                        .font(.title)
-                }
-
-                // Game launch buttons
-                VStack(spacing: 24) {
-                    Button {
-                        appModel.currentScreen = .balloonIntro
-                    } label: {
-                        VStack(spacing: 4) {
-                            Text("Balloon Frenzy")
-                                .font(.title2)
-                                .fontWeight(.bold)
-                            Text("A battle between the fastest fingers")
-                                .font(.footnote)
-                                .foregroundStyle(.secondary)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding()
+                        Text("Explore immersive games....")
+                            .font(.title)
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.pink)
 
-                    Button {
-                        appModel.currentScreen = .memoryGame
-                    } label: {
-                        VStack(spacing: 4) {
-                            Text("Memory ARcade")
-                                .font(.title2)
-                                .fontWeight(.bold)
-                            Text("Match pairs to unlock NYP’s hidden gems.")
-                                .font(.footnote)
-                                .foregroundStyle(.secondary)
+                    // Game launch buttons
+                    VStack(spacing: 24) {
+                        Button {
+                            appModel.currentScreen = .balloonIntro
+                        } label: {
+                            VStack(spacing: 4) {
+                                Text("Balloon Frenzy")
+                                    .font(.title2)
+                                    .fontWeight(.bold)
+                                Text("A battle between the fastest fingers")
+                                    .font(.footnote)
+                                    .foregroundStyle(.secondary)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding()
                         }
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.purple)
-                }
-                .frame(maxWidth: 400)
+                        .buttonStyle(.borderedProminent)
+                        .tint(.pink)
 
-                // Firebase connection test
-                VStack(spacing: 8) {
-                    Button("Verify Firebase Connection") {
-                        Task {
-                            // This calls the global helper that lives in FirebaseVerifier.swift (or whatever you named it).
-                            await verifyFirebasePlistAndConnection()
+                        Button {
+                            appModel.currentScreen = .memoryGame
+                        } label: {
+                            VStack(spacing: 4) {
+                                Text("Memory ARcade")
+                                    .font(.title2)
+                                    .fontWeight(.bold)
+                                Text("Match pairs to unlock NYP’s hidden gems.")
+                                    .font(.footnote)
+                                    .foregroundStyle(.secondary)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding()
                         }
+                        .buttonStyle(.borderedProminent)
+                        .tint(.purple)
                     }
-                    .buttonStyle(.bordered)
-                    .tint(.blue)
+                    // similar “content width” to StartingInterface
+                    .frame(maxWidth: 600)
 
-                    Text("This prints Firebase project info and tries a Firestore read.")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.center)
-                        .frame(maxWidth: 220)
+                    Spacer()
                 }
-                .padding(.top, 8)
-
-                Spacer()
-            }
-            .padding()
-            .glassBackgroundEffect(
-                in: RoundedRectangle(cornerRadius: 32, style: .continuous)
-            )
-            .onAppear {
-                // When we land back in the menu, close any immersive space
-                if appModel.immersiveSpaceState == .open {
-                    Task { await dismissImmersiveSpace() }
+                // match the kind of layout you used in StartingInterface
+                .frame(maxWidth: 1100)
+                .padding(.horizontal, 24)
+                .padding(.vertical, 12)
+                .frame(minHeight: geo.size.height, alignment: .center)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                .onAppear {
+                    // When we land back in the menu, close any immersive space
+                    if appModel.immersiveSpaceState == .open {
+                        Task { await dismissImmersiveSpace() }
+                    }
                 }
             }
         }
+        .glassBackgroundEffect(
+            in: RoundedRectangle(cornerRadius: 32, style: .continuous)
+        )
     }
 }
 
