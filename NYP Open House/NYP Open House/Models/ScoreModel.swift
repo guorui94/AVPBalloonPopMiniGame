@@ -10,18 +10,14 @@ import Foundation
 @Observable
 class ScoreModel {
 
-    // MARK: - Game Run record
     struct GameRun: Codable, Identifiable {
         let id: UUID
-        let game: String         // "balloon" or "memory"
+        let game: String
         let score: Int
         let startedAt: Date
         let endedAt: Date
     }
 
-    // ----------------------------
-    // Balloon Frenzy
-    // ----------------------------
     var poppingScore: Int = 0 {
         didSet {
             if poppingScore > balloonHighScore {
@@ -36,14 +32,10 @@ class ScoreModel {
     private(set) var balloonHighScore: Int = UserDefaults.standard.integer(forKey: "BalloonHighScore")
     var isHighScoreBalloon: Bool = false
 
-    // Session
     private(set) var balloonSessionID: UUID?
     private var balloonSessionStart: Date?
     private(set) var balloonHistory: [GameRun] = []
 
-    // ----------------------------
-    // ARcade of Memories
-    // ----------------------------
     var flipScore: Int = 0 {
         didSet {
             if flipScore > memoryGameHighScore {
@@ -62,9 +54,6 @@ class ScoreModel {
     private var memorySessionStart: Date?
     private(set) var memoryHistory: [GameRun] = []
 
-    // ----------------------------
-    // Init: load histories (optional)
-    // ----------------------------
     init() {
         if let data = UserDefaults.standard.data(forKey: "BalloonHistory"),
            let decoded = try? JSONDecoder().decode([GameRun].self, from: data) {
@@ -76,11 +65,7 @@ class ScoreModel {
         }
     }
 
-    // ----------------------------
-    // Begin / End Sessions
-    // ----------------------------
     func beginBalloonSession() {
-        // Reset only Balloon state for a clean run
         poppingScore = 0
         balloonsRemoved = 0
         isHighScoreBalloon = false
@@ -104,13 +89,11 @@ class ScoreModel {
         balloonHistory.append(run)
         persistBalloonHistory()
 
-        // Clear current session markers (optional)
         balloonSessionID = nil
         balloonSessionStart = nil
     }
 
     func beginMemorySession() {
-        // Reset only Memory state for a clean run
         flipScore = 0
         isHighScoreMemory = false
 
@@ -133,14 +116,10 @@ class ScoreModel {
         memoryHistory.append(run)
         persistMemoryHistory()
 
-        // Clear current session markers (optional)
         memorySessionID = nil
         memorySessionStart = nil
     }
 
-    // ----------------------------
-    // Resets (manual, if needed elsewhere)
-    // ----------------------------
     func resetBalloonScore() {
         poppingScore = 0
         balloonsRemoved = 0
@@ -152,9 +131,6 @@ class ScoreModel {
         isHighScoreMemory = false
     }
 
-    // ----------------------------
-    // Persistence
-    // ----------------------------
     private func saveBalloonHighScore() {
         UserDefaults.standard.set(balloonHighScore, forKey: "BalloonHighScore")
     }

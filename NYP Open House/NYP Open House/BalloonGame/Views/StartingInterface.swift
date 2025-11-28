@@ -14,10 +14,8 @@ struct StartingInterface: View {
     @State private var countdown: Int? = nil
     @State private var isFadingOut = false
 
-    // --- Form field (name only)
     @State private var playerName: String = ""
 
-    // --- Validation alert
     @State private var showValidationAlert = false
     @State private var validationMessage = ""
 
@@ -31,7 +29,6 @@ struct StartingInterface: View {
                 ScrollView(.vertical, showsIndicators: false) {
                     VStack(spacing: 22) {
 
-                        // Header
                         Text("🎈 Balloon Frenzy 🎈")
                             .font(.extraLargeTitle)
                             .fontWeight(.bold)
@@ -44,7 +41,6 @@ struct StartingInterface: View {
                             .foregroundStyle(.white)
                             .frame(maxWidth: 1000)
 
-                        // Legend
                         HStack(alignment: .top, spacing: 40) {
                             VStack(alignment: .leading, spacing: 8) {
                                 DisplayBalloonColors(color: BalloonColor.red.swiftColor,   points: BalloonColor.red.poppingScore)
@@ -71,7 +67,6 @@ struct StartingInterface: View {
                             .multilineTextAlignment(.center)
                             .frame(maxWidth: 1000)
 
-                        // ---------- Name (above the button)
                         VStack(spacing: 12) {
                             VStack(alignment: .leading, spacing: 6) {
                                 Text("Your Name")
@@ -91,7 +86,6 @@ struct StartingInterface: View {
                         }
                         .padding(.top, 4)
 
-                        // ---------- Start Button
                         Button(action: { handleStartTap() }) {
                             Group {
                                 if let currentCount = countdown {
@@ -114,7 +108,6 @@ struct StartingInterface: View {
                         .disabled(isStarting || !isFormValid)
                         .buttonStyle(.plain)
 
-                        // ---------- Footer note
                         VStack(spacing: 6) {
                             Text("We only use your name to save scores.")
                         }
@@ -150,7 +143,6 @@ struct StartingInterface: View {
         .opacity(isFadingOut ? 0 : 1)
         .animation(.easeInOut(duration: 0.5), value: isFadingOut)
         .onAppear {
-            // Prefill name if we have cached contact (ignore phone moving forward)
             if let cached = appModel.cachedBalloonContact {
                 playerName = cached.name
             }
@@ -178,8 +170,6 @@ struct StartingInterface: View {
     }
 
     private func startCountdown() {
-        // Save contact + start a fresh session (resets score & creates session ID)
-        // Pass empty string for phone to avoid touching AppModel right now.
         appModel.setBalloonContact(name: playerName, phone: "")
         appModel.startBalloonSession()
 

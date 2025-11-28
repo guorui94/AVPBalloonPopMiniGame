@@ -1,17 +1,14 @@
 // Models/Session.swift
 import Foundation
 
-/// Plain model we write/read to Firestore. No FirebaseFirestoreSwift wrappers,
-/// so this compiles even if that module isn't available on visionOS.
-/// Phone has been removed across the stack.
 struct Session: Codable, Identifiable {
-    var id: String?          // Firestore document id (same as sessionId)
+    var id: String?
     var sessionId: String
     var uid: String
     var name: String
-    var gameType: String     // e.g. "Balloon Frenzy" or "ARcade of Memories"
+    var gameType: String
     var score: Int
-    var createdAt: Date?     // Firestore server timestamp written via FieldValue.serverTimestamp()
+    var createdAt: Date?
 
     init(
         id: String? = nil,

@@ -13,7 +13,6 @@ struct PoppedComponent: Component {}
 struct AboutToDisappearComponent: Component {}
 
 struct BalloonGameImmersiveView: View {
-    // match any entity with a visible model component aka a 3d model
     @State var predicate = QueryPredicate<Entity>.has(ModelComponent.self)
     @State private var bubbleClones: [Entity] = []
     
@@ -256,7 +255,6 @@ struct BalloonGameImmersiveView: View {
                 modelEntity.components[ModelComponent.self] = modelComponent
 
             } catch {
-                // ignore the shader error
             }
         }
         for child in entity.children {

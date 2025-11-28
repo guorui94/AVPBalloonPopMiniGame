@@ -44,12 +44,10 @@ class AppModel {
     var pose = VisionProPose()
     var currentGameMode: GameModes? = .easy
 
-    // set game states
     var isBalloonGame = false
     var isMemoryGame = false
     var gameEnds = false
 
-    // functions
     func resetBalloonGame() {
         score.resetBalloonScore()
         score.balloonsRemoved = 0
@@ -70,33 +68,25 @@ class AppModel {
     func signalEndGame() { balloonEndGame.play() }
     func highScoreApplause() { applauses.play() }
 
-    // ---------------------------------------------------------
-    // MARK: - Player Info (no phone)
-    // ---------------------------------------------------------
     struct PlayerInfo: Codable {
         var name: String
     }
 
-    /// Legacy shape stored previously (with phone).
     private struct LegacyPlayerInfo: Codable {
         var name: String
         var phone: String
     }
 
-    // ---------- Balloon game contact ----------
     var balloonContact: PlayerInfo? = nil
 
     var cachedBalloonContact: PlayerInfo? {
         if let data = UserDefaults.standard.data(forKey: "balloon_contact") {
-            // Try new shape first
             if let info = try? JSONDecoder().decode(PlayerInfo.self, from: data) {
                 return info
             }
-            // Fallback to legacy (with phone) and map to new type
             if let legacy = try? JSONDecoder().decode(LegacyPlayerInfo.self, from: data) {
                 return PlayerInfo(name: legacy.name)
             }
-            // Extra safety: if someone stored as a simple dict before
             if let dict = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
                let name = dict["name"] as? String {
                 return PlayerInfo(name: name)
@@ -105,7 +95,6 @@ class AppModel {
         return nil
     }
 
-    /// New API: set only name
     func setBalloonContact(name: String) {
         let info = PlayerInfo(name: name.trimmingCharacters(in: .whitespacesAndNewlines))
         balloonContact = info
@@ -114,7 +103,6 @@ class AppModel {
         }
     }
 
-    // ---------- Memory game contact ----------
     var memoryContact: PlayerInfo? = nil
 
     var cachedMemoryContact: PlayerInfo? {
@@ -133,7 +121,6 @@ class AppModel {
         return nil
     }
 
-    /// New API: set only name
     func setMemoryContact(name: String) {
         let info = PlayerInfo(name: name.trimmingCharacters(in: .whitespacesAndNewlines))
         memoryContact = info
@@ -142,23 +129,18 @@ class AppModel {
         }
     }
 
-    // ---------- Back-compat shims (old calls keep compiling) ----------
-    /// Old signature kept for source compatibility (phone ignored).
     func setBalloonContact(name: String, phone: String) {
         setBalloonContact(name: name)
     }
-    /// Old signature kept for source compatibility (phone ignored).
     func setMemoryContact(name: String, phone: String) {
         setMemoryContact(name: name)
     }
 
-    /// Older generic accessors that some files may still reference:
     var playerInfo: PlayerInfo? {
         get { balloonContact }
         set { balloonContact = newValue }
     }
     var cachedPlayerInfo: PlayerInfo? { cachedBalloonContact }
-    /// Old shim: `email` param existed before; now ignored.
     func setPlayerInfo(name: String, email: String) {
         setBalloonContact(name: name)
     }
@@ -168,14 +150,10 @@ class AppModel {
         set { memoryContact = newValue }
     }
     var cachedMemoryPlayerInfo: PlayerInfo? { cachedMemoryContact }
-    /// Old shim: `email` param existed before; now ignored.
     func setMemoryPlayerInfo(name: String, email: String) {
         setMemoryContact(name: name)
     }
 
-    // ---------------------------------------------------------
-    // MARK: - Sessions (start / end / finalize)
-    // ---------------------------------------------------------
     func startBalloonSession() {
         score.beginBalloonSession()
         isBalloonGame = true
@@ -198,7 +176,6 @@ class AppModel {
         score.endMemorySession()
     }
 
-    /// Call this on EndGame to capture the final score into history.
     func finalizeCurrentSession() {
         if isBalloonGame {
             endBalloonSession()

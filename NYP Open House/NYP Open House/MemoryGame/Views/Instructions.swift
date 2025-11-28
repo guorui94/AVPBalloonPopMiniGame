@@ -14,10 +14,8 @@ struct Instructions: View {
     @State private var countdown: Int? = nil
     @State private var isFadingOut = false
 
-    // --- Form field (name only)
     @State private var playerName: String = ""
 
-    // --- Validation alert
     @State private var showValidationAlert = false
     @State private var validationMessage = ""
 
@@ -30,21 +28,18 @@ struct Instructions: View {
             GeometryReader { geo in
                 ScrollView(.vertical, showsIndicators: false) {
                     VStack(spacing: 16) {
-                        // Title
                         Text("🕹️ ARcade of Memories 🃏")
                             .font(.extraLargeTitle)
                             .fontWeight(.bold)
                             .foregroundStyle(.cyan)
                             .multilineTextAlignment(.center)
 
-                        // Subtitle
                         Text("Test your memory skills by flipping tiles to match pairs of images.")
                             .font(.title)
                             .multilineTextAlignment(.center)
                             .foregroundStyle(.white)
                             .frame(maxWidth: 900)
 
-                        // Steps
                         VStack(alignment: .leading, spacing: 8) {
                             InstructionStep(number: 1, text: "Tap on any tile to flip it over.")
                             InstructionStep(number: 2, text: "Flip another tile to find a matching image.")
@@ -53,7 +48,6 @@ struct Instructions: View {
                         }
                         .frame(maxWidth: 900, alignment: .leading)
 
-                        // 💡 Description — split into two lines
                         Text("💡 Each image on the tiles represents an exciting opportunity at Nanyang Polytechnic —\nlike Overseas Exchange, Scholarships, and more!")
                             .font(.title2)
                             .multilineTextAlignment(.center)
@@ -66,7 +60,6 @@ struct Instructions: View {
                             .fontWeight(.semibold)
                             .foregroundStyle(.white)
 
-                        // --- Name field
                         VStack(spacing: 10) {
                             VStack(alignment: .leading, spacing: 4) {
                                 Text("Your Name")
@@ -90,7 +83,6 @@ struct Instructions: View {
                             }
                         }
 
-                        // --- Start Button (same style)
                         Button(action: { handleStartTap() }) {
                             Group {
                                 if let currentCount = countdown {
@@ -113,7 +105,6 @@ struct Instructions: View {
                         .disabled(isStarting || !isFormValid)
                         .buttonStyle(.plain)
 
-                        // Footer note
                         VStack(spacing: 4) {
                             Text("We only use your name to save scores.")
                         }
@@ -149,7 +140,6 @@ struct Instructions: View {
             }
         }
         .onAppear {
-            // Load per-game (memory) cached contact; ignore phone going forward
             if let cached = appModel.cachedMemoryContact {
                 playerName = cached.name
             }
@@ -161,7 +151,6 @@ struct Instructions: View {
         }
     }
 
-    // MARK: - Actions
     private func handleStartTap() {
         let nameEmpty  = playerName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         if nameEmpty {
@@ -173,8 +162,6 @@ struct Instructions: View {
     }
 
     private func startCountdown() {
-        // Save per-game (memory) contact + start fresh session
-        // Pass empty string for phone to avoid changing AppModel for now.
         appModel.setMemoryContact(name: playerName, phone: "")
         appModel.startMemorySession()
 

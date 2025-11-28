@@ -8,14 +8,11 @@
 import Foundation
 
 enum Module: String, Identifiable, CaseIterable, Equatable {
-    // name of the space
     case bubbleSpace
     case memorySpace
     case startingSpace
     
-    // retrieve the id
     var id : Self {self}
     
-    // retrieve the id as string
     var name: String { rawValue.capitalized }
 }

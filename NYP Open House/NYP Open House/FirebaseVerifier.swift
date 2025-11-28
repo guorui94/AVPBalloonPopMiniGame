@@ -80,7 +80,6 @@ func verifyFirebasePlistAndConnection() async {
     }
 }
 
-/// If we hit permission errors, print quick guidance.
 private func suggestFixForPermissionsIfNeeded(_ error: Error) {
     let msg = error.localizedDescription.lowercased()
     if msg.contains("missing or insufficient permissions") || msg.contains("permission") {

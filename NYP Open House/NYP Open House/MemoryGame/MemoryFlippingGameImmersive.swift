@@ -43,7 +43,6 @@ struct MemoryGameImmersive: View {
             }
             worldAnchor.position = [0, spawnY, spawnZ]
 
-            // --- Load base tile from ImageAnchorScene (Tile entity) ---
             if let baseTile = await getBaseTile() {
                 await createGameTiles(gameMode: currentGameMode,
                                       baseTile: baseTile,
@@ -155,7 +154,6 @@ struct MemoryGameImmersive: View {
         }
     }
 
-    // MARK: - Base Tile Loader (from RealityKitContent bundle)
 
     func getBaseTile() async -> Entity? {
         // Load from your Reality Composer Pro scene
@@ -167,7 +165,6 @@ struct MemoryGameImmersive: View {
         return nil
     }
 
-    // MARK: - Grid Build
 
     func createGameTiles(gameMode: GameModes, baseTile: Entity, worldAnchor: AnchorEntity) async {
         var images = gameMode.images
@@ -205,8 +202,6 @@ struct MemoryGameImmersive: View {
                 }
 
                 do {
-                    // These are your *front* images (pairs).
-                    // If "1.png" is one of the image names, it will be used here.
                     let texture = try await TextureResource(named: imageName)
                     try mat.setParameter(name: "FrontImage", value: .textureResource(texture))
                     modelComponent.materials[0] = mat
@@ -277,7 +272,6 @@ struct MemoryGameImmersive: View {
         worldAnchor.addChild(textEntity)
     }
 
-    // MARK: - Animations
 
     func animateFlip(entity: Entity) {
         let newRotation = entity.transform.rotation * simd_quatf(angle: .pi, axis: [-1, 0, 0])

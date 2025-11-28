@@ -26,22 +26,17 @@ struct ContentView: View {
         }
     }
 
-    // MARK: - End Game Screen
-    // Picks correct score + player info based on which game they just played.
     private var endGameView: some View {
         let isBalloon = appModel.isBalloonGame
 
-        // Score for that game
         let score = isBalloon
             ? appModel.score.poppingScore
             : appModel.score.flipScore
 
-        // Contact info for that game
         let info: AppModel.PlayerInfo? = isBalloon
             ? appModel.cachedBalloonContact
             : appModel.cachedMemoryContact
 
-        // Title for that game
         let title = isBalloon
             ? "Balloon Frenzy"
             : "ARcade of Memories"
@@ -53,14 +48,12 @@ struct ContentView: View {
         )
     }
 
-    // MARK: - Main Menu (dimensions aligned with game screens)
     var mainMenuView: some View {
         ZStack {
             GeometryReader { geo in
                 VStack(spacing: 32) {
                     Spacer()
 
-                    // Header text
                     VStack(spacing: 12) {
                         Text("Welcome!")
                             .font(.system(size: 80))
@@ -70,7 +63,6 @@ struct ContentView: View {
                             .font(.title)
                     }
 
-                    // Game launch buttons
                     VStack(spacing: 24) {
                         Button {
                             appModel.currentScreen = .balloonIntro
@@ -106,12 +98,10 @@ struct ContentView: View {
                         .buttonStyle(.borderedProminent)
                         .tint(.purple)
                     }
-                    // similar “content width” to StartingInterface
                     .frame(maxWidth: 600)
 
                     Spacer()
                 }
-                // match the kind of layout you used in StartingInterface
                 .frame(maxWidth: 1100)
                 .padding(.horizontal, 24)
                 .padding(.vertical, 12)

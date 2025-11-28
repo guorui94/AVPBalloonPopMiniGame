@@ -4,7 +4,7 @@ import SwiftUI
 struct EndGame: View {
     let displayScore: Int
     let gameTitle: String
-    let playerInfo: AppModel.PlayerInfo?   // now only has `name`
+    let playerInfo: AppModel.PlayerInfo?   
 
     @Environment(AppModel.self) private var appModel
     @Environment(\.openImmersiveSpace) private var openImmersiveSpace
@@ -12,19 +12,17 @@ struct EndGame: View {
 
     @State private var isRestarting = false
     @State private var restartCountdown: Int? = nil
-    @State private var hasSavedSession = false   // prevent double saves
+    @State private var hasSavedSession = false
 
     var body: some View {
         ZStack {
             VStack(spacing: 20) {
-                // Game title
                 Text(gameTitle)
                     .font(.extraLargeTitle)
                     .fontWeight(.bold)
                     .foregroundStyle(.cyan)
                     .multilineTextAlignment(.center)
 
-                // Score section
                 Text("Your Score")
                     .font(.title2)
                     .foregroundStyle(.white.opacity(0.85))
@@ -33,7 +31,6 @@ struct EndGame: View {
                     .font(.system(size: 96, weight: .heavy, design: .rounded))
                     .foregroundStyle(.white)
 
-                // Player info (name only)
                 if let p = playerInfo {
                     Text("Player: \(p.name)")
                         .font(.headline)
@@ -44,7 +41,6 @@ struct EndGame: View {
                         .foregroundStyle(.white.opacity(0.7))
                 }
 
-                // Replay and Close buttons
                 HStack(spacing: 16) {
                     Button(action: { handlePlayAgainTap() }) {
                         Group {
@@ -76,7 +72,6 @@ struct EndGame: View {
             .padding(.vertical, 22)
             .glassBackgroundEffect(in: RoundedRectangle(cornerRadius: 32, style: .continuous))
         }
-        // Save once per appearance (no UI tick, just logs)
         .task {
             guard !hasSavedSession else { return }
             hasSavedSession = true
@@ -90,12 +85,10 @@ struct EndGame: View {
             } catch {
                 print("❌ Firestore save failed:", error.localizedDescription)
             }
-            // update local history
             appModel.finalizeCurrentSession()
         }
     }
 
-    // MARK: - Replay logic
     private func handlePlayAgainTap() {
         if appModel.isBalloonGame {
             guard appModel.cachedBalloonContact != nil else {
@@ -128,11 +121,9 @@ struct EndGame: View {
             restartCountdown = nil
 
             if isBalloon {
-                // Reset session for balloon game
                 appModel.startBalloonSession()
                 _ = await openImmersiveSpace(id: Module.bubbleSpace.name)
             } else {
-                // Reset session for memory game
                 appModel.startMemorySession()
                 _ = await openImmersiveSpace(id: Module.memorySpace.name)
             }

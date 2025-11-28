@@ -7,10 +7,8 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil
     ) -> Bool {
 
-        // Configure Firebase
         FirebaseApp.configure()
 
-        // Debug print so we know which Firebase project we are using
         if let opts = FirebaseApp.app()?.options {
             print("🔥 Firebase debug:")
             print("  ProjectID:", opts.projectID ?? "nil")
